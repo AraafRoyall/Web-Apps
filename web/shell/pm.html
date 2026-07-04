@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Package Comparator</title>
+
+<style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+
+body{
+margin:0;
+padding:14px;
+background:#eefcf8;
+color:#18463d;
+}
+
+.card{
+max-width:900px;
+margin:auto;
+background:#fff;
+border:2px solid #9be7d3;
+border-radius:18px;
+padding:16px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+h2{
+margin:0 0 15px;
+text-align:center;
+color:#15926d;
+}
+
+label{
+display:block;
+margin:14px 0 6px;
+font-weight:700;
+}
+
+input{
+width:100%;
+padding:12px;
+border:2px solid #b8eee0;
+border-radius:12px;
+background:#f8fffd;
+outline:none;
+font-size:15px;
+}
+
+textarea{
+width:100%;
+height:190px;
+resize:vertical;
+padding:12px;
+border:2px solid #b8eee0;
+border-radius:12px;
+background:#f8fffd;
+font-size:14px;
+outline:none;
+}
+
+textarea:focus,input:focus{
+border-color:#2cc39b;
+}
+
+.toolbar{
+display:flex;
+gap:8px;
+margin-bottom:8px;
+flex-wrap:wrap;
+}
+
+.toolbar button{
+flex:1;
+min-width:110px;
+}
+
+button{
+padding:13px;
+border:none;
+border-radius:12px;
+background:#29b88f;
+color:#fff;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{
+background:#1ea57f;
+}
+
+.main{
+width:100%;
+margin-top:16px;
+}
+
+.info{
+margin:16px 0 8px;
+font-weight:700;
+color:#15926d;
+}
+
+pre{
+margin:0;
+padding:12px;
+border:2px solid #b8eee0;
+border-radius:12px;
+background:#f8fffd;
+white-space:pre-wrap;
+word-break:break-word;
+min-height:150px;
+max-height:420px;
+overflow:auto;
+}
+
+#copyResult{
+width:100%;
+margin-top:12px;
+}
+
+#toast{
+position:fixed;
+left:50%;
+bottom:22px;
+transform:translateX(-50%);
+background:#15926d;
+color:#fff;
+padding:10px 18px;
+border-radius:30px;
+font-weight:700;
+opacity:0;
+transition:.25s;
+pointer-events:none;
+box-shadow:0 5px 15px rgba(0,0,0,.25);
+}
+
+@media(max-width:600px){
+body{padding:10px;}
+textarea{height:170px;}
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+<h2>📦 Package Comparator</h2>
+
+<label>User ID</label>
+<input id="uid" value="10" placeholder="User ID">
+
+<label>Quick Commands</label>
+
+<div class="toolbar">
+<button onclick="copyCmd(1)">📋 Copy -u</button>
+<button onclick="copyCmd(2)">📋 Copy Installed</button>
+<button onclick="copyCmd(3)">📋 Copy Both</button>
+</div>
+
+<label>All Packages (-u)</label>
+
+<div class="toolbar">
+<button onclick="pasteTo('all')">📋 Paste</button>
+<button onclick="clearBox('all')">🗑 Clear</button>
+</div>
+
+<textarea id="all" placeholder="Paste:
+cmd package list packages -u --user X"></textarea>
+
+<label>Installed Packages</label>
+
+<div class="toolbar">
+<button onclick="pasteTo('installed')">📋 Paste</button>
+<button onclick="clearBox('installed')">🗑 Clear</button>
+</div>
+
+<textarea id="installed" placeholder="Paste:
+cmd package list packages --user X"></textarea>
+
+<button class="main" onclick="compareLists()">🔍 Compare Lists</button>
+
+<div class="info" id="count">
+Difference: 0 packages
+</div>
+
+<pre id="result"></pre>
+
+<button id="copyResult" onclick="copyResult()">📄 Copy Result</button>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+function toast(msg){
+let t=document.getElementById("toast");
+t.textContent=msg;
+t.style.opacity="1";
+clearTimeout(window.toastTimer);
+window.toastTimer=setTimeout(()=>t.style.opacity="0",1800);
+}
+
+async function copy(text){
+try{
+await navigator.clipboard.writeText(text);
+toast("✅ Copied");
+}catch(e){
+toast("Clipboard unavailable");
+}
+}
+
+function getUser(){
+let u=document.getElementById("uid").value.trim();
+return u==""?"10":u;
+}
+
+function copyCmd(type){
+
+let u=getUser();
+
+let a="cmd package list packages -u --user "+u;
+let b="cmd package list packages --user "+u;
+
+if(type==1) copy(a);
+else if(type==2) copy(b);
+else copy(a+"\n\n"+b);
+
+}
+
+async function pasteTo(id){
+try{
+document.getElementById(id).value=await navigator.clipboard.readText();
+toast("📋 Pasted");
+}catch(e){
+toast("Clipboard permission denied");
+}
+}
+
+function clearBox(id){
+document.getElementById(id).value="";
+toast("🗑 Cleared");
+}
+
+async function copyResult(){
+
+let txt=document.getElementById("result").textContent;
+
+if(txt.trim()==""){
+toast("Nothing to copy");
+return;
+}
+
+copy(txt);
+
+}
+
+function clean(text){
+
+let i=text.indexOf("package:");
+
+if(i>=0)
+text=text.substring(i);
+
+let arr=[];
+
+text.split(/\r?\n/).forEach(line=>{
+
+line=line.trim();
+
+if(line.startsWith("package:"))
+arr.push(line.substring(8));
+
+});
+
+return arr;
+
+}
+
+function compareLists(){
+
+let all=clean(document.getElementById("all").value);
+let installed=new Set(clean(document.getElementById("installed").value));
+
+let diff=[];
+
+for(let p of all)
+if(!installed.has(p))
+diff.push(p);
+
+document.getElementById("count").textContent="Difference: "+diff.length+" package"+(diff.length==1?"":"s");
+
+document.getElementById("result").textContent=diff.join("\n");
+
+toast("✨ Comparison completed");
+
+}
+
+</script>
+
+</body>
+</html>
