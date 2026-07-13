@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Secure ECIES3</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:system-ui,-apple-system,sans-serif;
+}
+
+body{
+
+background:#F3FFFB;
+color:#16312C;
+padding:18px;
+
+}
+
+.container{
+
+max-width:620px;
+margin:auto;
+
+}
+
+.header{
+
+text-align:center;
+margin-bottom:20px;
+
+}
+
+.header h1{
+
+font-size:28px;
+color:#0F766E;
+
+}
+
+.header p{
+
+margin-top:6px;
+font-size:14px;
+color:#5F7C77;
+
+}
+
+.card{
+
+background:#FFFFFF;
+border-radius:18px;
+padding:18px;
+margin-bottom:18px;
+box-shadow:0 8px 20px rgba(0,0,0,.06);
+
+}
+
+.card h2{
+
+font-size:20px;
+color:#0F766E;
+margin-bottom:15px;
+
+}
+
+.row{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:6px;
+
+}
+
+.row span{
+
+font-weight:600;
+
+}
+
+.action{
+
+background:none;
+border:none;
+color:#0D9488;
+font-weight:700;
+cursor:pointer;
+
+}
+
+textarea{
+
+width:100%;
+height:90px;
+resize:vertical;
+
+padding:12px;
+
+border-radius:12px;
+
+border:1px solid #CFF7EC;
+
+background:#F8FFFD;
+
+font-size:14px;
+
+outline:none;
+
+margin-bottom:14px;
+
+}
+
+textarea:focus{
+
+border-color:#14B8A6;
+
+}
+
+.primary{
+
+width:100%;
+
+height:48px;
+
+border:none;
+
+border-radius:14px;
+
+background:#14B8A6;
+
+color:white;
+
+font-size:16px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.primary:active{
+
+transform:scale(.98);
+
+}
+
+.secondary{
+
+background:#10B981;
+
+}
+
+.footer{
+
+text-align:center;
+
+font-size:13px;
+
+color:#78908B;
+
+padding:15px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h1>🔐 Secure ECIES3</h1>
+
+<p>Compatible with Java SecureECIES3</p>
+
+</div>
+
+<!-- Keys -->
+
+<div class="card">
+
+<h2>🔑 Generate Keys</h2>
+
+<div class="row">
+
+<span>Public Key</span>
+
+<button id="copyPublic" class="action">📋 Copy</button>
+
+</div>
+
+<textarea
+id="publicKey"
+readonly
+placeholder="Public key will appear here..."></textarea>
+
+<div class="row">
+
+<span>Private Key</span>
+
+<button id="copyPrivate" class="action">📋 Copy</button>
+
+</div>
+
+<textarea
+id="privateKey"
+readonly
+placeholder="Private key will appear here..."></textarea>
+
+<button
+id="generate"
+class="primary">
+
+Generate New Key Pair
+
+</button>
+
+</div>
+
+<!-- Encrypt -->
+
+<div class="card">
+
+<h2>🔒 Encrypt</h2>
+
+<div class="row">
+
+<span>Recipient Public Key</span>
+
+<button id="pastePublic" class="action">📥 Paste</button>
+
+</div>
+
+<textarea
+id="encPublic"
+placeholder="Paste recipient public key..."></textarea>
+
+<div class="row">
+
+<span>Message</span>
+
+<button id="clearPlain" class="action">🗑 Clear</button>
+
+</div>
+
+<textarea
+id="plainText"
+placeholder="Enter message..."></textarea>
+
+<button
+id="encrypt"
+class="primary secondary">
+
+Encrypt
+
+</button>
+
+<br><br>
+
+<div class="row">
+
+<span>Cipher Text</span>
+
+<button id="copyCipher" class="action">📋 Copy</button>
+
+</div>
+
+<textarea
+id="cipherText"
+readonly
+placeholder="Encrypted text..."></textarea>
+
+</div>
+
+<!-- Decrypt -->
+
+<div class="card">
+
+<h2>🔓 Decrypt</h2>
+
+<div class="row">
+
+<span>Private Key</span>
+
+<button id="pastePrivate" class="action">📥 Paste</button>
+
+</div>
+
+<textarea
+id="decPrivate"
+placeholder="Paste private key..."></textarea>
+
+<div class="row">
+
+<span>Cipher Text</span>
+
+<button id="pasteCipher" class="action">📥 Paste</button>
+
+</div>
+
+<textarea
+id="decCipher"
+placeholder="Paste cipher text..."></textarea>
+
+<button
+id="decrypt"
+class="primary">
+
+Decrypt
+
+</button>
+
+<br><br>
+
+<div class="row">
+
+<span>Plain Text</span>
+
+<button id="copyResult" class="action">📋 Copy</button>
+
+</div>
+
+<textarea
+id="result"
+readonly
+placeholder="Decrypted message..."></textarea>
+
+</div>
+
+<div class="footer">
+
+Runs completely in your browser.<br>
+Compatible with SecureECIES3 Java.
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>
