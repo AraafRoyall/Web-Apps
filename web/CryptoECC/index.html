@@ -1,355 +1,608 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#f4fffb" />
 <title>Secure ECIES3</title>
-
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:system-ui,-apple-system,sans-serif;
-}
-
-body{
-
-background:#F3FFFB;
-color:#16312C;
-padding:18px;
-
-}
-
-.container{
-
-max-width:620px;
-margin:auto;
-
-}
-
-.header{
-
-text-align:center;
-margin-bottom:20px;
-
-}
-
-.header h1{
-
-font-size:28px;
-color:#0F766E;
-
-}
-
-.header p{
-
-margin-top:6px;
-font-size:14px;
-color:#5F7C77;
-
-}
-
-.card{
-
-background:#FFFFFF;
-border-radius:18px;
-padding:18px;
-margin-bottom:18px;
-box-shadow:0 8px 20px rgba(0,0,0,.06);
-
-}
-
-.card h2{
-
-font-size:20px;
-color:#0F766E;
-margin-bottom:15px;
-
-}
-
-.row{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:6px;
-
-}
-
-.row span{
-
-font-weight:600;
-
-}
-
-.action{
-
-background:none;
-border:none;
-color:#0D9488;
-font-weight:700;
-cursor:pointer;
-
-}
-
-textarea{
-
-width:100%;
-height:90px;
-resize:vertical;
-
-padding:12px;
-
-border-radius:12px;
-
-border:1px solid #CFF7EC;
-
-background:#F8FFFD;
-
-font-size:14px;
-
-outline:none;
-
-margin-bottom:14px;
-
-}
-
-textarea:focus{
-
-border-color:#14B8A6;
-
-}
-
-.primary{
-
-width:100%;
-
-height:48px;
-
-border:none;
-
-border-radius:14px;
-
-background:#14B8A6;
-
-color:white;
-
-font-size:16px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-transition:.2s;
-
-}
-
-.primary:active{
-
-transform:scale(.98);
-
-}
-
-.secondary{
-
-background:#10B981;
-
-}
-
-.footer{
-
-text-align:center;
-
-font-size:13px;
-
-color:#78908B;
-
-padding:15px;
-
-}
-
+  :root{
+    --bg:#f4fffb;
+    --card:#ffffff;
+    --text:#12322c;
+    --muted:#5d7b76;
+    --line:#d8f4eb;
+    --teal:#14b8a6;
+    --teal2:#0f766e;
+    --green:#10b981;
+    --mint:#eafff8;
+    --shadow:0 12px 30px rgba(17, 94, 89, .08);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,#f8fffd 0,#f4fffb 35%,#eefdf9 100%);
+    color:var(--text);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:16px 14px 28px}
+  .top{
+    background:rgba(255,255,255,.82);
+    border:1px solid rgba(20,184,166,.10);
+    box-shadow:var(--shadow);
+    border-radius:22px;
+    padding:16px 16px 14px;
+    backdrop-filter: blur(10px);
+    margin-bottom:14px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:46px;height:46px;border-radius:16px;display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(20,184,166,.14),rgba(16,185,129,.14));
+    border:1px solid rgba(20,184,166,.16);
+    font-size:22px
+  }
+  h1{margin:0;font-size:19px;line-height:1.2;color:var(--teal2)}
+  .sub{margin-top:4px;color:var(--muted);font-size:12.5px;line-height:1.45}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    padding:7px 10px;border-radius:999px;background:var(--mint);border:1px solid var(--line);
+    color:#13665f;font-size:12px;font-weight:700
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-top:14px
+  }
+  .card-hd{
+    display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+    padding:15px 15px 10px
+  }
+  .card-hd h2{margin:0;font-size:17px;color:var(--teal2)}
+  .hint{margin-top:4px;font-size:12.5px;color:var(--muted);line-height:1.45}
+  .badge{
+    font-size:11px;font-weight:800;color:#0f766e;background:#e7fffb;border:1px solid #cbf5ee;
+    padding:6px 9px;border-radius:999px;white-space:nowrap
+  }
+  .section{padding:0 15px 15px}
+  .field{margin-top:12px}
+  .field-head{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px
+  }
+  .field-head strong{font-size:13px;color:#224842}
+  .small{font-size:11px;color:var(--muted)}
+  .mini-actions{display:flex;gap:8px;flex-wrap:wrap}
+  button{
+    font:inherit;cursor:pointer;border:none;outline:none
+  }
+  .btn{
+    border-radius:14px;padding:12px 14px;font-weight:800;transition:.18s transform,.18s opacity,.18s box-shadow;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px
+  }
+  .btn:active{transform:scale(.985)}
+  .btn-main{
+    width:100%;background:linear-gradient(135deg,var(--teal),var(--green));color:white;
+    box-shadow:0 12px 24px rgba(20,184,166,.18)
+  }
+  .btn-dark{background:#f1fffb;color:#0f766e;border:1px solid #d3f3eb}
+  .btn-ghost{background:transparent;color:#0f766e;border:1px solid #d9f6ef}
+  .btn-copy{
+    padding:7px 10px;border-radius:999px;background:#f1fffb;color:#0f766e;border:1px solid #d3f3eb;
+    font-size:12px;font-weight:800
+  }
+  textarea{
+    width:100%;min-height:92px;resize:vertical;
+    border-radius:16px;border:1px solid #d6f2ea;background:#fbfffe;color:var(--text);
+    padding:13px 13px;font-size:14px;line-height:1.5;outline:none
+  }
+  textarea:focus{border-color:#8be4d6;box-shadow:0 0 0 4px rgba(20,184,166,.10)}
+  textarea[readonly]{background:#f9fffd}
+  .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+  .status{
+    margin-top:12px;padding:11px 12px;border-radius:14px;border:1px solid #d8f4eb;background:#f7fffd;
+    font-size:13px;line-height:1.45;color:#25514a
+  }
+  .status.good{border-color:#cbf0df;background:#f0fff8;color:#156b44}
+  .status.bad{border-color:#ffd6d6;background:#fff7f7;color:#a94442}
+  .footer{padding:14px 3px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+  @media (min-width: 680px){
+    .wrap{padding:20px 18px 32px}
+    .actions{grid-template-columns:repeat(3,1fr)}
+    .top{padding:18px 18px 16px}
+  }
 </style>
-
 </head>
-
 <body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="logo">🔐</div>
+      <div>
+        <h1>Secure ECIES3</h1>
+        <div class="sub">Mint-white mobile screen with teal / green styling. Copy, paste, encrypt, decrypt, and key generation in one page.</div>
+      </div>
+    </div>
+    <div class="chips">
+      <div class="chip">X25519</div>
+      <div class="chip">AES-GCM</div>
+      <div class="chip">Base64URL</div>
+      <div class="chip">ECI4 v2</div>
+    </div>
+  </div>
 
-<div class="container">
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <h2>🔑 Generate Keys</h2>
+        <div class="hint">Create a raw X25519 key pair compatible with your Java class.</div>
+      </div>
+      <div class="badge" id="supportBadge">Checking…</div>
+    </div>
+    <div class="section">
+      <div class="field">
+        <div class="field-head">
+          <strong>Public Key</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="copyPublic">📋 Copy</button>
+            <button class="btn-copy" id="pastePublicToEnc">📥 Use in Encrypt</button>
+          </div>
+        </div>
+        <textarea id="publicKey" readonly placeholder="Public key appears here..."></textarea>
+      </div>
 
-<div class="header">
+      <div class="field">
+        <div class="field-head">
+          <strong>Private Key</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="togglePrivate">👁 Show</button>
+            <button class="btn-copy" id="copyPrivate">📋 Copy</button>
+          </div>
+        </div>
+        <textarea id="privateKey" readonly placeholder="Private key appears here..."></textarea>
+      </div>
 
-<h1>🔐 Secure ECIES3</h1>
+      <div class="actions">
+        <button class="btn btn-main" id="generate">✨ Generate New Keys</button>
+        <button class="btn btn-dark" id="downloadKeys">💾 Download Keys</button>
+        <button class="btn btn-ghost" id="clearKeys">🧹 Clear Keys</button>
+      </div>
+      <div class="status" id="keyStatus">Ready.</div>
+    </div>
+  </div>
 
-<p>Compatible with Java SecureECIES3</p>
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <h2>🔒 Encrypt</h2>
+        <div class="hint">Paste the recipient public key, write your message, and encrypt.</div>
+      </div>
+      <div class="badge">ECI4 v2</div>
+    </div>
+    <div class="section">
+      <div class="field">
+        <div class="field-head">
+          <strong>Recipient Public Key</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="pasteEncPub">📥 Paste</button>
+          </div>
+        </div>
+        <textarea id="encPublic" placeholder="Paste recipient public key..."></textarea>
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <strong>Message</strong>
+          <div class="small"><span id="plainCount">0</span> chars</div>
+        </div>
+        <textarea id="plainText" placeholder="Type message to encrypt..."></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-main" id="encrypt">🔒 Encrypt</button>
+        <button class="btn btn-dark" id="copyCipher">📋 Copy Cipher</button>
+        <button class="btn btn-ghost" id="clearEncrypt">🧹 Clear</button>
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <strong>Cipher Text</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="pasteCipherToDec">📥 Use in Decrypt</button>
+          </div>
+        </div>
+        <textarea id="cipherText" readonly placeholder="Encrypted data appears here..."></textarea>
+      </div>
+      <div class="status" id="encStatus">Ready for encryption.</div>
+    </div>
+  </div>
 
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <h2>🔓 Decrypt</h2>
+        <div class="hint">Paste your private key and the cipher text to recover the message.</div>
+      </div>
+      <div class="badge">v2 / legacy v1</div>
+    </div>
+    <div class="section">
+      <div class="field">
+        <div class="field-head">
+          <strong>Private Key</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="pasteDecPriv">📥 Paste</button>
+          </div>
+        </div>
+        <textarea id="decPrivate" placeholder="Paste private key..."></textarea>
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <strong>Cipher Text</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="pasteDecCipher">📥 Paste</button>
+          </div>
+        </div>
+        <textarea id="decCipher" placeholder="Paste cipher text..."></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-main" id="decrypt">🔓 Decrypt</button>
+        <button class="btn btn-dark" id="copyPlain">📋 Copy Result</button>
+        <button class="btn btn-ghost" id="clearDecrypt">🧹 Clear</button>
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <strong>Plain Text</strong>
+          <div class="small">Result</div>
+        </div>
+        <textarea id="plainOut" readonly placeholder="Decrypted text appears here..."></textarea>
+      </div>
+      <div class="status" id="decStatus">Ready for decryption.</div>
+    </div>
+  </div>
+
+  <div class="footer">Everything stays in the browser. Upload this file to GitHub Pages as <b>index.html</b>.</div>
 </div>
 
-<!-- Keys -->
-
-<div class="card">
-
-<h2>🔑 Generate Keys</h2>
-
-<div class="row">
-
-<span>Public Key</span>
-
-<button id="copyPublic" class="action">📋 Copy</button>
-
-</div>
-
-<textarea
-id="publicKey"
-readonly
-placeholder="Public key will appear here..."></textarea>
-
-<div class="row">
-
-<span>Private Key</span>
-
-<button id="copyPrivate" class="action">📋 Copy</button>
-
-</div>
-
-<textarea
-id="privateKey"
-readonly
-placeholder="Private key will appear here..."></textarea>
-
-<button
-id="generate"
-class="primary">
-
-Generate New Key Pair
-
-</button>
-
-</div>
-
-<!-- Encrypt -->
-
-<div class="card">
-
-<h2>🔒 Encrypt</h2>
-
-<div class="row">
-
-<span>Recipient Public Key</span>
-
-<button id="pastePublic" class="action">📥 Paste</button>
-
-</div>
-
-<textarea
-id="encPublic"
-placeholder="Paste recipient public key..."></textarea>
-
-<div class="row">
-
-<span>Message</span>
-
-<button id="clearPlain" class="action">🗑 Clear</button>
-
-</div>
-
-<textarea
-id="plainText"
-placeholder="Enter message..."></textarea>
-
-<button
-id="encrypt"
-class="primary secondary">
-
-Encrypt
-
-</button>
-
-<br><br>
-
-<div class="row">
-
-<span>Cipher Text</span>
-
-<button id="copyCipher" class="action">📋 Copy</button>
-
-</div>
-
-<textarea
-id="cipherText"
-readonly
-placeholder="Encrypted text..."></textarea>
-
-</div>
-
-<!-- Decrypt -->
-
-<div class="card">
-
-<h2>🔓 Decrypt</h2>
-
-<div class="row">
-
-<span>Private Key</span>
-
-<button id="pastePrivate" class="action">📥 Paste</button>
-
-</div>
-
-<textarea
-id="decPrivate"
-placeholder="Paste private key..."></textarea>
-
-<div class="row">
-
-<span>Cipher Text</span>
-
-<button id="pasteCipher" class="action">📥 Paste</button>
-
-</div>
-
-<textarea
-id="decCipher"
-placeholder="Paste cipher text..."></textarea>
-
-<button
-id="decrypt"
-class="primary">
-
-Decrypt
-
-</button>
-
-<br><br>
-
-<div class="row">
-
-<span>Plain Text</span>
-
-<button id="copyResult" class="action">📋 Copy</button>
-
-</div>
-
-<textarea
-id="result"
-readonly
-placeholder="Decrypted message..."></textarea>
-
-</div>
-
-<div class="footer">
-
-Runs completely in your browser.<br>
-Compatible with SecureECIES3 Java.
-
-</div>
-
-<script src="app.js"></script>
-
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const te = new TextEncoder();
+  const td = new TextDecoder();
+  const subtle = crypto.subtle;
+  const RAW_LEN = 32;
+  const IV_LEN = 12;
+  const VERSION = 2;
+  const MAGIC = new Uint8Array([69, 67, 73, 52]); // ECI4
+  const AAD = te.encode('ECIES');
+  const KDF_INFO = te.encode('ECIES-X25519-AESGCM');
+  const ZERO_SALT = new Uint8Array(32);
+
+  let privVisible = false;
+
+  const setStatus = (el, msg, kind='') => {
+    el.className = 'status' + (kind ? ' ' + kind : '');
+    el.textContent = msg;
+  };
+
+  const bytesToB64Url = bytes => {
+    let s = '';
+    for (const b of bytes) s += String.fromCharCode(b);
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  };
+
+  const b64UrlToBytes = str => {
+    str = String(str || '').trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    const bin = atob(str);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  };
+
+  const concat = (...parts) => {
+    let len = 0;
+    for (const p of parts) len += p.length;
+    const out = new Uint8Array(len);
+    let o = 0;
+    for (const p of parts) { out.set(p, o); o += p.length; }
+    return out;
+  };
+
+  const encodeLen = len => {
+    if (len < 128) return new Uint8Array([len]);
+    const tmp = [];
+    while (len > 0) { tmp.unshift(len & 255); len >>= 8; }
+    return new Uint8Array([0x80 | tmp.length, ...tmp]);
+  };
+
+  const derTag = (tag, content) => concat(new Uint8Array([tag]), encodeLen(content.length), content);
+  const derSeq = (...items) => derTag(0x30, concat(...items));
+  const derInt = n => derTag(0x02, new Uint8Array([n]));
+  const derOid = bytes => derTag(0x06, bytes);
+  const derBitString = bytes => derTag(0x03, concat(new Uint8Array([0x00]), bytes));
+  const derOctet = bytes => derTag(0x04, bytes);
+  const OID_X25519 = new Uint8Array([0x2b, 0x65, 0x6e]);
+
+  const spkiFromRaw = rawPub => derSeq(derSeq(derOid(OID_X25519)), derBitString(rawPub));
+  const pkcs8FromRaw = rawPriv => derSeq(derInt(0), derSeq(derOid(OID_X25519)), derOctet(derOctet(rawPriv)));
+
+  const readDerLen = (buf, offset) => {
+    const first = buf[offset];
+    if (first < 0x80) return { len: first, next: offset + 1 };
+    const count = first & 0x7f;
+    let len = 0;
+    for (let i = 0; i < count; i++) len = (len << 8) | buf[offset + 1 + i];
+    return { len, next: offset + 1 + count };
+  };
+
+  const readDer = (buf, offset) => {
+    const tag = buf[offset];
+    const { len, next } = readDerLen(buf, offset + 1);
+    return { tag, start: next, end: next + len, next: next + len };
+  };
+
+  const extractRawFromSpki = spki => {
+    const seq = readDer(spki, 0); if (seq.tag !== 0x30) throw new Error('Bad public key');
+    const alg = readDer(spki, seq.start); if (alg.tag !== 0x30) throw new Error('Bad public key');
+    const bit = readDer(spki, alg.next); if (bit.tag !== 0x03) throw new Error('Bad public key');
+    if (spki[bit.start] !== 0x00) throw new Error('Bad public key');
+    const raw = spki.slice(bit.start + 1, bit.end);
+    if (raw.length !== RAW_LEN) throw new Error('Bad public key length');
+    return raw;
+  };
+
+  const extractRawFromPkcs8 = pkcs8 => {
+    const seq = readDer(pkcs8, 0); if (seq.tag !== 0x30) throw new Error('Bad private key');
+    const ver = readDer(pkcs8, seq.start); if (ver.tag !== 0x02) throw new Error('Bad private key');
+    const alg = readDer(pkcs8, ver.next); if (alg.tag !== 0x30) throw new Error('Bad private key');
+    const key = readDer(pkcs8, alg.next); if (key.tag !== 0x04) throw new Error('Bad private key');
+    const inner = pkcs8.slice(key.start, key.end);
+    const oct = readDer(inner, 0); if (oct.tag !== 0x04) throw new Error('Bad private key');
+    const raw = inner.slice(oct.start, oct.end);
+    if (raw.length !== RAW_LEN) throw new Error('Bad private key length');
+    return raw;
+  };
+
+  const importPublicRaw = async rawPub => {
+    const key = await subtle.importKey('spki', spkiFromRaw(rawPub), { name: 'X25519' }, false, []);
+    return key;
+  };
+
+  const importPrivateRaw = async rawPriv => {
+    const key = await subtle.importKey('pkcs8', pkcs8FromRaw(rawPriv), { name: 'X25519' }, false, ['deriveBits']);
+    return key;
+  };
+
+  const exportPublicRaw = async key => {
+    const spki = new Uint8Array(await subtle.exportKey('spki', key));
+    return extractRawFromSpki(spki);
+  };
+
+  const exportPrivateRaw = async key => {
+    const pkcs8 = new Uint8Array(await subtle.exportKey('pkcs8', key));
+    return extractRawFromPkcs8(pkcs8);
+  };
+
+  const hmacSha256 = async (keyBytes, dataBytes) => {
+    const key = await subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    return new Uint8Array(await subtle.sign('HMAC', key, dataBytes));
+  };
+
+  const hkdfLike = async shared => {
+    const prk = await hmacSha256(ZERO_SALT, shared);
+    const okm = await hmacSha256(prk, KDF_INFO);
+    return okm.slice(0, 32);
+  };
+
+  const aesEncrypt = async (plainBytes, aesKey, iv) => {
+    const key = await subtle.importKey('raw', aesKey, { name: 'AES-GCM' }, false, ['encrypt']);
+    return new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD, tagLength: 128 }, key, plainBytes));
+  };
+
+  const aesDecrypt = async (cipherBytes, aesKey, iv) => {
+    const key = await subtle.importKey('raw', aesKey, { name: 'AES-GCM' }, false, ['decrypt']);
+    return new Uint8Array(await subtle.decrypt({ name: 'AES-GCM', iv, additionalData: AAD, tagLength: 128 }, key, cipherBytes));
+  };
+
+  const generateKeyPair = async () => {
+    const kp = await subtle.generateKey({ name: 'X25519' }, true, ['deriveBits']);
+    const pub = await exportPublicRaw(kp.publicKey);
+    const priv = await exportPrivateRaw(kp.privateKey);
+    return { pub, priv };
+  };
+
+  const encryptCompatible = async (plainText, recipientPubB64) => {
+    const recipientRaw = b64UrlToBytes(recipientPubB64);
+    if (recipientRaw.length !== RAW_LEN) throw new Error('Public key must be 32 bytes');
+    const recipientKey = await importPublicRaw(recipientRaw);
+    const eph = await subtle.generateKey({ name: 'X25519' }, true, ['deriveBits']);
+    const ephPubRaw = await exportPublicRaw(eph.publicKey);
+    const shared = new Uint8Array(await subtle.deriveBits({ name: 'X25519', public: recipientKey }, eph.privateKey, 256));
+    const aesKey = await hkdfLike(shared);
+    const iv = crypto.getRandomValues(new Uint8Array(IV_LEN));
+    const enc = await aesEncrypt(te.encode(plainText || ''), aesKey, iv);
+    return bytesToB64Url(concat(MAGIC, new Uint8Array([VERSION]), ephPubRaw, iv, enc));
+  };
+
+  const decryptCompatible = async (cipherB64, privateB64) => {
+    const all = b64UrlToBytes(cipherB64);
+    const privRaw = b64UrlToBytes(privateB64);
+    if (privRaw.length !== RAW_LEN) throw new Error('Private key must be 32 bytes');
+    let ephRaw, iv, enc;
+    if (all.length >= 4 + 1 + 32 + 12 + 16 && all[0] === 69 && all[1] === 67 && all[2] === 73 && all[3] === 52) {
+      if (all[4] !== VERSION) throw new Error('Bad version');
+      ephRaw = all.slice(5, 37);
+      iv = all.slice(37, 49);
+      enc = all.slice(49);
+    } else {
+      if (all.length < 61 || all[0] !== 1) throw new Error('Invalid legacy payload');
+      ephRaw = all.slice(1, 33);
+      iv = all.slice(33, 45);
+      enc = all.slice(45);
+    }
+    if (ephRaw.length !== RAW_LEN || iv.length !== IV_LEN || enc.length < 16) throw new Error('Invalid payload');
+    const ephKey = await importPublicRaw(ephRaw);
+    const privKey = await importPrivateRaw(privRaw);
+    const shared = new Uint8Array(await subtle.deriveBits({ name: 'X25519', public: ephKey }, privKey, 256));
+    const aesKey = await hkdfLike(shared);
+    const plain = await aesDecrypt(enc, aesKey, iv);
+    return td.decode(plain);
+  };
+
+  const copyText = async txt => {
+    if (!txt) throw new Error('Nothing to copy');
+    await navigator.clipboard.writeText(txt);
+  };
+
+  const pasteText = async id => {
+    const txt = await navigator.clipboard.readText();
+    $(id).value = txt || '';
+    $(id).dispatchEvent(new Event('input'));
+  };
+
+  const updatePrivateBox = () => {
+    const box = $('privateKey');
+    if (!box.value) return;
+    box.value = privVisible ? box.dataset.raw || '' : '••••••••••••••••••••••••••••••••••••••••';
+    $('togglePrivate').textContent = privVisible ? '🙈 Hide' : '👁 Show';
+  };
+
+  const setKeys = (pub, priv) => {
+    $('publicKey').value = pub || '';
+    $('privateKey').dataset.raw = priv || '';
+    $('privateKey').value = privVisible ? (priv || '') : (priv ? '••••••••••••••••••••••••••••••••••••••••' : '');
+    $('keyStatus').textContent = pub && priv ? 'Key pair generated.' : 'Ready.';
+    $('togglePrivate').textContent = privVisible ? '🙈 Hide' : '👁 Show';
+  };
+
+  const fillEncryptPublic = () => {
+    $('encPublic').value = $('publicKey').value || '';
+    $('encPublic').dispatchEvent(new Event('input'));
+    $('encStatus').textContent = 'Public key moved into Encrypt.';
+  };
+
+  const fillDecryptCipher = () => {
+    $('decCipher').value = $('cipherText').value || '';
+    $('decStatus').textContent = 'Cipher moved into Decrypt.';
+  };
+
+  $('plainText').addEventListener('input', () => {
+    $('plainCount').textContent = $('plainText').value.length;
+  });
+
+  $('generate').onclick = async () => {
+    try {
+      $('generate').textContent = '✨ Generating…';
+      const kp = await generateKeyPair();
+      setKeys(bytesToB64Url(kp.pub), bytesToB64Url(kp.priv));
+      setStatus($('keyStatus'), 'Key pair generated successfully.', 'good');
+    } catch (e) {
+      setStatus($('keyStatus'), e.message || String(e), 'bad');
+    } finally {
+      $('generate').textContent = '✨ Generate New Keys';
+    }
+  };
+
+  $('encrypt').onclick = async () => {
+    try {
+      $('encrypt').textContent = '🔒 Encrypting…';
+      const out = await encryptCompatible($('plainText').value, $('encPublic').value);
+      $('cipherText').value = out;
+      setStatus($('encStatus'), 'Encryption complete.', 'good');
+    } catch (e) {
+      setStatus($('encStatus'), e.message || String(e), 'bad');
+    } finally {
+      $('encrypt').textContent = '🔒 Encrypt';
+    }
+  };
+
+  $('decrypt').onclick = async () => {
+    try {
+      $('decrypt').textContent = '🔓 Decrypting…';
+      const out = await decryptCompatible($('decCipher').value, $('decPrivate').value);
+      $('plainOut').value = out;
+      setStatus($('decStatus'), 'Decryption complete.', 'good');
+    } catch (e) {
+      setStatus($('decStatus'), e.message || String(e), 'bad');
+    } finally {
+      $('decrypt').textContent = '🔓 Decrypt';
+    }
+  };
+
+  $('copyPublic').onclick = async () => { try { await copyText($('publicKey').value); $('keyStatus').textContent = 'Public key copied.'; } catch (e) { alert(e.message || e); } };
+  $('copyPrivate').onclick = async () => { try { await copyText($('privateKey').dataset.raw || ''); $('keyStatus').textContent = 'Private key copied.'; } catch (e) { alert(e.message || e); } };
+  $('copyCipher').onclick = async () => { try { await copyText($('cipherText').value); $('encStatus').textContent = 'Cipher copied.'; } catch (e) { alert(e.message || e); } };
+  $('copyPlain').onclick = async () => { try { await copyText($('plainOut').value); $('decStatus').textContent = 'Plain text copied.'; } catch (e) { alert(e.message || e); } };
+
+  $('pastePublicToEnc').onclick = fillEncryptPublic;
+  $('pasteEncPub').onclick = async () => { try { await pasteText('encPublic'); } catch (e) { alert('Clipboard permission denied'); } };
+  $('pasteCipherToDec').onclick = fillDecryptCipher;
+  $('pasteDecPriv').onclick = async () => { try { await pasteText('decPrivate'); } catch (e) { alert('Clipboard permission denied'); } };
+  $('pasteDecCipher').onclick = async () => { try { await pasteText('decCipher'); } catch (e) { alert('Clipboard permission denied'); } };
+
+  $('togglePrivate').onclick = () => {
+    privVisible = !privVisible;
+    if ($('privateKey').dataset.raw) {
+      $('privateKey').value = privVisible ? $('privateKey').dataset.raw : '••••••••••••••••••••••••••••••••••••••••';
+      $('togglePrivate').textContent = privVisible ? '🙈 Hide' : '👁 Show';
+    }
+  };
+
+  $('downloadKeys').onclick = () => {
+    const content = [
+      'Secure ECIES3 Keys',
+      '',
+      'Public Key:',
+      $('publicKey').value || '',
+      '',
+      'Private Key:',
+      $('privateKey').dataset.raw || '',
+      ''
+    ].join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'secure-ecies3-keys.txt';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  $('clearKeys').onclick = () => {
+    $('publicKey').value = '';
+    $('privateKey').value = '';
+    $('privateKey').dataset.raw = '';
+    $('keyStatus').textContent = 'Keys cleared.';
+  };
+
+  $('clearEncrypt').onclick = () => {
+    $('encPublic').value = '';
+    $('plainText').value = '';
+    $('cipherText').value = '';
+    $('plainCount').textContent = '0';
+    $('encStatus').textContent = 'Ready for encryption.';
+  };
+
+  $('clearDecrypt').onclick = () => {
+    $('decPrivate').value = '';
+    $('decCipher').value = '';
+    $('plainOut').value = '';
+    $('decStatus').textContent = 'Ready for decryption.';
+  };
+
+  const markSupport = () => {
+    const ok = !!(crypto && crypto.subtle && crypto.subtle.generateKey);
+    const badge = $('supportBadge');
+    badge.textContent = ok ? 'Supported' : 'Check browser';
+    badge.style.background = ok ? '#e7fffb' : '#fff7e8';
+    badge.style.color = ok ? '#0f766e' : '#9b6b00';
+  };
+
+  markSupport();
+  // start with one generated key pair to make testing easy
+  $('generate').click();
+})();
+</script>
 </body>
-
 </html>
