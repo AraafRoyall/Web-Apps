@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#f4fffb" />
+<title>AES v1</title>
+<style>
+  :root{
+    --bg:#f4fffb;
+    --card:#ffffff;
+    --text:#12322c;
+    --muted:#5d7b76;
+    --line:#d8f4eb;
+    --teal:#14b8a6;
+    --teal2:#0f766e;
+    --green:#10b981;
+    --mint:#eafff8;
+    --shadow:0 12px 30px rgba(17, 94, 89, .08);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,#f8fffd 0,#f4fffb 35%,#eefdf9 100%);
+    color:var(--text);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:16px 14px 28px}
+  .top{
+    background:rgba(255,255,255,.82);
+    border:1px solid rgba(20,184,166,.10);
+    box-shadow:var(--shadow);
+    border-radius:22px;
+    padding:16px 16px 14px;
+    backdrop-filter: blur(10px);
+    margin-bottom:14px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:46px;height:46px;border-radius:16px;display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(20,184,166,.14),rgba(16,185,129,.14));
+    border:1px solid rgba(20,184,166,.16);
+    font-size:22px
+  }
+  h1{margin:0;font-size:19px;line-height:1.2;color:var(--teal2)}
+  .sub{margin-top:4px;color:var(--muted);font-size:12.5px;line-height:1.45}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    padding:7px 10px;border-radius:999px;background:var(--mint);border:1px solid var(--line);
+    color:#13665f;font-size:12px;font-weight:700
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-top:14px
+  }
+  .card-hd{
+    display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+    padding:15px 15px 10px
+  }
+  .card-hd h2{margin:0;font-size:17px;color:var(--teal2)}
+  .hint{margin-top:4px;font-size:12.5px;color:var(--muted);line-height:1.45}
+  .badge{
+    font-size:11px;font-weight:800;color:#0f766e;background:#e7fffb;border:1px solid #cbf5ee;
+    padding:6px 9px;border-radius:999px;white-space:nowrap
+  }
+  .section{padding:0 15px 15px}
+  .field{margin-top:12px}
+  .field-head{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px
+  }
+  .field-head strong{font-size:13px;color:#224842}
+  .small{font-size:11px;color:var(--muted)}
+  .mini-actions{display:flex;gap:8px;flex-wrap:wrap}
+  button{font:inherit;cursor:pointer;border:none;outline:none}
+  .btn{
+    border-radius:14px;padding:12px 14px;font-weight:800;transition:.18s transform,.18s opacity,.18s box-shadow;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px
+  }
+  .btn:active{transform:scale(.985)}
+  .btn-main{
+    width:100%;background:linear-gradient(135deg,var(--teal),var(--green));color:white;
+    box-shadow:0 12px 24px rgba(20,184,166,.18)
+  }
+  .btn-dark{background:#f1fffb;color:#0f766e;border:1px solid #d3f3eb}
+  .btn-ghost{background:transparent;color:#0f766e;border:1px solid #d9f6ef}
+  .btn-copy{
+    padding:7px 10px;border-radius:999px;background:#f1fffb;color:#0f766e;border:1px solid #d3f3eb;
+    font-size:12px;font-weight:800
+  }
+  textarea, input{
+    width:100%;
+    border-radius:16px;border:1px solid #d6f2ea;background:#fbfffe;color:var(--text);
+    padding:13px 13px;font-size:14px;line-height:1.5;outline:none
+  }
+  textarea{min-height:92px;resize:vertical}
+  textarea:focus,input:focus{border-color:#8be4d6;box-shadow:0 0 0 4px rgba(20,184,166,.10)}
+  textarea[readonly]{background:#f9fffd}
+  .actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+  .status{
+    margin-top:12px;padding:11px 12px;border-radius:14px;border:1px solid #d8f4eb;background:#f7fffd;
+    font-size:13px;line-height:1.45;color:#25514a
+  }
+  .status.good{border-color:#cbf0df;background:#f0fff8;color:#156b44}
+  .status.bad{border-color:#ffd6d6;background:#fff7f7;color:#a94442}
+  .footer{padding:14px 3px 0;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:#244842;user-select:none}
+  .toggle input{width:18px;height:18px;accent-color:#14b8a6}
+  @media (min-width: 680px){
+    .wrap{padding:20px 18px 32px}
+    .actions{grid-template-columns:repeat(3,1fr)}
+    .top{padding:18px 18px 16px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="logo">🔒</div>
+      <div>
+        <h1>AES v1</h1>
+        <div class="sub">Mint-white mobile screen with teal / green styling. Password based AES-GCM encrypt and decrypt with Base64URL output.</div>
+      </div>
+    </div>
+    <div class="chips">
+      <div class="chip">SHA-256 key derive</div>
+      <div class="chip">AES-GCM</div>
+      <div class="chip">Base64URL</div>
+      <div class="chip">AESv1 AAD</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <h2>🔑 Password</h2>
+        <div class="hint">Use the same password on both sides. The key is derived with SHA-256 like your Java code.</div>
+      </div>
+      <div class="badge" id="supportBadge">Checking…</div>
+    </div>
+    <div class="section">
+      <div class="field">
+        <div class="field-head">
+          <strong>Password</strong>
+          <label class="toggle"><input type="checkbox" id="showPassword"> Show</label>
+        </div>
+        <input id="password" type="password" placeholder="Enter password..." />
+      </div>
+      <div class="actions">
+        <button class="btn btn-main" id="clearPass">🧹 Clear Password</button>
+        <button class="btn btn-dark" id="copyPass">📋 Copy Password</button>
+        <button class="btn btn-ghost" id="pastePass">📥 Paste Password</button>
+      </div>
+      <div class="status" id="passStatus">Ready.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <h2>🔒 Encrypt</h2>
+        <div class="hint">Enter plain text and encrypt it with the password. Output is Base64URL.</div>
+      </div>
+      <div class="badge">Version 2</div>
+    </div>
+    <div class="section">
+      <div class="field">
+        <div class="field-head">
+          <strong>Plain Text</strong>
+          <div class="small"><span id="plainCount">0</span> chars</div>
+        </div>
+        <textarea id="plainText" placeholder="Type message to encrypt..."></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-main" id="encrypt">🔒 Encrypt</button>
+        <button class="btn btn-dark" id="copyCipher">📋 Copy Cipher</button>
+        <button class="btn btn-ghost" id="clearEncrypt">🧹 Clear</button>
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <strong>Cipher Text</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="pasteCipherToDec">📥 Use in Decrypt</button>
+          </div>
+        </div>
+        <textarea id="cipherText" readonly placeholder="Encrypted data appears here..."></textarea>
+      </div>
+      <div class="status" id="encStatus">Ready for encryption.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div>
+        <h2>🔓 Decrypt</h2>
+        <div class="hint">Paste cipher text and decrypt it with the same password.</div>
+      </div>
+      <div class="badge">AESv1 / v2</div>
+    </div>
+    <div class="section">
+      <div class="field">
+        <div class="field-head">
+          <strong>Cipher Text</strong>
+          <div class="mini-actions">
+            <button class="btn-copy" id="pasteCipher">📥 Paste</button>
+          </div>
+        </div>
+        <textarea id="decCipher" placeholder="Paste cipher text..."></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn-main" id="decrypt">🔓 Decrypt</button>
+        <button class="btn btn-dark" id="copyPlain">📋 Copy Result</button>
+        <button class="btn btn-ghost" id="clearDecrypt">🧹 Clear</button>
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <strong>Plain Text</strong>
+          <div class="small">Result</div>
+        </div>
+        <textarea id="plainOut" readonly placeholder="Decrypted text appears here..."></textarea>
+      </div>
+      <div class="status" id="decStatus">Ready for decryption.</div>
+    </div>
+  </div>
+
+  <div class="footer">Everything stays in the browser. Upload this file as <b>index.html</b> to GitHub Pages.</div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const te = new TextEncoder();
+  const td = new TextDecoder();
+  const subtle = crypto.subtle;
+  const VERSION = 2;
+  const IV_LEN = 12;
+  const MAGIC = new Uint8Array([65,83,86,49]); // "ASV1" marker for compatibility
+  const AAD = te.encode('AESv1');
+
+  const setStatus = (el, msg, kind='') => {
+    el.className = 'status' + (kind ? ' ' + kind : '');
+    el.textContent = msg;
+  };
+
+  const bytesToB64Url = bytes => {
+    let s = '';
+    for (const b of bytes) s += String.fromCharCode(b);
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  };
+
+  const b64UrlToBytes = str => {
+    str = String(str || '').trim().replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    const bin = atob(str);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  };
+
+  const concat = (...parts) => {
+    let len = 0;
+    for (const p of parts) len += p.length;
+    const out = new Uint8Array(len);
+    let o = 0;
+    for (const p of parts) { out.set(p, o); o += p.length; }
+    return out;
+  };
+
+  const deriveFast = async password => {
+    const bytes = te.encode(String(password || ''));
+    return new Uint8Array(await subtle.digest('SHA-256', bytes));
+  };
+
+  const encryptCore = async (text, password) => {
+    const iv = crypto.getRandomValues(new Uint8Array(IV_LEN));
+    const key = await deriveFast(password);
+    const ckey = await subtle.importKey('raw', key, { name: 'AES-GCM' }, false, ['encrypt']);
+    const enc = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD, tagLength: 128 }, ckey, te.encode(String(text || ''))));
+    return bytesToB64Url(concat(new Uint8Array([VERSION]), iv, enc));
+  };
+
+  const decryptCore = async (cipherB64, password) => {
+    const all = b64UrlToBytes(cipherB64);
+    if (all.length < 1 + IV_LEN + 16) throw new Error('Invalid cipher');
+    if (all[0] !== VERSION) throw new Error('Bad version');
+    const iv = all.slice(1, 1 + IV_LEN);
+    const enc = all.slice(1 + IV_LEN);
+    const key = await deriveFast(password);
+    const ckey = await subtle.importKey('raw', key, { name: 'AES-GCM' }, false, ['decrypt']);
+    const dec = new Uint8Array(await subtle.decrypt({ name: 'AES-GCM', iv, additionalData: AAD, tagLength: 128 }, ckey, enc));
+    return td.decode(dec);
+  };
+
+  const copyText = async txt => {
+    if (!txt) throw new Error('Nothing to copy');
+    await navigator.clipboard.writeText(txt);
+  };
+
+  const pasteText = async id => {
+    const txt = await navigator.clipboard.readText();
+    $(id).value = txt || '';
+    $(id).dispatchEvent(new Event('input'));
+  };
+
+  const clearSensitive = id => {
+    const el = $(id);
+    el.value = '';
+    el.blur();
+  };
+
+  $('showPassword').addEventListener('change', e => {
+    $('password').type = e.target.checked ? 'text' : 'password';
+  });
+
+  $('password').addEventListener('input', () => {
+    $('passStatus').textContent = $('password').value ? 'Password ready.' : 'Ready.';
+  });
+
+  $('plainText').addEventListener('input', () => {
+    $('plainCount').textContent = $('plainText').value.length;
+  });
+
+  $('encrypt').onclick = async () => {
+    try {
+      $('encrypt').textContent = '🔒 Encrypting…';
+      const pass = $('password').value;
+      if (!pass) throw new Error('Password required');
+      const out = await encryptCore($('plainText').value, pass);
+      $('cipherText').value = out;
+      setStatus($('encStatus'), 'Encryption complete.', 'good');
+    } catch (e) {
+      setStatus($('encStatus'), e.message || String(e), 'bad');
+    } finally {
+      $('encrypt').textContent = '🔒 Encrypt';
+    }
+  };
+
+  $('decrypt').onclick = async () => {
+    try {
+      $('decrypt').textContent = '🔓 Decrypting…';
+      const pass = $('password').value;
+      if (!pass) throw new Error('Password required');
+      const out = await decryptCore($('decCipher').value, pass);
+      $('plainOut').value = out;
+      setStatus($('decStatus'), 'Decryption complete.', 'good');
+    } catch (e) {
+      setStatus($('decStatus'), e.message || String(e), 'bad');
+    } finally {
+      $('decrypt').textContent = '🔓 Decrypt';
+    }
+  };
+
+  $('copyPass').onclick = async () => { try { await copyText($('password').value); $('passStatus').textContent = 'Password copied.'; } catch (e) { alert(e.message || e); } };
+  $('pastePass').onclick = async () => { try { await pasteText('password'); } catch (e) { alert('Clipboard permission denied'); } };
+  $('copyCipher').onclick = async () => { try { await copyText($('cipherText').value); $('encStatus').textContent = 'Cipher copied.'; } catch (e) { alert(e.message || e); } };
+  $('pasteCipher').onclick = async () => { try { await pasteText('decCipher'); } catch (e) { alert('Clipboard permission denied'); } };
+  $('pasteCipherToDec').onclick = async () => { $('decCipher').value = $('cipherText').value || ''; $('decStatus').textContent = 'Cipher moved into Decrypt.'; };
+  $('copyPlain').onclick = async () => { try { await copyText($('plainOut').value); $('decStatus').textContent = 'Plain text copied.'; } catch (e) { alert(e.message || e); } };
+
+  $('clearPass').onclick = () => {
+    clearSensitive('password');
+    $('showPassword').checked = false;
+    $('password').type = 'password';
+    $('passStatus').textContent = 'Password cleared.';
+  };
+
+  $('clearEncrypt').onclick = () => {
+    $('plainText').value = '';
+    $('cipherText').value = '';
+    $('plainCount').textContent = '0';
+    $('encStatus').textContent = 'Ready for encryption.';
+  };
+
+  $('clearDecrypt').onclick = () => {
+    $('decCipher').value = '';
+    $('plainOut').value = '';
+    $('decStatus').textContent = 'Ready for decryption.';
+  };
+
+  const markSupport = () => {
+    const ok = !!(crypto && crypto.subtle && crypto.subtle.digest && crypto.subtle.encrypt && crypto.subtle.decrypt);
+    const badge = $('supportBadge');
+    badge.textContent = ok ? 'Supported' : 'Check browser';
+    badge.style.background = ok ? '#e7fffb' : '#fff7e8';
+    badge.style.color = ok ? '#0f766e' : '#9b6b00';
+  };
+
+  markSupport();
+})();
+</script>
+</body>
+</html>
