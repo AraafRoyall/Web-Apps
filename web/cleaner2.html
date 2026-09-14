@@ -3,767 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f7fbf9">
+<meta name="theme-color" content="#f4faf7">
 <title>Cleaner Royall Script Maker</title>
 <style>
-:root{
-  --bg:#f6faf8;--surface:#fff;--surface2:#f2f8f5;--line:#dce9e3;--text:#17342a;--muted:#6f877d;
-  --green:#18a66a;--green2:#0d8a56;--teal:#0ea7a1;--danger:#dc5862;--shadow:0 8px 28px rgba(22,72,53,.08);
-  --radius:18px;
-}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-body{min-height:100vh}
-.app{max-width:900px;margin:auto;min-height:100vh;padding:14px 14px 90px}
-.screen{display:none}.screen.active{display:block}
-.topbar{display:flex;align-items:center;gap:11px;padding:8px 0 16px}
-.logo{width:45px;height:45px;border-radius:15px;background:linear-gradient(135deg,var(--green),var(--teal));display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 8px 22px rgba(14,167,161,.20)}
-.brand{flex:1;min-width:0}.brand h1{margin:0;font-size:17px;line-height:1.2}.brand p{margin:4px 0 0;color:var(--muted);font-size:11px}
-.icon{border:1px solid var(--line);background:var(--surface);color:var(--text);width:42px;height:42px;border-radius:13px;box-shadow:0 4px 14px rgba(22,72,53,.05)}
-.hero{background:linear-gradient(145deg,#eaf9f1,#effbf9);border:1px solid #d6eee3;border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
-.hero h2{margin:0;font-size:27px;letter-spacing:-.6px}.hero p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
-.hero-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
-.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:11px 13px;border-radius:12px;font-weight:700}
-.btn.primary{background:linear-gradient(135deg,var(--green),var(--green2));border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(24,166,106,.18)}
-.btn.teal{background:linear-gradient(135deg,var(--teal),#078f8b);border-color:transparent;color:#fff}
-.btn.ghost{background:var(--surface2)}
-.btn.danger{color:var(--danger);border-color:#f0c9cd;background:#fff7f8}
-.btn.small{padding:8px 10px;font-size:12px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
-.section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.section-head>div:first-child{flex:1}
-.section-title{font-size:14px;font-weight:850}.muted{font-size:11px;color:var(--muted);margin-top:3px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
-label{font-size:11px;color:var(--muted);font-weight:800}
-input,textarea,select{width:100%;border:1px solid var(--line);background:#fbfdfc;color:var(--text);padding:10px 11px;border-radius:11px;outline:none}
-input:focus,textarea:focus,select:focus{border-color:#75c7a4;box-shadow:0 0 0 3px rgba(24,166,106,.08)}
-textarea{min-height:88px;resize:vertical}
-.list{display:flex;flex-direction:column;gap:8px}
-.op-item{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);padding:12px;border-radius:15px;box-shadow:0 5px 16px rgba(22,72,53,.05)}
-.op-num{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#e8f8f0;color:var(--green2);font-weight:900;font-size:12px}
-.op-info{flex:1;min-width:0}.op-info strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.op-info span{display:block;font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.switch-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--line);padding:10px 11px;border-radius:11px}
-.switch{appearance:none;width:45px;height:25px;border-radius:20px;background:#c8d7d0;position:relative;margin:0}.switch:after{content:"";width:19px;height:19px;background:white;border-radius:50%;position:absolute;left:3px;top:3px;transition:.18s;box-shadow:0 2px 4px #0001}.switch:checked{background:var(--green)}.switch:checked:after{left:23px}
-.tag-list{display:flex;gap:6px;flex-wrap:wrap}.tag{display:flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;background:#eaf8f3;color:var(--green2);font-size:11px;font-weight:700}.tag button{border:0;background:transparent;color:inherit;padding:0}
-.row{display:flex;gap:7px;align-items:flex-start}.row>*:first-child{flex:1}.row-btn{flex:0 0 42px}
-.back{display:flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--green2);font-weight:800;padding:4px 0 14px}
-.editor-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.editor-head .grow{flex:1;min-width:0}.editor-head h2{margin:0;font-size:20px}.editor-head p{margin:4px 0 0;color:var(--muted);font-size:11px}
-.empty{padding:28px 18px;text-align:center;border:1px dashed #cdded7;border-radius:15px;color:var(--muted);background:#fbfdfc}
-.badge{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:#eef7f3;color:var(--muted);font-size:10px;font-weight:800}
-.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(900px,calc(100% - 24px));background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border:1px solid var(--line);padding:8px;border-radius:17px;box-shadow:0 10px 35px rgba(22,72,53,.12);display:flex;gap:8px;z-index:40}
-.bottom button{flex:1}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:78px;background:#18342a;color:#fff;padding:10px 13px;border-radius:12px;font-size:12px;display:none;z-index:60}
-.toast.show{display:block}
-.raw{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;min-height:65vh}
-@media(max-width:620px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero h2{font-size:24px}.app{padding:10px 10px 100px}}
-@media(min-width:760px){.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
+:root{--bg:#f4faf7;--surface:#fff;--surface2:#edf7f2;--line:#d7e8df;--line2:#c3ddd1;--text:#17362a;--muted:#6b8478;--green:#16a36a;--green2:#087c4c;--teal:#0aa39e;--danger:#d85762;--shadow:0 8px 26px rgba(23,54,42,.08);--r:18px}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{min-height:100vh}button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{max-width:920px;margin:auto;padding:12px 12px 90px}.screen{display:none}.screen.active{display:block}
+.topbar,.editor-head{display:flex;align-items:center;gap:10px}.topbar{padding:6px 0 14px}
+.logo,.op-number{display:grid;place-items:center;flex:none}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;font-weight:900;box-shadow:0 8px 22px rgba(10,163,158,.2)}
+.op-number{width:44px;height:44px;border-radius:14px;background:#e8f8f1;color:var(--green2);font-size:12px;font-weight:900}
+.brand,.grow{flex:1;min-width:0}.brand h1,.editor-head h2{margin:0}.brand h1{font-size:18px}.brand p,.editor-head p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.hero{background:linear-gradient(145deg,#e8f8f0,#eefbf9);border:1px solid #d0eade;border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}.hero h2{margin:0 0 7px;font-size:27px;letter-spacing:-.5px}.hero p{margin:0 0 15px;color:var(--muted);font-size:13px;line-height:1.5}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.section-head .grow{min-width:0}.section-title{font-size:14px;font-weight:850}.muted{font-size:11px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.full{grid-column:1/-1}
+label{font-size:11px;font-weight:800;color:var(--muted)}.required::after{content:" *";color:var(--danger)}
+input,textarea,select{width:100%;border:1px solid var(--line);background:#fbfdfc;color:var(--text);padding:10px 11px;border-radius:11px;outline:none}input:focus,textarea:focus,select:focus{border-color:#72c8a4;box-shadow:0 0 0 3px rgba(22,163,106,.08)}textarea{min-height:92px;resize:vertical}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface2);border:1px solid var(--line);padding:10px 11px;border-radius:11px}.switch{appearance:none;width:45px;height:25px;border-radius:20px;background:#c7d7cf;position:relative;flex:none}.switch:after{content:"";position:absolute;width:19px;height:19px;top:3px;left:3px;background:#fff;border-radius:50%;transition:.16s;box-shadow:0 2px 4px #0002}.switch:checked{background:var(--green)}.switch:checked:after{left:23px}
+.row{display:flex;gap:8px;align-items:flex-start}.row .grow{flex:1;min-width:0}.list{display:flex;flex-direction:column;gap:8px}.list-item{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:#fff;padding:11px;border-radius:15px}
+.list-main{flex:1;min-width:0}.list-main strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.list-main span{display:block;margin-top:3px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-actions{display:flex;gap:6px;flex:none}.preview{flex:1;min-width:0;font-size:12px;white-space:pre-wrap;word-break:break-word;line-height:1.45}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px}.tag{display:flex;align-items:center;gap:5px;padding:6px 9px;background:#eaf8f3;border:1px solid #caeadc;color:var(--green2);border-radius:999px;font-size:11px;font-weight:750}.tag button{border:0;background:transparent;color:inherit;padding:0}
+.num{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#e8f8f1;color:var(--green2);font-size:12px;font-weight:900;flex:none}
+.empty{padding:25px 16px;border:1px dashed var(--line2);background:#fbfdfc;border-radius:14px;text-align:center;color:var(--muted);font-size:12px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:12px;font-weight:750}.btn.primary{background:linear-gradient(135deg,var(--green),var(--green2));border-color:transparent;color:#fff;box-shadow:0 8px 18px rgba(22,163,106,.18)}.btn.teal{background:linear-gradient(135deg,var(--teal),#078884);border-color:transparent;color:#fff}.btn.ghost{background:var(--surface2)}.btn.danger{color:var(--danger);border-color:#ecc9cd;background:#fff7f8}.btn.small{font-size:12px;padding:8px 10px}
+.icon{border:1px solid var(--line);background:#fff;color:var(--text);width:42px;height:42px;border-radius:13px}.back{border:0;background:transparent;color:var(--green2);font-weight:800;padding:3px 0 13px}.action-row{display:flex;gap:8px;flex-wrap:wrap}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:50;width:min(460px,calc(100% - 24px));display:none}.fab.show{display:block}.fab button{width:100%;padding:13px 16px;border:1px solid #0a8a57;border-radius:16px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;font-weight:850;box-shadow:0 12px 32px rgba(22,163,106,.28)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:75px;z-index:70;background:#18362b;color:#fff;padding:10px 13px;border-radius:12px;font-size:12px;display:none}.toast.show{display:block}
+.modal-bg{position:fixed;inset:0;background:rgba(20,45,35,.34);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;z-index:90}.modal-bg.show{display:flex}.modal{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 24px 70px rgba(20,45,35,.2)}.modal h3{margin:0 0 5px;font-size:17px}.modal p{margin:0 0 12px;color:var(--muted);font-size:11px}
+.code{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}.raw{min-height:67vh;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.hero h2{font-size:24px}}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- HOME -->
-  <section class="screen active" id="homeScreen">
-    <div class="topbar">
-      <div class="logo">CR</div>
-      <div class="brand"><h1>Cleaner Royall</h1><p>Dynamic cleaner script tools</p></div>
-      <button class="icon" id="homeImport" title="Import JSON">↥</button>
-    </div>
+<section class="screen active" id="homeScreen">
+  <div class="topbar"><div class="logo">CR</div><div class="brand"><h1>Cleaner Royall</h1><p>Dynamic cleaner script tools</p></div><button class="icon" id="homeImport">↥</button></div>
+  <div class="hero"><h2>Cleaner Royall Script Maker</h2><p>Create, manage, validate and export Cleaner Royall scripts.</p><div class="action-row"><button class="btn primary" id="createBtn">＋ Create New</button><button class="btn teal" id="importBtn">Import JSON</button></div></div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Saved Scripts</div><div class="muted">Saved locally on this device</div></div><span class="muted" id="scriptCount"></span></div><div class="list" id="savedScripts"></div></div>
+</section>
 
-    <div class="hero">
-      <h2>Cleaner Royall Script Maker</h2>
-      <p>Create, manage and export Cleaner Royall scripts with dynamic operations and commands.</p>
-      <div class="hero-actions">
-        <button class="btn primary" id="createBtn">＋ Create New</button>
-        <button class="btn teal" id="importBtn">Import JSON</button>
-      </div>
-    </div>
+<section class="screen" id="scriptScreen">
+  <button class="back" id="scriptBack">‹ Back</button>
+  <div class="editor-head"><div class="logo">CR</div><div class="grow"><h2 id="scriptTitle">New Cleaner</h2><p id="scriptSubtitle">Cleaner script</p></div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Current Script</div><div class="muted">Stored locally on this device</div></div><span class="badge" id="homeCount">0 operations</span></div>
-      <div id="homeScript"></div>
-    </div>
-  </section>
+  <div class="card"><div class="action-row"><button class="btn ghost" id="rawBtn">Raw JSON</button><button class="btn ghost" id="exportBtn">Export</button><button class="btn ghost" id="copyBtn">Copy</button></div></div>
 
-  <!-- SCRIPT DASHBOARD -->
-  <section class="screen" id="scriptScreen">
-    <button class="back" id="scriptBack">‹ Back</button>
-    <div class="editor-head">
-      <div class="logo">CR</div>
-      <div class="grow"><h2 id="scriptTitle">New Cleaner</h2><p id="scriptSubtitle">Cleaner script configuration</p></div>
-    </div>
-    <div class="card" style="padding:10px;margin-top:-4px">
-      <div class="row" style="align-items:center">
-        <button class="btn ghost" id="topRawBtn">Raw JSON</button>
-        <button class="btn ghost" id="topExportBtn">Export</button>
-        <button class="btn ghost" id="topCopyBtn">Copy</button>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Basic Information</div><div class="muted">Core cleaner identity</div></div></div><div class="grid">
+    <div class="field"><label class="required">Id</label><input id="id"></div>
+    <div class="field"><label class="required">Name</label><input id="name"></div>
+    <div class="field full"><label class="required">Description</label><textarea id="description"></textarea></div>
+  </div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Basic information</div><div class="muted">Core cleaner identity</div></div></div>
-      <div class="grid">
-        <div class="field"><label>Id</label><input id="id"></div>
-        <div class="field"><label>Name</label><input id="name"></div>
-        <div class="field full"><label>Description</label><textarea id="description"></textarea></div>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">MetaData</div><div class="muted">Publishing and identification data</div></div></div><div class="grid">
+    <div class="switch-row"><span>Enabled</span><input class="switch" id="metaEnabled" type="checkbox"></div>
+    <div class="field"><label class="required">ScriptVersion</label><input id="scriptVersion"></div>
+    <div class="field"><label class="required">MinAppVersion</label><input id="minAppVersion"></div>
+    <div class="field"><label class="required">Author</label><input id="author"></div>
+    <div class="field"><label class="required">CreatedOn</label><input id="createdOn" type="date"></div>
+    <div class="field"><label class="required">UpdatedOn</label><input id="updatedOn" type="date"></div>
+    <div class="field full"><label class="required">Info</label><textarea id="info"></textarea></div>
+    <div class="field full"><label>Url</label><input id="url"></div>
+    <div class="field full"><label>Tags</label><div class="row"><input class="grow" id="tagInput" placeholder="Add tag"><button class="btn small" id="addTag">＋</button></div><div class="tag-list" id="tags" style="margin-top:8px"></div></div>
+  </div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">MetaData</div><div class="muted">Identity, version and publishing information</div></div></div>
-      <div class="grid">
-        <div class="switch-row"><span>Enabled</span><input class="switch" id="metaEnabled" type="checkbox"></div>
-        <div class="field"><label>ScriptVersion</label><input id="scriptVersion"></div>
-        <div class="field"><label>MinAppVersion</label><input id="minAppVersion"></div>
-        <div class="field"><label>Author</label><input id="author"></div>
-        <div class="field"><label>CreatedOn</label><input id="createdOn" type="date"></div>
-        <div class="field"><label>UpdatedOn</label><input id="updatedOn" type="date"></div>
-        <div class="field full"><label>Info</label><textarea id="info"></textarea></div>
-        <div class="field full"><label>Url</label><input id="url"></div>
-        <div class="field full"><label>Tags</label><div class="row"><input id="tagInput" placeholder="Add tag"><button class="btn small row-btn" id="addTag">＋</button></div><div class="tag-list" id="tags" style="margin-top:8px"></div></div>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Execution Settings</div><div class="muted">Global script behavior</div></div></div><div class="grid">
+    <div class="switch-row"><span>stop_on_error</span><input class="switch" id="stopOnError" type="checkbox"></div>
+    <div class="switch-row"><span>record_output</span><input class="switch" id="recordOutput" type="checkbox"></div>
+    <div class="field"><label class="required">output_mode</label><input id="outputMode"></div>
+    <div class="field"><label class="required">timeout (ms)</label><input id="timeout" type="number" inputmode="numeric" min="0" step="1"></div>
+  </div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Execution Settings</div><div class="muted">Global script behavior</div></div></div>
-      <div class="grid">
-        <div class="switch-row"><span>stop_on_error</span><input class="switch" id="stopOnError" type="checkbox"></div>
-        <div class="switch-row"><span>record_output</span><input class="switch" id="recordOutput" type="checkbox"></div>
-        <div class="field"><label>output_mode</label><input id="outputMode"></div>
-        <div class="field"><label>timeout (ms)</label><input id="timeout" type="number" inputmode="numeric" min="0" step="1"></div>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Direct Commands</div><div class="muted">Add complete shell commands or scripts</div></div></div>
+    <div class="row"><textarea class="grow" id="commandInput" rows="2" placeholder="Enter full command or script..."></textarea><button class="btn primary row-btn" id="addCommand">Add</button></div>
+    <div class="list" id="commands" style="margin-top:10px"></div>
+  </div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Direct Commands</div><div class="muted">Standalone shell commands or complete scripts</div></div><button class="icon" id="addCommand" title="Add command">＋</button></div>
-      <div class="list" id="commands"></div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Operations</div><div class="muted">Dynamic 001, 002, 003...</div></div><button class="btn primary small" id="addOperation">＋ Operation</button></div><div class="list" id="operations"></div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Operations</div><div class="muted">Add as many as you need, starting from 001</div></div><button class="btn small primary" id="addOperation">＋ Add Operation</button></div>
-      <div class="list" id="operations"></div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Custom JSON Field</div><div class="muted">Add any extra root-level JSON field</div></div></div>
+    <div class="field"><label class="required">Field Name</label><input id="customName" placeholder="Example: LicenseInfo"></div>
+    <div class="field" style="margin-top:9px"><label class="required">JSON Value</label><textarea id="customJson" class="code" placeholder='Example: {"Type":"MIT","Url":"https://..."}'></textarea></div>
+    <button class="btn teal" id="addCustom" style="margin-top:9px">＋ Add Custom Field</button>
+    <div class="list" id="customList" style="margin-top:10px"></div>
+  </div>
+</section>
 
+<section class="screen" id="operationScreen">
+  <button class="back" id="operationBack">‹ Back to Operations</button>
+  <div class="editor-head"><div class="op-number" id="operationNumber">001</div><div class="grow"><h2 id="operationTitle">Operation</h2><p id="operationSubtitle">Complete required fields</p></div><button class="btn danger small" id="deleteOperation">Delete</button></div>
 
-  </section>
+  <div class="card"><div class="section-head"><div><div class="section-title">Overview</div><div class="muted">Required fields are marked with *</div></div></div><div class="grid">
+    <div class="switch-row"><span>Enabled</span><input class="switch" id="opEnabled" type="checkbox"></div>
+    <div class="switch-row"><span>ContinueOnError</span><input class="switch" id="opContinue" type="checkbox"></div>
+    <div class="switch-row"><span>Background</span><input class="switch" id="opBackground" type="checkbox"></div>
+    <div class="field"><label class="required">Delay (ms)</label><input id="opDelay" type="number" inputmode="numeric" min="0" step="1"></div>
+    <div class="field full"><label class="required">Title / Description</label><input id="opDescription"></div>
+  </div></div>
 
-  <!-- OPERATION FRAGMENT -->
-  <section class="screen" id="operationScreen">
-    <button class="back" id="operationBack">‹ Back to Operations</button>
-    <div class="editor-head">
-      <div class="op-num" id="operationNumber">001</div>
-      <div class="grow"><h2 id="operationTitle">Operation</h2><p id="operationSubtitle">Configure command execution</p></div>
-      <button class="btn danger small" id="deleteOperation">Delete</button>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Command</div><div class="muted">Command construction</div></div></div><div class="grid">
+    <div class="field"><label class="required">Method</label><input id="opMethod" placeholder="rm"></div>
+    <div class="field"><label class="required">Arguments</label><input id="opArguments" placeholder="-rf"></div>
+    <div class="field"><label class="required">ArgumentPosition</label><select id="opArgumentPosition"><option value="">Select...</option><option value="before">before</option><option value="after">after</option></select></div>
+    <div class="field"><label>PathSuffix</label><input id="opPathSuffix" placeholder="/*"></div>
+    <div class="field full"><label>CommandSuffix</label><input id="opCommandSuffix" placeholder="| wc -l"></div>
+  </div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Overview</div><div class="muted">What this operation does</div></div></div>
-      <div class="grid">
-        <div class="switch-row"><span>Enabled</span><input class="switch" id="opEnabled" type="checkbox"></div>
-        <div class="switch-row"><span>ContinueOnError</span><input class="switch" id="opContinue" type="checkbox"></div>
-        <div class="switch-row"><span>Background</span><input class="switch" id="opBackground" type="checkbox"></div>
-        <div class="field"><label>Delay (ms)</label><input id="opDelay"></div>
-        <div class="field full"><label>Title / Description</label><input id="opDescription"></div>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Conditions</div><div class="muted">Execution checks</div></div></div><div class="grid">
+    <div class="switch-row"><span>PathExists</span><input class="switch" id="opPathExists" type="checkbox"></div>
+    <div class="switch-row"><span>MethodExists</span><input class="switch" id="opMethodExists" type="checkbox"></div>
+  </div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Command</div><div class="muted">Build the shell command</div></div></div>
-      <div class="grid">
-        <div class="field"><label>Method</label><input id="opMethod" placeholder="rm"></div>
-        <div class="field"><label>Arguments</label><input id="opArguments" placeholder="-rf"></div>
-        <div class="field"><label>ArgumentPosition</label><select id="opArgumentPosition"><option value="before">before</option><option value="after">after</option></select></div>
-        <div class="field"><label>PathSuffix</label><input id="opPathSuffix" placeholder="/*"></div>
-        <div class="field full"><label>CommandSuffix</label><input id="opCommandSuffix" placeholder="| wc -l"></div>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Paths</div><div class="muted">At least one path is required</div></div></div>
+    <div class="row"><input class="grow" id="pathInput" placeholder="/data/cache"><button class="btn primary row-btn" id="addPath">Add</button></div>
+    <div class="list" id="paths" style="margin-top:10px"></div>
+  </div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Conditions</div><div class="muted">Execution checks</div></div></div>
-      <div class="grid">
-        <div class="switch-row"><span>PathExists</span><input class="switch" id="opPathExists" type="checkbox"></div>
-        <div class="switch-row"><span>MethodExists</span><input class="switch" id="opMethodExists" type="checkbox"></div>
-      </div>
-    </div>
+  <div class="card"><div class="section-head"><div><div class="section-title">Tags</div><div class="muted">Optional</div></div></div><div class="row"><input class="grow" id="opTagInput" placeholder="Add operation tag"><button class="btn small" id="addOpTag">＋</button></div><div class="tag-list" id="opTags" style="margin-top:8px"></div></div>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Paths</div><div class="muted">Each path creates an execution target</div></div><button class="btn small primary" id="addPath">＋ Path</button></div>
-      <div class="list" id="paths"></div>
-    </div>
+  <div class="card"><button class="btn primary" id="saveOperation" style="width:100%">Save Operation</button></div>
+</section>
 
-    <div class="card">
-      <div class="section-head"><div><div class="section-title">Tags</div><div class="muted">Classify the operation</div></div></div>
-      <div class="row"><input id="opTagInput" placeholder="Add operation tag"><button class="btn small" id="addOpTag">＋</button></div>
-      <div class="tag-list" id="opTags" style="margin-top:8px"></div>
-    </div>
-
-    <div class="card">
-      <button class="btn primary" id="saveOperation" style="width:100%">Save Operation</button>
-    </div>
-  </section>
-
-  <!-- RAW -->
-  <section class="screen" id="rawScreen">
-    <button class="back" id="rawBack">‹ Back</button>
-    <div class="editor-head"><div class="grow"><h2>Raw JSON</h2><p>Direct JSON editing</p></div></div>
-    <div class="card">
-      <textarea id="raw" class="raw" spellcheck="false"></textarea>
-      <button class="btn primary" id="applyRaw" style="width:100%;margin-top:10px">Apply JSON</button>
-    </div>
-  </section>
+<section class="screen" id="rawScreen">
+  <button class="back" id="rawBack">‹ Back</button>
+  <div class="editor-head"><div class="grow"><h2>Raw JSON</h2><p>Direct JSON editing</p></div></div>
+  <div class="card"><textarea id="raw" class="raw" spellcheck="false"></textarea><button class="btn primary" id="applyRaw" style="width:100%;margin-top:10px">Apply JSON</button></div>
+</section>
 </div>
 
-<div class="bottom" id="bottomBar" style="display:none"><button class="btn ghost" id="bottomBack">Back</button><button class="btn primary" id="bottomSave">Save</button></div>
+<div class="fab" id="mainFab"><button id="saveMain">Save</button></div>
 <div class="toast" id="toast"></div>
+
+<div class="modal-bg" id="exportModal">
+  <div class="modal">
+    <h3>Export JSON</h3><p>Choose the filename for this cleaner.</p>
+    <div class="field"><label class="required">Filename</label><input id="downloadName" placeholder="cache_cleaner.json"></div>
+    <div class="action-row" style="margin-top:12px"><button class="btn ghost" id="cancelExport">Cancel</button><button class="btn primary" id="confirmExport">Download</button></div>
+  </div>
+</div>
+
 <input id="fileInput" type="file" accept=".json,application/json" hidden>
 
 <script>
-const KEY="cleaner_royall_scripts_v4";
-const LAST_KEY="cleaner_royall_last_v4";
+const STORE_KEY="cleaner_royall_scripts_final_v1",DRAFT_KEY="cleaner_royall_draft_final_v1",LAST_KEY="cleaner_royall_last_final_v1";
+const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x)),truth=v=>String(v).toLowerCase()==="true",today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")},uid=()=>Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);
+const esc=s=>String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+function emptyScript(){const d=today();return {_localId:null,Id:"",Name:"",Description:"",MetaData:{Enabled:"true",ScriptVersion:"1",MinAppVersion:"1",Author:"",CreatedOn:d,UpdatedOn:d,Info:"",Url:"",Tags:[]},CleanerScript:{Settings:{stop_on_error:"true",record_output:"true",output_mode:"3",timeout:"30000"},DirectCommands:[],Operations:{}}}}
+function readStore(){try{const x=localStorage.getItem(STORE_KEY);return Array.isArray(JSON.parse(x||"[]"))?JSON.parse(x||"[]"):[]}catch(e){return []}}
+let scripts=readStore(),data=null,editingId=null,editingCommand=-1,editingPath=-1,dirty=false;
+function ensure(){data.MetaData=data.MetaData||{};data.MetaData.Tags=Array.isArray(data.MetaData.Tags)?data.MetaData.Tags:[];data.CleanerScript=data.CleanerScript||{};data.CleanerScript.Settings=data.CleanerScript.Settings||{};data.CleanerScript.DirectCommands=Array.isArray(data.CleanerScript.DirectCommands)?data.CleanerScript.DirectCommands:[];data.CleanerScript.Operations=data.CleanerScript.Operations&&typeof data.CleanerScript.Operations==="object"&&!Array.isArray(data.CleanerScript.Operations)?data.CleanerScript.Operations:{}}
+function normalize(x){data=clone(x||emptyScript());ensure();data.Id=String(data.Id??"");data.Name=String(data.Name??"");data.Description=String(data.Description??"");["Enabled","ScriptVersion","MinAppVersion","Author","CreatedOn","UpdatedOn","Info","Url"].forEach(k=>data.MetaData[k]=String(data.MetaData[k]??""));data.MetaData.Tags=data.MetaData.Tags.map(String);data.CleanerScript.Settings.stop_on_error=String(data.CleanerScript.Settings.stop_on_error??"true");data.CleanerScript.Settings.record_output=String(data.CleanerScript.Settings.record_output??"true");data.CleanerScript.Settings.output_mode=String(data.CleanerScript.Settings.output_mode??"3");data.CleanerScript.Settings.timeout=String(data.CleanerScript.Settings.timeout??"30000");data.CleanerScript.DirectCommands=data.CleanerScript.DirectCommands.map(String);Object.keys(data.CleanerScript.Operations).forEach(id=>{const o=data.CleanerScript.Operations[id]||{};["Enabled","Description","ContinueOnError","Background","Delay","Method","Arguments","ArgumentPosition","PathSuffix","CommandSuffix"].forEach(k=>o[k]=String(o[k]??""));o.ConditionCheck=o.ConditionCheck||{};o.ConditionCheck.PathExists=String(o.ConditionCheck.PathExists??"true");o.ConditionCheck.MethodExists=String(o.ConditionCheck.MethodExists??"true");o.Paths=Array.isArray(o.Paths)?o.Paths.map(String):[];o.Tags=Array.isArray(o.Tags)?o.Tags.map(String):[];data.CleanerScript.Operations[id]=o});if(!data.MetaData.CreatedOn)data.MetaData.CreatedOn=today();if(!data.MetaData.UpdatedOn)data.MetaData.UpdatedOn=data.MetaData.CreatedOn}
+function toast(m){$("toast").textContent=m;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),2200)}
+function show(screen){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(screen).classList.add("active");$("mainFab").classList.toggle("show",screen==="scriptScreen");window.scrollTo({top:0,behavior:"smooth"})}
+function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(data));dirty=true}catch(e){}}
+function clearDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
+function persist(){ensure();const id=data.Id.trim();if(!id){saveDraft();toast("Id is required before saving");$("id").focus();return false}let idx=data._localId?scripts.findIndex(x=>x._localId===data._localId):-1;const sameId=scripts.findIndex(x=>String(x.Id||"").toLowerCase()===id.toLowerCase());if(idx<0&&sameId>=0){idx=sameId;data._localId=scripts[idx]._localId||uid()}if(idx<0){data._localId=uid();scripts.push(clone(data))}else{scripts[idx]=clone(data)}try{localStorage.setItem(STORE_KEY,JSON.stringify(scripts));localStorage.setItem(LAST_KEY,data._localId);clearDraft();dirty=false;return true}catch(e){toast("Local save failed");return false}}
+function autoSave(){sync(false);saveDraft();if(data.Id.trim())persist()}
+function loadInitial(){try{const last=localStorage.getItem(LAST_KEY);if(last){const found=scripts.find(x=>x._localId===last);if(found)return found}const draft=localStorage.getItem(DRAFT_KEY);return draft?JSON.parse(draft):null}catch(e){return null}}
+data=loadInitial()||emptyScript();
 
-const $=id=>document.getElementById(id);
-const clone=x=>JSON.parse(JSON.stringify(x));
-const truth=v=>String(v).toLowerCase()==="true";
-const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
-const uid=()=> "s_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,9);
+function sync(updateDate){ensure();data.Id=$("id").value.trim();data.Name=$("name").value.trim();data.Description=$("description").value.trim();data.MetaData.Enabled=$("metaEnabled").checked?"true":"false";data.MetaData.ScriptVersion=$("scriptVersion").value.trim();data.MetaData.MinAppVersion=$("minAppVersion").value.trim();data.MetaData.Author=$("author").value.trim();data.MetaData.CreatedOn=$("createdOn").value.trim();data.MetaData.UpdatedOn=$("updatedOn").value.trim();data.MetaData.Info=$("info").value.trim();data.MetaData.Url=$("url").value.trim();data.CleanerScript.Settings.stop_on_error=$("stopOnError").checked?"true":"false";data.CleanerScript.Settings.record_output=$("recordOutput").checked?"true":"false";data.CleanerScript.Settings.output_mode=$("outputMode").value.trim();data.CleanerScript.Settings.timeout=$("timeout").value.trim();if(updateDate)data.MetaData.UpdatedOn=today();$("scriptTitle").textContent=data.Name||"New Cleaner";$("scriptSubtitle").textContent=(data.Id?data.Id+" · ":"")+"Cleaner script"}
+function validateScript(){sync(false);const req=[[data.Id,"Id"],[data.Name,"Name"],[data.Description,"Description"],[data.MetaData.ScriptVersion,"ScriptVersion"],[data.MetaData.MinAppVersion,"MinAppVersion"],[data.MetaData.Author,"Author"],[data.MetaData.CreatedOn,"CreatedOn"],[data.MetaData.UpdatedOn,"UpdatedOn"],[data.MetaData.Info,"Info"],[data.CleanerScript.Settings.output_mode,"output_mode"],[data.CleanerScript.Settings.timeout,"timeout"]];for(const [v,n] of req)if(!String(v||"").trim())return n+" is required.";if(!/^\d+$/.test(data.CleanerScript.Settings.timeout))return "timeout must be numeric.";for(const id of Object.keys(data.CleanerScript.Operations)){const o=data.CleanerScript.Operations[id];for(const [v,n] of [[o.Description,"Title / Description"],[o.Delay,"Delay"],[o.Method,"Method"],[o.Arguments,"Arguments"],[o.ArgumentPosition,"ArgumentPosition"]])if(!String(v||"").trim())return "Operation "+id+": "+n+" is required.";if(!o.Paths.length)return "Operation "+id+": at least one Path is required.";if(o.Paths.some(x=>!String(x).trim()))return "Operation "+id+": every Path is required."}return ""}
+function renderHome(){$("scriptCount").textContent=scripts.length+" script"+(scripts.length===1?"":"s");const box=$("savedScripts");box.innerHTML="";if(!scripts.length){box.innerHTML='<div class="empty">No saved scripts yet.<br><br><button class="btn primary" id="firstCreate">＋ Create New</button></div>';$("firstCreate").onclick=newScript;return}[...scripts].sort((a,b)=>String(a.Name||"").localeCompare(String(b.Name||""))).forEach(x=>{const row=document.createElement("div");row.className="list-item";row.innerHTML='<div class="num">CR</div><div class="list-main"><strong>'+esc(x.Name||"Untitled Cleaner")+'</strong><span>'+esc(x.Id||"No ID")+' · '+Object.keys(x.CleanerScript?.Operations||{}).length+' operation'+(Object.keys(x.CleanerScript?.Operations||{}).length===1?"":"s")+'</span></div><div class="item-actions"><button class="btn small edit">Edit</button><button class="btn danger small delete">×</button></div>';row.querySelector(".edit").onclick=()=>{normalize(x);renderScript();show("scriptScreen")};row.querySelector(".delete").onclick=()=>{if(confirm('Delete "'+(x.Name||x.Id||"Untitled")+'"?')){scripts=scripts.filter(y=>y._localId!==x._localId);localStorage.setItem(STORE_KEY,JSON.stringify(scripts));renderHome();toast("Deleted")}};box.appendChild(row)})}
+function bind(id,v,type){type==="check"?$(id).checked=truth(v):$(id).value=v??""}
+function renderScript(){ensure();bind("id",data.Id);bind("name",data.Name);bind("description",data.Description);bind("metaEnabled",data.MetaData.Enabled,"check");bind("scriptVersion",data.MetaData.ScriptVersion);bind("minAppVersion",data.MetaData.MinAppVersion);bind("author",data.MetaData.Author);bind("createdOn",data.MetaData.CreatedOn);bind("updatedOn",data.MetaData.UpdatedOn);bind("info",data.MetaData.Info);bind("url",data.MetaData.Url);bind("stopOnError",data.CleanerScript.Settings.stop_on_error,"check");bind("recordOutput",data.CleanerScript.Settings.record_output,"check");bind("outputMode",data.CleanerScript.Settings.output_mode);bind("timeout",data.CleanerScript.Settings.timeout);$("scriptTitle").textContent=data.Name||"New Cleaner";$("scriptSubtitle").textContent=(data.Id?data.Id+" · ":"")+"Cleaner script";renderTags();renderCommands();renderOperations();renderCustom()}
+function renderTags(){$("tags").innerHTML=data.MetaData.Tags.map((t,i)=>'<div class="tag">'+esc(t)+'<button onclick="removeTag('+i+')">×</button></div>').join("")||'<span class="muted">No tags</span>'}
+function addTag(){const v=$("tagInput").value.trim();if(!v)return;data.MetaData.Tags.push(v);$("tagInput").value="";autoSave();renderTags()}
+function removeTag(i){if(!confirm("Delete this tag?"))return;data.MetaData.Tags.splice(i,1);autoSave();renderTags()}
+function renderCommands(){const box=$("commands");box.innerHTML="";data.CleanerScript.DirectCommands.forEach((c,i)=>{if(editingCommand===i){const card=document.createElement("div");card.className="card";card.style.margin="0";card.innerHTML='<textarea rows="3">'+esc(c)+'</textarea><div class="action-row" style="margin-top:8px"><button class="btn ghost save">Save</button><button class="btn danger del">Delete</button></div>';card.querySelector("textarea").oninput=e=>{data.CleanerScript.DirectCommands[i]=e.target.value;saveDraft()};card.querySelector(".save").onclick=()=>{if(!data.CleanerScript.DirectCommands[i].trim()){toast("Command cannot be empty");return}editingCommand=-1;autoSave();renderCommands()};card.querySelector(".del").onclick=()=>{if(confirm("Delete this command?")){data.CleanerScript.DirectCommands.splice(i,1);editingCommand=-1;autoSave();renderCommands()}};box.appendChild(card)}else{const row=document.createElement("div");row.className="list-item";row.innerHTML='<div class="preview">'+esc(c)+'</div><div class="item-actions"><button class="btn small edit">Edit</button></div>';row.querySelector(".edit").onclick=()=>{editingCommand=i;renderCommands()};box.appendChild(row)}});if(!box.children.length)box.innerHTML='<div class="empty">No commands added yet.</div>'}
+function addCommand(){const v=$("commandInput").value.trim();if(!v){toast("Enter a command first");return}data.CleanerScript.DirectCommands.push(v);$("commandInput").value="";autoSave();renderCommands();toast("Command added")}
+function renderOperations(){const box=$("operations");box.innerHTML="";const ids=Object.keys(data.CleanerScript.Operations);if(!ids.length){box.innerHTML='<div class="empty">No operations yet.<br><br>Use ＋ Operation to create 001.</div>';return}ids.forEach(id=>{const o=data.CleanerScript.Operations[id],row=document.createElement("div");row.className="list-item";row.innerHTML='<div class="num">'+esc(id)+'</div><div class="list-main"><strong>'+esc(o.Description||"Untitled operation")+'</strong><span>'+esc(o.Method||"No method")+' · '+(o.Paths||[]).length+' path(s)</span></div><button class="btn small edit">Edit</button>';row.querySelector(".edit").onclick=()=>openOperation(id);box.appendChild(row)})}
+function nextId(){let n=1;while(data.CleanerScript.Operations[String(n).padStart(3,"0")])n++;return String(n).padStart(3,"0")}
+function addOperation(){const id=nextId();data.CleanerScript.Operations[id]={Enabled:"true",Description:"",ContinueOnError:"true",Background:"false",Delay:"0",Method:"",Arguments:"",ArgumentPosition:"",ConditionCheck:{PathExists:"true",MethodExists:"true"},Paths:[],PathSuffix:"",CommandSuffix:"",Tags:[]};editingId=id;autoSave();openOperation(id)}
+function openOperation(id){editingId=id;editingPath=-1;const o=data.CleanerScript.Operations[id];$("operationNumber").textContent=id;$("operationTitle").textContent=o.Description||"Operation "+id;$("operationSubtitle").textContent=o.Method||"Complete required fields";$("opEnabled").checked=truth(o.Enabled);$("opContinue").checked=truth(o.ContinueOnError);$("opBackground").checked=truth(o.Background);$("opDelay").value=o.Delay||"";$("opDescription").value=o.Description||"";$("opMethod").value=o.Method||"";$("opArguments").value=o.Arguments||"";$("opArgumentPosition").value=o.ArgumentPosition||"";$("opPathSuffix").value=o.PathSuffix||"";$("opCommandSuffix").value=o.CommandSuffix||"";$("opPathExists").checked=truth(o.ConditionCheck?.PathExists);$("opMethodExists").checked=truth(o.ConditionCheck?.MethodExists);$("pathInput").value="";renderPaths();renderOpTags();show("operationScreen")}
+function validateOperation(o){for(const [v,n] of [[o.Description,"Title / Description"],[o.Delay,"Delay"],[o.Method,"Method"],[o.Arguments,"Arguments"],[o.ArgumentPosition,"ArgumentPosition"]])if(!String(v||"").trim())return n+" is required.";if(!o.Paths.length)return "At least one Path is required.";if(o.Paths.some(v=>!String(v).trim()))return "Every Path is required.";if(!/^\d+$/.test(o.Delay))return "Delay must be numeric.";return ""}
+function saveOperation(){const o=data.CleanerScript.Operations[editingId];o.Enabled=$("opEnabled").checked?"true":"false";o.ContinueOnError=$("opContinue").checked?"true":"false";o.Background=$("opBackground").checked?"true":"false";o.Delay=$("opDelay").value.trim();o.Description=$("opDescription").value.trim();o.Method=$("opMethod").value.trim();o.Arguments=$("opArguments").value.trim();o.ArgumentPosition=$("opArgumentPosition").value;o.PathSuffix=$("opPathSuffix").value;o.CommandSuffix=$("opCommandSuffix").value;o.ConditionCheck=o.ConditionCheck||{};o.ConditionCheck.PathExists=$("opPathExists").checked?"true":"false";o.ConditionCheck.MethodExists=$("opMethodExists").checked?"true":"false";const err=validateOperation(o);if(err){toast("Operation "+editingId+": "+err);return}autoSave();renderScript();show("scriptScreen");toast("Operation saved")}
+function deleteOperation(){if(confirm("Delete operation "+editingId+"?")){delete data.CleanerScript.Operations[editingId];autoSave();show("scriptScreen");renderOperations();toast("Operation deleted")}}
+function renderPaths(){const o=data.CleanerScript.Operations[editingId],box=$("paths");box.innerHTML="";(o.Paths||[]).forEach((p,i)=>{if(editingPath===i){const card=document.createElement("div");card.className="card";card.style.margin="0";card.innerHTML='<input value="'+esc(p)+'"><div class="action-row" style="margin-top:8px"><button class="btn ghost save">Save</button><button class="btn danger del">Delete</button></div>';card.querySelector("input").oninput=e=>{o.Paths[i]=e.target.value;saveDraft()};card.querySelector(".save").onclick=()=>{if(!o.Paths[i].trim()){toast("Path cannot be empty");return}editingPath=-1;autoSave();renderPaths()};card.querySelector(".del").onclick=()=>{if(confirm("Delete this path?")){o.Paths.splice(i,1);editingPath=-1;autoSave();renderPaths()}};box.appendChild(card)}else{const row=document.createElement("div");row.className="list-item";row.innerHTML='<div class="preview">'+esc(p)+'</div><div class="item-actions"><button class="btn small edit">Edit</button></div>';row.querySelector(".edit").onclick=()=>{editingPath=i;renderPaths()};box.appendChild(row)}});if(!box.children.length)box.innerHTML='<div class="empty">No paths added yet.</div>'}
+function addPath(){const v=$("pathInput").value.trim();if(!v){toast("Enter a path first");return}data.CleanerScript.Operations[editingId].Paths.push(v);$("pathInput").value="";autoSave();renderPaths()}
+function renderOpTags(){const o=data.CleanerScript.Operations[editingId];$("opTags").innerHTML=(o.Tags||[]).map((t,i)=>'<div class="tag">'+esc(t)+'<button onclick="removeOpTag('+i+')">×</button></div>').join("")||'<span class="muted">No tags</span>'}
+function addOpTag(){const v=$("opTagInput").value.trim();if(!v)return;data.CleanerScript.Operations[editingId].Tags.push(v);$("opTagInput").value="";autoSave();renderOpTags()}
+function removeOpTag(i){if(!confirm("Delete this operation tag?"))return;data.CleanerScript.Operations[editingId].Tags.splice(i,1);autoSave();renderOpTags()}
+function renderCustom(){const box=$("customList");box.innerHTML="";const reserved=new Set(["_localId","Id","Name","Description","MetaData","CleanerScript"]);Object.keys(data).filter(k=>!reserved.has(k)).forEach(k=>{const row=document.createElement("div");row.className="list-item";row.innerHTML='<div class="list-main"><strong>'+esc(k)+'</strong><span class="code">'+esc(JSON.stringify(data[k]))+'</span></div><button class="btn danger small del">×</button>';row.querySelector(".del").onclick=()=>{if(confirm('Delete custom field "'+k+'"?')){delete data[k];autoSave();renderCustom()}};box.appendChild(row)});if(!box.children.length)box.innerHTML='<div class="empty">No custom fields.</div>'}
+function addCustom(){const n=$("customName").value.trim(),raw=$("customJson").value.trim();if(!n){toast("Custom field name is required");return}if(!raw){toast("JSON value is required");return}if(["_localId","Id","Name","Description","MetaData","CleanerScript"].includes(n)){toast("Reserved field name");return}try{data[n]=JSON.parse(raw);$("customName").value="";$("customJson").value="";autoSave();renderCustom();toast("Custom field added")}catch(e){toast("Invalid JSON value")}}
+function openRaw(){sync(false);$("raw").value=JSON.stringify(data,null,2);show("rawScreen")}
+function applyRaw(){try{const x=JSON.parse($("raw").value);if(!x||Array.isArray(x)||typeof x!=="object")throw Error("Root must be an object");normalize(x);persist();renderScript();show("scriptScreen");toast("JSON applied")}catch(e){toast("Invalid JSON: "+e.message)}}
+function openExport(){sync(false);$("downloadName").value=(data.Id||data.Name||"cleaner_royall").replace(/[^\w.-]+/g,"_")+".json";$("exportModal").classList.add("show")}
+function closeExport(){$("exportModal").classList.remove("show")}
+function confirmExport(){const n=$("downloadName").value.trim();if(!n){toast("Filename is required");return}try{const a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.href=u;a.download=n.toLowerCase().endsWith(".json")?n:n+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);closeExport();toast("Export started")}catch(e){toast("Export failed")}}
+async function copyJson(){sync(false);try{await navigator.clipboard.writeText(JSON.stringify(data,null,2));toast("JSON copied")}catch(e){toast("Copy unavailable")}}
+function newScript(){data=emptyScript();editingId=null;editingCommand=-1;editingPath=-1;saveDraft();renderScript();show("scriptScreen")}
+function backHome(){show("homeScreen");renderHome()}
+function backOps(){show("scriptScreen");renderOperations()}
 
-function emptyScript(){
-  const d=today();
-  return {
-    _localId:null,
-    Id:"",
-    Name:"",
-    Description:"",
-    MetaData:{Enabled:"true",ScriptVersion:"1",MinAppVersion:"1",Author:"",CreatedOn:d,UpdatedOn:d,Info:"",Url:"",Tags:[]},
-    CleanerScript:{
-      Settings:{stop_on_error:"true",record_output:"true",output_mode:"3",timeout:"30000"},
-      DirectCommands:[],
-      Operations:{}
-    }
-  };
-}
+$("createBtn").onclick=newScript;$("importBtn").onclick=()=>$("fileInput").click();$("homeImport").onclick=()=>$("fileInput").click();
+$("scriptBack").onclick=backHome;$("operationBack").onclick=backOps;$("rawBack").onclick=()=>show("scriptScreen");
+$("rawBtn").onclick=openRaw;$("exportBtn").onclick=openExport;$("copyBtn").onclick=copyJson;$("cancelExport").onclick=closeExport;$("confirmExport").onclick=confirmExport;
+$("saveMain").onclick=()=>{sync(true);const err=validateScript();if(err){toast(err);return}if(persist()){renderHome();renderScript();toast("Saved")}};
+$("saveOperation").onclick=saveOperation;$("deleteOperation").onclick=deleteOperation;$("addTag").onclick=addTag;$("addCommand").onclick=addCommand;$("addOperation").onclick=addOperation;$("addPath").onclick=addPath;$("addOpTag").onclick=addOpTag;$("addCustom").onclick=addCustom;$("applyRaw").onclick=applyRaw;
+$("tagInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addTag()}});$("commandInput").addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();addCommand()}});$("pathInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPath()}});$("opTagInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addOpTag()}});
+["id","name","description","scriptVersion","minAppVersion","author","createdOn","updatedOn","info","url","outputMode","timeout"].forEach(id=>$(id).addEventListener("input",autoSave));["metaEnabled","stopOnError","recordOutput"].forEach(id=>$(id).addEventListener("change",autoSave));
+$("fileInput").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{normalize(JSON.parse(r.result));editingId=null;editingCommand=-1;editingPath=-1;persist();renderHome();renderScript();show("scriptScreen");toast("JSON imported")}catch(err){toast("Import failed: "+err.message)}};r.readAsText(f);e.target.value=""};
 
-function esc(s){
-  return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-}
-
-function loadAll(){
-  try{
-    const x=localStorage.getItem(KEY);
-    const list=x?JSON.parse(x):[];
-    return Array.isArray(list)?list:[];
-  }catch(e){return [];}
-}
-
-let scripts=loadAll();
-let data=null;
-let editingId=null;
-let editingCommandIndex=null;
-let editingPathIndex=null;
-
-function loadLast(){
-  try{
-    const last=localStorage.getItem(LAST_KEY);
-    return last?scripts.find(x=>x._localId===last)||null:null;
-  }catch(e){return null;}
-}
-data=loadLast()||emptyScript();
-
-function persistCurrent(){
-  ensure();
-  if(!data._localId)data._localId=uid();
-  const copy=clone(data);
-  const index=scripts.findIndex(x=>x._localId===data._localId);
-  if(index<0)scripts.push(copy);else scripts[index]=copy;
-  localStorage.setItem(KEY,JSON.stringify(scripts));
-  localStorage.setItem(LAST_KEY,data._localId);
-}
-
-function deleteSavedScript(id){
-  scripts=scripts.filter(x=>x._localId!==id);
-  localStorage.setItem(KEY,JSON.stringify(scripts));
-  if(localStorage.getItem(LAST_KEY)===id)localStorage.removeItem(LAST_KEY);
-}
-
-function ensure(){
-  data.MetaData=data.MetaData||{};
-  data.MetaData.Tags=Array.isArray(data.MetaData.Tags)?data.MetaData.Tags:[];
-  data.CleanerScript=data.CleanerScript||{};
-  data.CleanerScript.Settings=data.CleanerScript.Settings||{};
-  data.CleanerScript.DirectCommands=Array.isArray(data.CleanerScript.DirectCommands)?data.CleanerScript.DirectCommands:[];
-  data.CleanerScript.Operations=data.CleanerScript.Operations&&typeof data.CleanerScript.Operations==="object"&&!Array.isArray(data.CleanerScript.Operations)?data.CleanerScript.Operations:{};
-}
-
-function normalizeImported(x){
-  data=clone(x);
-  ensure();
-  data._localId=null;
-  ["Id","Name","Description"].forEach(k=>data[k]=String(data[k]??""));
-  ["Enabled","ScriptVersion","MinAppVersion","Author","CreatedOn","UpdatedOn","Info","Url"].forEach(k=>data.MetaData[k]=String(data.MetaData[k]??""));
-  data.MetaData.Tags=data.MetaData.Tags.map(v=>String(v));
-  data.CleanerScript.Settings.stop_on_error=String(data.CleanerScript.Settings.stop_on_error??"true");
-  data.CleanerScript.Settings.record_output=String(data.CleanerScript.Settings.record_output??"true");
-  data.CleanerScript.Settings.output_mode=String(data.CleanerScript.Settings.output_mode??"3");
-  data.CleanerScript.Settings.timeout=String(data.CleanerScript.Settings.timeout??"30000");
-  data.CleanerScript.DirectCommands=data.CleanerScript.DirectCommands.map(v=>String(v));
-  Object.keys(data.CleanerScript.Operations).forEach(id=>{
-    const op=data.CleanerScript.Operations[id]||{};
-    op.Enabled=String(op.Enabled??"true");
-    op.Description=String(op.Description??"");
-    op.ContinueOnError=String(op.ContinueOnError??"true");
-    op.Background=String(op.Background??"false");
-    op.Delay=String(op.Delay??"");
-    op.Method=String(op.Method??"");
-    op.Arguments=String(op.Arguments??"");
-    op.ArgumentPosition=String(op.ArgumentPosition??"before");
-    op.PathSuffix=String(op.PathSuffix??"");
-    op.CommandSuffix=String(op.CommandSuffix??"");
-    op.ConditionCheck=op.ConditionCheck||{};
-    op.ConditionCheck.PathExists=String(op.ConditionCheck.PathExists??"true");
-    op.ConditionCheck.MethodExists=String(op.ConditionCheck.MethodExists??"true");
-    op.Paths=Array.isArray(op.Paths)?op.Paths.map(v=>String(v)):[];
-    op.Tags=Array.isArray(op.Tags)?op.Tags.map(v=>String(v)):[];
-    data.CleanerScript.Operations[id]=op;
-  });
-  const d=today();
-  if(!data.MetaData.CreatedOn)data.MetaData.CreatedOn=d;
-  if(!data.MetaData.UpdatedOn)data.MetaData.UpdatedOn=data.MetaData.CreatedOn;
-}
-
-function toast(message){
-  $("toast").textContent=message;
-  $("toast").classList.add("show");
-  clearTimeout(toast.timer);
-  toast.timer=setTimeout(()=>$("toast").classList.remove("show"),2200);
-}
-
-function show(screen){
-  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
-  $(screen).classList.add("active");
-  const floating=screen==="scriptScreen"||screen==="operationScreen";
-  $("bottomBar").style.display=floating?"flex":"none";
-  $("bottomBack").textContent=screen==="operationScreen"?"Back":"Home";
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-function bind(id,value,type="value"){
-  const el=$(id);
-  if(type==="check")el.checked=truth(value);else el.value=value??"";
-}
-
-function touchUpdated(){ensure();data.MetaData.UpdatedOn=today();}
-
-function renderHome(){
-  $("homeCount").textContent=scripts.length+" script"+(scripts.length===1?"":"s");
-  const box=$("homeScript");
-  box.innerHTML="";
-  if(!scripts.length){
-    box.innerHTML='<div class="empty">No saved scripts yet.<br><br><button class="btn primary" id="emptyCreate">＋ Create New</button></div>';
-    $("emptyCreate").onclick=newScript;
-    return;
-  }
-  [...scripts].reverse().forEach(item=>{
-    const operations=Object.keys(item.CleanerScript?.Operations||{}).length;
-    const row=document.createElement("div");
-    row.className="op-item";
-    row.innerHTML=`<div class="op-num">CR</div><div class="op-info"><strong>${esc(item.Name||"Untitled Cleaner")}</strong><span>${esc(item.Id||"No ID")} · ${operations} operation${operations===1?"":"s"}</span></div><div class="item-actions"><button class="btn small editSaved">Edit</button><button class="btn danger small deleteSaved">×</button></div>`;
-    row.querySelector(".editSaved").onclick=()=>{data=clone(item);renderScript();show("scriptScreen");};
-    row.querySelector(".deleteSaved").onclick=()=>{
-      if(confirm('Delete saved script "'+(item.Name||item.Id||"Untitled")+'"?')){
-        deleteSavedScript(item._localId);
-        renderHome();
-        toast("Script deleted");
-      }
-    };
-    box.appendChild(row);
-  });
-}
-
-function renderScript(){
-  ensure();
-  bind("id",data.Id);
-  bind("name",data.Name);
-  bind("description",data.Description);
-  bind("metaEnabled",data.MetaData.Enabled,"check");
-  bind("scriptVersion",data.MetaData.ScriptVersion);
-  bind("minAppVersion",data.MetaData.MinAppVersion);
-  bind("author",data.MetaData.Author);
-  bind("createdOn",data.MetaData.CreatedOn);
-  bind("updatedOn",data.MetaData.UpdatedOn);
-  bind("info",data.MetaData.Info);
-  bind("url",data.MetaData.Url);
-  bind("stopOnError",data.CleanerScript.Settings.stop_on_error,"check");
-  bind("recordOutput",data.CleanerScript.Settings.record_output,"check");
-  bind("outputMode",data.CleanerScript.Settings.output_mode);
-  bind("timeout",data.CleanerScript.Settings.timeout);
-  $("scriptTitle").textContent=data.Name||"New Cleaner";
-  $("scriptSubtitle").textContent=(data.Id?data.Id+" · ":"")+"Cleaner script configuration";
-  renderTags();
-  renderCommands();
-  renderOperations();
-}
-
-function syncScript(updateDate=true){
-  ensure();
-  data.Id=$("id").value.trim();
-  data.Name=$("name").value.trim();
-  data.Description=$("description").value.trim();
-  data.MetaData.Enabled=$("metaEnabled").checked?"true":"false";
-  data.MetaData.ScriptVersion=$("scriptVersion").value.trim();
-  data.MetaData.MinAppVersion=$("minAppVersion").value.trim();
-  data.MetaData.Author=$("author").value.trim();
-  data.MetaData.CreatedOn=$("createdOn").value.trim();
-  data.MetaData.Info=$("info").value.trim();
-  data.MetaData.Url=$("url").value.trim();
-  data.CleanerScript.Settings.stop_on_error=$("stopOnError").checked?"true":"false";
-  data.CleanerScript.Settings.record_output=$("recordOutput").checked?"true":"false";
-  data.CleanerScript.Settings.output_mode=$("outputMode").value.trim();
-  data.CleanerScript.Settings.timeout=$("timeout").value.trim();
-  if(updateDate)data.MetaData.UpdatedOn=today();
-  $("scriptTitle").textContent=data.Name||"New Cleaner";
-  $("scriptSubtitle").textContent=(data.Id?data.Id+" · ":"")+"Cleaner script configuration";
-}
-
-function validateScript(){
-  ensure();
-  const required=[
-    ["Id","Id"],["Name","Name"],["Description","Description"],["ScriptVersion","ScriptVersion"],
-    ["MinAppVersion","MinAppVersion"],["Author","Author"],["CreatedOn","CreatedOn"],
-    ["UpdatedOn","UpdatedOn"],["Info","Info"],["output_mode","output_mode"],["timeout","timeout"]
-  ];
-  for(const [key,label] of required){
-    const value=key==="Id"?data.Id:key==="Name"?data.Name:key==="Description"?data.Description:key==="ScriptVersion"?data.MetaData.ScriptVersion:
-      key==="MinAppVersion"?data.MetaData.MinAppVersion:key==="Author"?data.MetaData.Author:key==="CreatedOn"?data.MetaData.CreatedOn:
-      key==="UpdatedOn"?data.MetaData.UpdatedOn:key==="Info"?data.MetaData.Info:data.CleanerScript.Settings[key];
-    if(!String(value??"").trim())return "Required field missing: "+label;
-  }
-  for(const id of Object.keys(data.CleanerScript.Operations)){
-    const op=data.CleanerScript.Operations[id]||{};
-    for(const [key,label] of [["Description","Description"],["Delay","Delay"],["Method","Method"],["Arguments","Arguments"],["ArgumentPosition","ArgumentPosition"]]){
-      if(!String(op[key]??"").trim())return "Operation "+id+": "+label+" is required";
-    }
-    if(!Array.isArray(op.Paths)||!op.Paths.length)return "Operation "+id+": at least one Path is required";
-    if(op.Paths.some(x=>!String(x).trim()))return "Operation "+id+": every Path is required";
-  }
-  return "";
-}
-
-function saveScript(){
-  syncScript(false);
-  const error=validateScript();
-  if(error){toast(error);return false;}
-  touchUpdated();
-  persistCurrent();
-  renderHome();
-  toast("Script saved");
-  return true;
-}
-
-function newScript(){
-  data=emptyScript();
-  editingCommandIndex=null;
-  editingPathIndex=null;
-  renderScript();
-  show("scriptScreen");
-}
-
-function openScript(){
-  renderScript();
-  show("scriptScreen");
-}
-
-function renderTags(){
-  const box=$("tags");
-  box.innerHTML=(data.MetaData.Tags||[]).map((t,i)=>`<div class="tag"><span>${esc(t)}</span><button onclick="removeMainTag(${i})">×</button></div>`).join("")||'<span class="muted">No tags</span>';
-}
-function removeMainTag(i){syncScript(false);data.MetaData.Tags.splice(i,1);touchUpdated();persistCurrent();renderTags();}
-function addMainTag(){
-  syncScript(false);
-  const v=$("tagInput").value.trim();
-  if(!v)return;
-  data.MetaData.Tags.push(v);
-  $("tagInput").value="";
-  touchUpdated();persistCurrent();renderTags();
-}
-
-function renderCommands(){
-  const box=$("commands");
-  box.innerHTML="";
-  data.CleanerScript.DirectCommands.forEach((c,i)=>{
-    if(editingCommandIndex===i){
-      const wrap=document.createElement("div");
-      wrap.className="editing-row card";wrap.style.margin="0";
-      wrap.innerHTML=`<textarea rows="3">${esc(c)}</textarea><div class="row-actions"><button class="btn ghost cmdSave">Save</button><button class="btn danger cmdDelete">Delete</button></div>`;
-      wrap.querySelector("textarea").oninput=e=>data.CleanerScript.DirectCommands[i]=e.target.value;
-      wrap.querySelector(".cmdSave").onclick=()=>{
-        if(!data.CleanerScript.DirectCommands[i].trim()){toast("Command cannot be empty");return;}
-        editingCommandIndex=null;touchUpdated();persistCurrent();renderCommands();
-      };
-      wrap.querySelector(".cmdDelete").onclick=()=>{
-        if(confirm("Delete this command?")){
-          data.CleanerScript.DirectCommands.splice(i,1);
-          editingCommandIndex=null;touchUpdated();persistCurrent();renderCommands();
-        }
-      };
-      box.appendChild(wrap);
-    }else{
-      const row=document.createElement("div");
-      row.className="op-item";
-      row.innerHTML=`<div class="text-preview">${esc(c)}</div><div class="item-actions"><button class="btn small cmdEdit">Edit</button></div>`;
-      row.querySelector(".cmdEdit").onclick=()=>{editingCommandIndex=i;renderCommands();};
-      box.appendChild(row);
-    }
-  });
-  if(!data.CleanerScript.DirectCommands.length)box.innerHTML='<div class="empty">No commands added yet.</div>';
-}
-
-function addCommand(){
-  syncScript(false);
-  const v=$("commandInput").value.trim();
-  if(!v){toast("Enter a command first");$("commandInput").focus();return;}
-  data.CleanerScript.DirectCommands.push(v);
-  $("commandInput").value="";
-  touchUpdated();persistCurrent();renderCommands();toast("Command added");
-}
-
-function renderOperations(){
-  const box=$("operations");
-  box.innerHTML="";
-  const ids=Object.keys(data.CleanerScript.Operations);
-  if(!ids.length){box.innerHTML='<div class="empty">No operations yet.<br><br>Add Operation creates 001 automatically.</div>';return;}
-  ids.forEach(id=>{
-    const op=data.CleanerScript.Operations[id]||{};
-    const row=document.createElement("div");row.className="op-item";
-    row.innerHTML=`<div class="op-num">${esc(id)}</div><div class="op-info"><strong>${esc(op.Description||op.Method||"Untitled operation")}</strong><span>${esc(op.Method||"No method")} · ${(op.Paths||[]).length} path(s)</span></div><button class="btn small opEdit">Edit</button>`;
-    row.querySelector(".opEdit").onclick=()=>openOperation(id);
-    box.appendChild(row);
-  });
-}
-
-function nextId(){
-  let n=1;
-  while(data.CleanerScript.Operations[String(n).padStart(3,"0")])n++;
-  return String(n).padStart(3,"0");
-}
-
-function addOperation(){
-  ensure();
-  const id=nextId();
-  data.CleanerScript.Operations[id]={
-    Enabled:"true",Description:"",ContinueOnError:"true",Background:"false",Delay:"",
-    Method:"",Arguments:"",ArgumentPosition:"before",ConditionCheck:{PathExists:"true",MethodExists:"true"},
-    Paths:[],PathSuffix:"",CommandSuffix:"",Tags:[]
-  };
-  touchUpdated();persistCurrent();openOperation(id);toast("Operation "+id+" created");
-}
-
-function openOperation(id){
-  editingId=id;editingPathIndex=null;
-  const op=data.CleanerScript.Operations[id];
-  if(!op)return;
-  $("operationNumber").textContent=id;
-  $("operationTitle").textContent=op.Description||"Operation "+id;
-  $("operationSubtitle").textContent=op.Method||"Complete required fields";
-  $("opEnabled").checked=truth(op.Enabled);
-  $("opContinue").checked=truth(op.ContinueOnError);
-  $("opBackground").checked=truth(op.Background);
-  $("opDelay").value=op.Delay||"";
-  $("opDescription").value=op.Description||"";
-  $("opMethod").value=op.Method||"";
-  $("opArguments").value=op.Arguments||"";
-  $("opArgumentPosition").value=op.ArgumentPosition||"before";
-  $("opPathSuffix").value=op.PathSuffix||"";
-  $("opCommandSuffix").value=op.CommandSuffix||"";
-  $("opPathExists").checked=truth(op.ConditionCheck?.PathExists);
-  $("opMethodExists").checked=truth(op.ConditionCheck?.MethodExists);
-  $("pathInput").value="";
-  renderPaths();renderOpTags();show("operationScreen");
-}
-
-function validateOperation(op){
-  for(const [key,label] of [["Description","Title / Description"],["Delay","Delay"],["Method","Method"],["Arguments","Arguments"],["ArgumentPosition","ArgumentPosition"]]){
-    if(!String(op[key]??"").trim())return label+" is required";
-  }
-  if(!Array.isArray(op.Paths)||!op.Paths.length)return "At least one Path is required";
-  if(op.Paths.some(x=>!String(x).trim()))return "Every Path is required";
-  return "";
-}
-
-function saveOperation(){
-  const op=data.CleanerScript.Operations[editingId];
-  if(!op)return false;
-  op.Enabled=$("opEnabled").checked?"true":"false";
-  op.ContinueOnError=$("opContinue").checked?"true":"false";
-  op.Background=$("opBackground").checked?"true":"false";
-  op.Delay=$("opDelay").value.trim();
-  op.Description=$("opDescription").value.trim();
-  op.Method=$("opMethod").value.trim();
-  op.Arguments=$("opArguments").value.trim();
-  op.ArgumentPosition=$("opArgumentPosition").value;
-  op.PathSuffix=$("opPathSuffix").value;
-  op.CommandSuffix=$("opCommandSuffix").value;
-  op.ConditionCheck=op.ConditionCheck||{};
-  op.ConditionCheck.PathExists=$("opPathExists").checked?"true":"false";
-  op.ConditionCheck.MethodExists=$("opMethodExists").checked?"true":"false";
-  const error=validateOperation(op);
-  if(error){toast("Operation "+editingId+": "+error);return false;}
-  touchUpdated();persistCurrent();renderScript();show("scriptScreen");toast("Operation saved");return true;
-}
-
-function renderPaths(){
-  const op=data.CleanerScript.Operations[editingId];
-  const box=$("paths");box.innerHTML="";
-  (op.Paths||[]).forEach((p,i)=>{
-    if(editingPathIndex===i){
-      const wrap=document.createElement("div");
-      wrap.className="editing-row card";wrap.style.margin="0";
-      wrap.innerHTML=`<input value="${esc(p)}"><div class="row-actions"><button class="btn ghost pathSave">Save</button><button class="btn danger pathDelete">Delete</button></div>`;
-      wrap.querySelector("input").oninput=e=>op.Paths[i]=e.target.value;
-      wrap.querySelector(".pathSave").onclick=()=>{
-        if(!op.Paths[i].trim()){toast("Path cannot be empty");return;}
-        editingPathIndex=null;touchUpdated();persistCurrent();renderPaths();
-      };
-      wrap.querySelector(".pathDelete").onclick=()=>{
-        if(confirm("Delete this path?")){
-          op.Paths.splice(i,1);editingPathIndex=null;touchUpdated();persistCurrent();renderPaths();
-        }
-      };
-      box.appendChild(wrap);
-    }else{
-      const row=document.createElement("div");row.className="op-item";
-      row.innerHTML=`<div class="text-preview">${esc(p)}</div><div class="item-actions"><button class="btn small pathEdit">Edit</button></div>`;
-      row.querySelector(".pathEdit").onclick=()=>{editingPathIndex=i;renderPaths();};
-      box.appendChild(row);
-    }
-  });
-  if(!box.children.length)box.innerHTML='<div class="empty">No paths added yet.</div>';
-}
-
-function addPath(){
-  const op=data.CleanerScript.Operations[editingId];
-  const v=$("pathInput").value.trim();
-  if(!v){toast("Enter a path first");$("pathInput").focus();return;}
-  op.Paths=op.Paths||[];op.Paths.push(v);$("pathInput").value="";
-  touchUpdated();persistCurrent();renderPaths();toast("Path added");
-}
-
-function renderOpTags(){
-  const op=data.CleanerScript.Operations[editingId];
-  $("opTags").innerHTML=(op.Tags||[]).map((t,i)=>`<div class="tag"><span>${esc(t)}</span><button onclick="removeOpTag(${i})">×</button></div>`).join("")||'<span class="muted">No tags</span>';
-}
-function removeOpTag(i){
-  const op=data.CleanerScript.Operations[editingId];
-  op.Tags.splice(i,1);touchUpdated();persistCurrent();renderOpTags();
-}
-function addOpTag(){
-  const v=$("opTagInput").value.trim();if(!v)return;
-  const op=data.CleanerScript.Operations[editingId];op.Tags=op.Tags||[];op.Tags.push(v);
-  $("opTagInput").value="";touchUpdated();persistCurrent();renderOpTags();
-}
-function deleteOperation(){
-  if(!editingId)return;
-  if(confirm("Delete operation "+editingId+"?")){
-    delete data.CleanerScript.Operations[editingId];
-    touchUpdated();persistCurrent();renderScript();show("scriptScreen");toast("Operation deleted");
-  }
-}
-
-function openRaw(){
-  syncScript(false);
-  $("raw").value=JSON.stringify(data,null,2);
-  show("rawScreen");
-}
-function applyRaw(){
-  try{
-    const x=JSON.parse($("raw").value);
-    if(!x||Array.isArray(x)||typeof x!=="object")throw Error("Root must be an object");
-    normalizeImported(x);
-    renderScript();persistCurrent();show("scriptScreen");toast("JSON applied");
-  }catch(e){toast("Invalid JSON: "+e.message)}
-}
-
-function openDownload(){
-  syncScript(false);
-  $("downloadName").value=(data.Id||data.Name||"cleaner_royall").replace(/[^\w.-]+/g,"_")+".json";
-  $("downloadModal").classList.add("show");
-}
-function closeDownload(){$("downloadModal").classList.remove("show")}
-function confirmDownload(){
-  const n=$("downloadName").value.trim();
-  if(!n){toast("Filename is required");$("downloadName").focus();return;}
-  const filename=n.toLowerCase().endsWith(".json")?n:n+".json";
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download=filename;a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),500);
-  closeDownload();toast("Download started");
-}
-async function copyJson(){
-  syncScript(false);
-  try{await navigator.clipboard.writeText(JSON.stringify(data,null,2));toast("JSON copied");}
-  catch(e){toast("Copy unavailable");}
-}
-
-function importJson(){$("fileInput").click()}
-
-$("fileInput").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    try{
-      const x=JSON.parse(reader.result);
-      if(!x||Array.isArray(x)||typeof x!=="object")throw Error("Root must be an object");
-      normalizeImported(x);
-      renderScript();
-      renderHome();
-      show("scriptScreen");
-      toast("JSON imported");
-    }catch(err){toast("Invalid JSON: "+err.message)}
-  };
-  reader.readAsText(f);
-  e.target.value="";
-};
-
-$("createBtn").onclick=newScript;
-$("importBtn").onclick=importJson;
-$("homeImport").onclick=importJson;
-$("scriptBack").onclick=()=>{renderHome();show("homeScreen")};
-$("addCommand").onclick=addCommand;
-$("addOperation").onclick=addOperation;
-$("topRawBtn").onclick=openRaw;
-$("topExportBtn").onclick=openDownload;
-$("topCopyBtn").onclick=copyJson;
-$("operationBack").onclick=()=>{renderScript();show("scriptScreen")};
-$("saveOperation").onclick=saveOperation;
-$("bottomSave").onclick=()=>{
-  if($("operationScreen").classList.contains("active"))saveOperation();else saveScript();
-};
-$("bottomBack").onclick=()=>{
-  if($("operationScreen").classList.contains("active")){$("operationBack").click();}
-  else{$("scriptBack").click();}
-};
-$("deleteOperation").onclick=deleteOperation;
-$("addPath").onclick=addPath;
-$("addOpTag").onclick=addOpTag;
-$("rawBack").onclick=()=>{renderScript();show("scriptScreen")};
-$("applyRaw").onclick=applyRaw;
-$("cancelDownload").onclick=closeDownload;
-$("confirmDownload").onclick=confirmDownload;
-
-$("addTag").onclick=addMainTag;
-$("tagInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addMainTag()}});
-$("commandInput").addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();addCommand()}});
-$("pathInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPath()}});
-$("opTagInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addOpTag()}});
-
-["id","name","description","scriptVersion","minAppVersion","author","createdOn","updatedOn","info","url","outputMode","timeout"].forEach(id=>{
-  $(id).addEventListener("input",()=>{syncScript(false);renderHome();});
-});
-["metaEnabled","stopOnError","recordOutput"].forEach(id=>$(id).addEventListener("change",()=>{syncScript(false);renderHome();}));
-
-renderHome();
+renderHome();renderScript();show("homeScreen");
 </script>
 </body>
 </html>
