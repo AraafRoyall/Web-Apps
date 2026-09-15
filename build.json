@@ -11,9 +11,9 @@
       "icon": "CR"
     },
     {
-      "name": "JSON Manager",
+      "name": "JSON Tools",
       "description": "Create and edit JSON",
-      "url": "json/json.html",
+      "url": "json/EmojiToJsonKey.html",
       "icon": "{}"
     }
   ],
