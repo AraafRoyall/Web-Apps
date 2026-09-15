@@ -14,7 +14,7 @@
       "name": "JSON Tools",
       "description": "Create and edit JSON",
       "url": "json/EmojiToJsonKey.html",
-      "icon": "{}"
+      "icon": "{ }"
     }
   ],
   "groups": [
