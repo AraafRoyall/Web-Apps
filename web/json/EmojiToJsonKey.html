@@ -11,8 +11,25 @@ html,body{width:100%;height:100%;margin:0;overflow:hidden}
 body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#17211d}
 .app{width:100%;height:100dvh;display:flex;flex-direction:column;padding:16px 16px 84px}
 .header{flex:none;margin-bottom:11px}
-.title{margin:0;font-size:25px;font-weight:850;letter-spacing:-.5px;color:#087f5b}
-.subtitle{margin:4px 0 0;font-size:13px;color:#74817b}
+.brand-row{display:flex;align-items:center;gap:11px}
+.brand-icon{
+    width:46px;height:46px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:14px;
+    background:#eaf8f3;
+    border:1px solid #d4eee4;
+    font-size:26px;
+    box-shadow:0 4px 12px rgba(20,100,75,.08),inset 0 1px 1px rgba(255,255,255,.7)
+}
+.title{margin:0;font-size:24px;font-weight:850;letter-spacing:-.5px;color:#087f5b}
+.subtitle{margin:3px 0 0;font-size:13px;color:#74817b}
+.pool-helper{margin-top:7px;font-size:11px;font-weight:700;color:#087f5b}
+.setup-actions{display:flex;gap:9px;margin-top:11px}
+.setup-actions button,.preset-change{
+    border:none;border-radius:12px;padding:11px 12px;font-size:13px;font-weight:800
+}
+.setup-generate{flex:1;background:#0f9f73;color:#fff}
+
 
 .card{flex:none;border:1px solid #e6ece9;border-radius:17px;background:#fff;padding:14px;box-shadow:0 5px 18px rgba(20,60,45,.06)}
 .setup-card{display:none}
@@ -31,12 +48,6 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 .check:has(input:checked){border-color:#9edfc9;background:#effaf6}
 .check input{width:17px;height:17px;accent-color:#0f9f73;margin:0}
 .all-wrap{margin-top:8px}
-.setup-actions{display:flex;gap:9px;margin-top:11px}
-.setup-actions button,.preset-change{
-    border:none;border-radius:12px;padding:11px 12px;font-size:13px;font-weight:800
-}
-.setup-generate{flex:1;background:#0f9f73;color:#fff}
-.setup-all{background:#e9f3fb;color:#1769aa}
 .setup-meta{margin-top:8px;font-size:11px;color:#7a8781;line-height:1.4}
 
 .preset-summary{display:none;align-items:center;justify-content:space-between;gap:10px}
@@ -61,9 +72,9 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
 .fab{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:calc(100% - 32px);max-width:420px;height:52px;border:none;border-radius:17px;color:#fff;font-size:15px;font-weight:800;letter-spacing:.1px;cursor:pointer;background:#0f9f73;box-shadow:0 8px 22px rgba(15,118,110,.25),inset 0 1px 1px rgba(255,255,255,.32)}
 .fab:active{transform:translateX(-50%) scale(.985)}
 
-.overlay{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(15,30,24,.28);backdrop-filter:blur(4px);z-index:20}
-.dialog{width:100%;max-width:440px;background:#fff;border-radius:24px 24px 0 0;padding:18px;box-shadow:0 -12px 35px rgba(0,0,0,.16);animation:slideUp .2s ease}
-@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.overlay{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;background:rgba(15,30,24,.28);backdrop-filter:blur(4px);z-index:20;padding:18px 16px}
+.dialog{width:100%;max-width:440px;margin-top:8px;background:#fff;border-radius:22px;padding:18px;box-shadow:0 12px 35px rgba(0,0,0,.18);animation:dropIn .2s ease}
+@keyframes dropIn{from{transform:translateY(-18px);opacity:0}to{transform:translateY(0);opacity:1}}
 .dialog-title{font-size:20px;font-weight:850;color:#087f5b;margin-bottom:5px}
 .dialog-subtitle{font-size:13px;color:#718078;margin-bottom:13px}
 .name-input{width:100%;border:1.5px solid #dce7e2;border-radius:13px;padding:12px;font-size:16px;outline:none;background:#fbfdfc}
@@ -83,8 +94,13 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
 <div class="app">
 
   <div class="header">
-    <h1 class="title">Emoji Key Generator</h1>
-    <div class="subtitle">Generate a random emoji mapping instantly.</div>
+    <div class="brand-row">
+      <div class="brand-icon">🥏</div>
+      <div>
+        <h1 class="title">Emoji Key Generator</h1>
+        <div class="subtitle">Generate a random emoji mapping instantly.</div>
+      </div>
+    </div>
   </div>
 
   <div class="card setup-card show" id="setupCard">
@@ -108,8 +124,7 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
     </div>
 
     <div class="setup-actions">
-      <button class="setup-generate" onclick="applyPreset(true)">Use Selected Preset</button>
-      <button class="setup-all" onclick="selectAll()">Select All</button>
+      <button class="setup-generate" onclick="applyPreset()">Use Selected Preset</button>
     </div>
 
     <div class="setup-meta" id="presetMeta">
@@ -168,6 +183,7 @@ let presetSet=false;
 const output=document.getElementById("output");
 const status=document.getElementById("status");
 const poolBadge=document.getElementById("poolBadge");
+const poolHelper=document.getElementById("poolHelper");
 const setupCard=document.getElementById("setupCard");
 const summaryCard=document.getElementById("summaryCard");
 const presetSummary=document.getElementById("presetSummary");
@@ -196,9 +212,14 @@ async function loadPool(){
     const text=await r.text();
     EMOJIS=[...new Set(getEmojis(text))];
     poolBadge.textContent=EMOJIS.length+" emojis";
-    if(EMOJIS.length<102)showToast("EmojiPool.txt needs more emojis");
+    poolHelper.textContent="✓ Emoji Pool Loaded";
+    if(EMOJIS.length<102) {
+      poolHelper.textContent="⚠ Emoji Pool Loaded, but needs more unique emojis";
+      showToast("EmojiPool.txt needs more emojis");
+    }
   }catch(e){
     poolBadge.textContent="Load failed";
+    poolHelper.textContent="✕ Emoji Pool could not be loaded";
     output.textContent="Unable to load EmojiPool.txt.\n\nKeep EmojiPool.txt in the same folder as index.html.";
     status.textContent="Pool error";
     showToast("Could not load EmojiPool.txt");
@@ -226,12 +247,6 @@ function presetNames(){
   if(checks.num.checked)names.push("0–9");
   if(checks.special.checked)names.push("Special");
   return names.join(" · ");
-}
-
-function selectAll(){
-  checks.all.checked=true;
-  checks.az.checked=checks.low.checked=checks.num.checked=checks.special.checked=true;
-  updatePresetMeta();
 }
 
 checks.all.addEventListener("change",()=>{
