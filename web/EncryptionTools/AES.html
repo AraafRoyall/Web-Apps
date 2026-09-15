@@ -226,7 +226,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   padding:3px;
   border:1px solid #e0e9e5;
   border-radius:12px;
-  background:#f5f8f7;
+  background:#f7f9f8;
 }
 .mode button{
   flex:1;
@@ -239,12 +239,13 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   font-weight:800;
 }
 .mode button.active{
-  background:#fff;
-  color:var(--teal);
-  box-shadow:0 2px 7px rgba(0,0,0,.07);
+  background:#eaf8f3;
+  color:#0f766e;
+  box-shadow:none;
 }
 .mode button.active.decrypt{
-  color:var(--amber);
+  background:#fff5df;
+  color:#9a6800;
 }
 
 .divider{
@@ -324,11 +325,28 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   box-shadow:0 9px 22px rgba(15,159,115,.24),inset 0 1px 1px rgba(255,255,255,.28);
 }
 .fab:disabled{opacity:.55;box-shadow:none}
+.fab.decrypt-action{
+  background:#b47a12;
+  box-shadow:0 9px 22px rgba(180,122,18,.20),inset 0 1px 1px rgba(255,255,255,.28);
+}
 .fab:active{transform:translateX(-50%) scale(.985)}
 
 .result-head{min-width:0}
 .copy-btn{height:31px;min-width:48px;border-radius:9px;padding:0 9px}
 .top-clear{height:31px;min-width:63px;padding:0 9px}
+.download-btn{
+  flex:none;
+  height:31px;
+  min-width:66px;
+  padding:0 9px;
+  border:1px solid #bde7d7;
+  border-radius:9px;
+  background:#eaf8f3;
+  color:#0f8b65;
+  font-size:10px;
+  font-weight:850;
+}
+.download-btn:active{transform:scale(.97)}
 .result-actions{
   flex:none;
   display:flex;
@@ -515,6 +533,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
       <div class="result-title" id="resultTitle">Encrypted Result</div>
       <div class="result-count"><span id="resultCount">0</span> chars</div>
       <button class="small-btn blue copy-btn" id="copyResult" type="button">Copy</button>
+      <button class="download-btn" id="downloadResult" type="button" hidden>Download</button>
     </div>
 
     <div class="result" id="result">Result will appear after Encrypt or Decrypt.</div>
@@ -600,6 +619,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
     $("actionBtn").textContent =
       mode === "encrypt" ? "🔒 Encrypt" : "🔓 Decrypt";
+    $("actionBtn").classList.toggle("decrypt-action", mode === "decrypt");
 
     $("message").textContent =
       mode === "encrypt" ? "Ready to encrypt." : "Ready to decrypt.";
@@ -751,6 +771,27 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     }
   };
 
+
+  $("downloadResult").onclick = function(){
+    var text = $("result").textContent || "";
+    if(!text || text === "Result will appear after Encrypt or Decrypt."){
+      toast("Nothing to download");
+      return;
+    }
+
+    var filename = mode === "encrypt" ? "encrypted.txt" : "decrypted.txt";
+    var blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+    toast("Downloaded");
+  };
+
   function openClearDialog(){
     var d = $("clearDialog");
     $("confirmClear").dataset.clearMode = "";
@@ -771,6 +812,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   function clearAll(){
     if($("confirmClear").dataset.clearMode === "text"){
       $("inputText").value = "";
+      $("downloadResult").hidden = true;
       updateInputCount();
       closeClearDialog();
       toast("Text cleared");
@@ -782,6 +824,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     $("password").type = "password";
     $("showPass").textContent = "Show";
     $("result").textContent = "Result will appear after Encrypt or Decrypt.";
+    $("downloadResult").hidden = true;
     updateInputCount();
     updateResultCount();
     $("message").textContent = mode === "encrypt"
@@ -874,6 +917,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
       $("result").textContent = result;
       updateResultCount();
+      $("downloadResult").hidden = false;
 
       $("message").textContent =
         mode === "encrypt"
@@ -891,6 +935,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
       $("result").textContent = reason;
       updateResultCount();
+      $("downloadResult").hidden = true;
       $("message").textContent = reason;
       toast("Operation failed");
     }finally{
