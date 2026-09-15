@@ -2,6 +2,7 @@
   "version": 1,
   "name": "Royall Web Apps",
   "description": "Tools and utilities from AraafRoyall",
+  "WebAppsFolder": "web/",
   "top": [
     {
       "name": "Cleaner Royall",
@@ -14,18 +15,13 @@
       "description": "Create and edit JSON",
       "url": "json/json.html",
       "icon": "{}"
-    },
-    {
-      "name": "Shell PM",
-      "description": "Package manager tools",
-      "url": "shell/pm.html",
-      "icon": "⌘"
     }
   ],
   "groups": [
     {
       "name": "Cryptography",
       "description": "Encryption and security tools",
+      "icon": "🔐",
       "items": [
         {
           "name": "AES Crypto",
@@ -44,6 +40,7 @@
     {
       "name": "Utilities",
       "description": "Useful web tools",
+      "icon": "✦",
       "items": [
         {
           "name": "QR Tools",
@@ -68,18 +65,6 @@
           "description": "Text formatting tool",
           "url": "bold.html",
           "icon": "B"
-        }
-      ]
-    },
-    {
-      "name": "WhatsApp",
-      "description": "WhatsApp related tools",
-      "items": [
-        {
-          "name": "Chat TXT Reader",
-          "description": "Read WhatsApp chat TXT files",
-          "url": "WhatsApp/ChatTxtReader.html",
-          "icon": "WA"
         }
       ]
     }
