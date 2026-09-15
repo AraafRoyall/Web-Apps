@@ -201,10 +201,10 @@ function itemTile(item,index){
   </a>`;
 }
 
-function groupTile(group,index){
-  const c=colorFor(index);
+function groupTile(group,groupIndex,visualIndex){
+  const c=colorFor(visualIndex);
 
-  return `<button class="tile" type="button" data-group-index="${index}">
+  return `<button class="tile" type="button" data-group-index="${groupIndex}">
     <div class="tile-icon ${c}">${esc(safeIcon(group.icon))}</div>
     <div class="tile-body">
       <div class="tile-name">${esc(group.name||"Group")}</div>
@@ -252,7 +252,9 @@ function renderHome(q=""){
 
   data.groups.forEach((group,index)=>{
     if(groupMatches(group,search)){
-      html+=groupTile(group,data.top.length+index);
+      // index is the actual groups[] index.
+      // top.length is used only for visual color ordering.
+      html+=groupTile(group,index,data.top.length+index);
     }
   });
 
