@@ -76,8 +76,13 @@ button,input{font:inherit}button{cursor:pointer}
 </div>
 
 <script>
-const BUILD_URL="https://raw.githubusercontent.com/AraafRoyall/Web-Apps/main/build.json";
+/*
+  The launcher and build.json are both at the repository root.
+  Using ./build.json keeps them on the exact same GitHub Pages revision.
+*/
+const BUILD_URL="./build.json";
 const COLORS=["green","teal","amber","blue"];
+
 let data={
   version:1,
   name:"Royall Web Apps",
@@ -111,47 +116,59 @@ function normalizeFolder(folder){
   return f?f+"/":"";
 }
 
+function normalizeItem(item){
+  const x=(item&&typeof item==="object")?item:{};
+
+  return {
+    ...x,
+    name:String(x.name??""),
+    description:String(x.description??""),
+    url:String(x.url??""),
+    icon:safeIcon(x.icon)
+  };
+}
+
+function normalizeGroup(group){
+  const g=(group&&typeof group==="object")?group:{};
+
+  return {
+    ...g,
+    name:String(g.name??""),
+    description:String(g.description??""),
+    icon:safeIcon(g.icon),
+    items:Array.isArray(g.items)
+      ? g.items.map(normalizeItem)
+      : []
+  };
+}
+
 /*
-  JSON contract:
+  JSON schema:
+    root
+      ├─ top[]      direct app tiles
+      └─ groups[]
+           ├─ name
+           ├─ description
+           ├─ icon
+           └─ items[] app tiles
 
-  {
-    version,
-    name,
-    description,
-    WebAppsFolder,
-    top: [ app, app, ... ],
-    groups: [
-      {
-        name,
-        description,
-        icon,
-        items: [ app, app, ... ]
-      }
-    ]
-  }
-
-  App:
-  {
-    name,
-    description,
-    url,
-    icon
-  }
-
-  Extra/unknown JSON fields are intentionally ignored so the schema
-  can be extended later without breaking the launcher.
+  Unknown fields are retained on objects so the JSON can be extended later.
 */
-
 function normalizeConfig(raw){
   const root=(raw&&typeof raw==="object")?raw:{};
 
   return {
+    ...root,
     version:root.version??1,
-    name:root.name||"Royall Web Apps",
-    description:root.description||"",
-    WebAppsFolder:root.WebAppsFolder||"web/",
-    top:Array.isArray(root.top)?root.top:[],
-    groups:Array.isArray(root.groups)?root.groups:[]
+    name:String(root.name??"Royall Web Apps"),
+    description:String(root.description??""),
+    WebAppsFolder:String(root.WebAppsFolder??"web/"),
+    top:Array.isArray(root.top)
+      ? root.top.map(normalizeItem)
+      : [],
+    groups:Array.isArray(root.groups)
+      ? root.groups.map(normalizeGroup)
+      : []
   };
 }
 
@@ -159,12 +176,12 @@ function itemUrl(item){
   const raw=String(item?.url??"").trim();
   if(!raw)return "#";
 
-  // External URLs stay exactly as supplied by JSON.
-  if(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)||raw.startsWith("//")){
+  // Absolute/external URL: leave unchanged.
+  if(/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(raw)){
     return raw;
   }
 
-  // Relative app URL = WebAppsFolder + url.
+  // Every relative item URL is inside WebAppsFolder.
   return new URL(
     normalizeFolder(data.WebAppsFolder)+raw.replace(/^\/+/,""),
     document.baseURI||location.href
@@ -176,10 +193,10 @@ function itemTile(item,index){
   const url=itemUrl(item);
 
   return `<a class="tile" href="${esc(url)}">
-    <div class="tile-icon ${c}">${esc(safeIcon(item?.icon))}</div>
+    <div class="tile-icon ${c}">${esc(safeIcon(item.icon))}</div>
     <div class="tile-body">
-      <div class="tile-name">${esc(item?.name||"Untitled")}</div>
-      <div class="tile-desc">${esc(item?.description||"")}</div>
+      <div class="tile-name">${esc(item.name||"Untitled")}</div>
+      <div class="tile-desc">${esc(item.description||"")}</div>
     </div>
   </a>`;
 }
@@ -187,11 +204,11 @@ function itemTile(item,index){
 function groupTile(group,index){
   const c=colorFor(index);
 
-  return `<button class="tile" type="button" onclick="openGroup(${index})">
-    <div class="tile-icon ${c}">${esc(safeIcon(group?.icon))}</div>
+  return `<button class="tile" type="button" data-group-index="${index}">
+    <div class="tile-icon ${c}">${esc(safeIcon(group.icon))}</div>
     <div class="tile-body">
-      <div class="tile-name">${esc(group?.name||"Group")}</div>
-      <div class="tile-desc">${esc(group?.description||"")}</div>
+      <div class="tile-name">${esc(group.name||"Group")}</div>
+      <div class="tile-desc">${esc(group.description||"")}</div>
     </div>
   </button>`;
 }
@@ -199,64 +216,63 @@ function groupTile(group,index){
 function matchesText(obj,q){
   if(!q)return true;
 
-  const text=(
+  return (
     String(obj?.name??"")+" "+
     String(obj?.description??"")
-  ).toLowerCase();
-
-  return text.includes(q);
+  ).toLowerCase().includes(q);
 }
 
 function groupMatches(group,q){
   if(!q)return true;
   if(matchesText(group,q))return true;
 
-  const items=Array.isArray(group?.items)?group.items:[];
-  return items.some(item=>matchesText(item,q));
+  return group.items.some(item=>matchesText(item,q));
 }
 
-/*
-  Home ordering is exactly:
-    top[0...n]
-    then groups[0...n]
+function bindGroupButtons(){
+  document.querySelectorAll("[data-group-index]").forEach(button=>{
+    button.onclick=()=>{
+      openGroup(Number(button.getAttribute("data-group-index")));
+    };
+  });
+}
 
-  There are no hard-coded categories, so future top/groups entries
-  added to build.json automatically appear here.
-*/
 function renderHome(q=""){
   const search=String(q||"").trim().toLowerCase();
-  const top=Array.isArray(data.top)?data.top:[];
-  const groups=Array.isArray(data.groups)?data.groups:[];
-
   let html="";
-  let visualIndex=0;
 
-  top.forEach(item=>{
+  // Exact JSON order:
+  // 1. all top[]
+  // 2. all groups[]
+  data.top.forEach((item,index)=>{
     if(matchesText(item,search)){
-      html+=itemTile(item,visualIndex);
+      html+=itemTile(item,index);
     }
-    visualIndex++;
   });
 
-  groups.forEach((group,index)=>{
+  data.groups.forEach((group,index)=>{
     if(groupMatches(group,search)){
-      html+=groupTile(group,visualIndex,index);
+      html+=groupTile(group,data.top.length+index);
     }
-    visualIndex++;
   });
 
   document.getElementById("homeContent").innerHTML=
     html
       ? `<div class="grid">${html}</div>`
       : `<div class="empty">No apps found.</div>`;
+
+  bindGroupButtons();
 }
 
 function fillGroup(index){
+  if(!Number.isInteger(index)||index<0||index>=data.groups.length){
+    return false;
+  }
+
   const group=data.groups[index];
-  if(!group)return false;
 
   document.getElementById("groupIcon").className=
-    "page-icon "+colorFor(index);
+    "page-icon "+colorFor(data.top.length+index);
 
   document.getElementById("groupIcon").textContent=
     safeIcon(group.icon);
@@ -267,11 +283,9 @@ function fillGroup(index){
   document.getElementById("groupDesc").textContent=
     group.description||"";
 
-  const items=Array.isArray(group.items)?group.items:[];
-
   document.getElementById("groupContent").innerHTML=
-    items.length
-      ? `<div class="grid">${items.map((item,i)=>itemTile(item,i)).join("")}</div>`
+    group.items.length
+      ? `<div class="grid">${group.items.map((item,i)=>itemTile(item,i)).join("")}</div>`
       : `<div class="empty">No apps in this group.</div>`;
 
   return true;
@@ -283,7 +297,7 @@ function openGroup(index){
   document.getElementById("home").classList.remove("active");
   document.getElementById("group").classList.add("active");
 
-  // Hash routing keeps the group state without changing the UI.
+  // Hash only stores the current group; no pushState/replaceState.
   location.hash="group="+index;
   scrollTo(0,0);
 }
@@ -302,12 +316,7 @@ function route(){
   if(match){
     const index=Number(match[1]);
 
-    if(
-      Number.isInteger(index)&&
-      index>=0&&
-      index<data.groups.length&&
-      fillGroup(index)
-    ){
+    if(fillGroup(index)){
       document.getElementById("home").classList.remove("active");
       document.getElementById("group").classList.add("active");
       scrollTo(0,0);
@@ -332,9 +341,9 @@ async function load(){
     data=normalizeConfig(raw);
 
     document.title=data.name;
+
     document.getElementById("brand").textContent=data.name;
-    document.getElementById("brandSub").textContent=
-      "Live catalog from GitHub";
+    document.getElementById("brandSub").textContent="Live catalog from GitHub";
 
     document.getElementById("homeTitle").textContent=data.name;
     document.getElementById("homeDesc").textContent=
@@ -345,7 +354,7 @@ async function load(){
   }catch(e){
     document.getElementById("brandSub").textContent="Catalog unavailable";
     document.getElementById("homeDesc").textContent=
-      "Could not load build.json from GitHub.";
+      "Could not load build.json.";
 
     document.getElementById("homeContent").innerHTML=
       `<div class="error">
