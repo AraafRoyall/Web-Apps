@@ -19,15 +19,15 @@
   ],
   "groups": [
     {
-      "name": "Cryptography",
-      "description": "Encryption and security tools",
+      "name": "Security Tools",
+      "description": "Encryption and security",
       "icon": "🔐",
       "items": [
         {
-          "name": "AES Crypto",
-          "description": "AES encryption utility",
-          "url": "CryptoECC/AES.html",
-          "icon": "A"
+          "name": "AES 256",
+          "description": "AES Encryption Utility",
+          "url": "EncryptionTools/AES.html",
+          "icon": "AES"
         },
         {
           "name": "ECC Crypto",
