@@ -1,7 +1,7 @@
 {
   "version": 1,
   "name": "Royall Web Apps",
-
+  "description": "Tools and utilities from AraafRoyall",
   "top": [
     {
       "name": "Cleaner Royall",
@@ -14,9 +14,14 @@
       "description": "Create and edit JSON",
       "url": "json/json.html",
       "icon": "{}"
+    },
+    {
+      "name": "Shell PM",
+      "description": "Package manager tools",
+      "url": "shell/pm.html",
+      "icon": "⌘"
     }
   ],
-
   "groups": [
     {
       "name": "Cryptography",
@@ -42,9 +47,39 @@
       "items": [
         {
           "name": "QR Tools",
-          "description": "QR utilities",
+          "description": "QR utility",
           "url": "qr/qr.html",
           "icon": "QR"
+        },
+        {
+          "name": "Image to Base64",
+          "description": "Convert image data",
+          "url": "ImageToBase64/convert.html",
+          "icon": "IMG"
+        },
+        {
+          "name": "Emoji JSON",
+          "description": "Emoji JSON utility",
+          "url": "EmojiJson.html",
+          "icon": "✦"
+        },
+        {
+          "name": "Bold Text",
+          "description": "Text formatting tool",
+          "url": "bold.html",
+          "icon": "B"
+        }
+      ]
+    },
+    {
+      "name": "WhatsApp",
+      "description": "WhatsApp related tools",
+      "items": [
+        {
+          "name": "Chat TXT Reader",
+          "description": "Read WhatsApp chat TXT files",
+          "url": "WhatsApp/ChatTxtReader.html",
+          "icon": "WA"
         }
       ]
     }
