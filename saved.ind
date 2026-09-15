@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7fbf9">
+<title>Royall Web Apps</title>
+<style>
+:root{
+  --bg:#f6faf8;--surface:#fff;--surface2:#f2f8f5;--line:#dce9e3;--text:#17342a;--muted:#6f877d;
+  --green:#18a66a;--green2:#0d8a56;--teal:#0ea7a1;--amber:#e7a51c;--blue:#4388e8;
+  --shadow:0 8px 28px rgba(22,72,53,.08);--radius:18px
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}button{cursor:pointer}
+.app{max-width:760px;margin:auto;min-height:100vh;padding:12px 12px 30px}
+.screen{display:none}.screen.active{display:block}
+.topbar{display:flex;align-items:center;gap:11px;padding:6px 2px 17px}
+.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--green),var(--teal));display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:0 8px 22px rgba(14,167,161,.20)}
+.brand{flex:1;min-width:0}.brand h1{margin:0;font-size:18px;line-height:1.2}.brand p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.icon-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);width:42px;height:42px;border-radius:13px;box-shadow:0 4px 14px rgba(22,72,53,.05)}
+.hero{background:linear-gradient(145deg,#eaf9f1,#effbf9);border:1px solid #d6eee3;border-radius:24px;padding:20px;margin-bottom:15px;box-shadow:var(--shadow)}
+.hero h2{margin:0;font-size:26px;letter-spacing:-.6px}.hero p{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.search{margin-top:14px;position:relative}.search span{position:absolute;left:13px;top:9px;font-size:18px;color:var(--muted)}
+.search input{width:100%;border:1px solid #cfe2da;background:#fff;border-radius:13px;padding:12px 13px 12px 39px;color:var(--text);outline:none}
+.search input:focus{border-color:#75c7a4;box-shadow:0 0 0 3px rgba(24,166,106,.08)}
+.section{margin-top:15px}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:0 2px 9px}
+.section-title{font-size:14px;font-weight:850}.muted{font-size:10px;color:var(--muted);margin-top:3px}.count{font-size:10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.tile{border:1px solid var(--line);background:var(--surface);border-radius:16px;min-height:76px;padding:11px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;text-align:left;transition:transform .14s ease;text-decoration:none;color:inherit;width:100%;font:inherit}
+.tile:active{transform:scale(.985)}
+.tile-icon{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-weight:900;font-size:12px;flex:none}
+.tile-body{min-width:0;flex:1}.tile-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile-desc{font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.green{background:#e5f7ee;color:#14935b}.teal{background:#e4f7f6;color:#078b87}.amber{background:#fff4d9;color:#b47a00}.blue{background:#e8f1ff;color:#3778ca}
+.back{display:flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--green2);font-weight:800;padding:2px 0 14px}
+.page-head{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.page-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900}
+.page-head h2{margin:0;font-size:20px}.page-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}
+.empty{text-align:center;border:1px dashed #cdded7;background:#fbfdfc;border-radius:15px;padding:24px;color:var(--muted);font-size:12px}
+.error{padding:17px;border:1px solid #efcdd1;background:#fff7f8;border-radius:15px;color:#a34d57;font-size:12px}
+.loading{text-align:center;padding:42px 10px;color:var(--muted);font-size:12px}
+.footer{text-align:center;color:#94a69f;font-size:10px;padding:20px 0 4px}
+@media(max-width:390px){.app{padding-left:10px;padding-right:10px}.tile{min-height:70px;padding:9px}.tile-icon{width:37px;height:37px}.tile-name{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="screen active" id="home">
+    <header class="topbar">
+      <div class="logo">R</div>
+      <div class="brand"><h1 id="brand">Royall Web Apps</h1><p id="brandSub">Loading catalog…</p></div>
+      <button class="icon-btn" onclick="location.reload()">↻</button>
+    </header>
+
+    <section class="hero">
+      <h2 id="homeTitle">Web Apps</h2>
+      <p id="homeDesc">Loading the latest app catalog from GitHub…</p>
+      <div class="search"><span>⌕</span><input id="search" placeholder="Search apps..." autocomplete="off"></div>
+    </section>
+
+    <main id="homeContent"><div class="loading">Loading apps…</div></main>
+    <div class="footer">AraafRoyall • Web-Apps</div>
+  </section>
+
+  <section class="screen" id="group">
+    <button class="back" onclick="showHome()">‹ All Apps</button>
+    <div class="page-head">
+      <div id="groupIcon" class="page-icon green">*</div>
+      <div><h2 id="groupTitle">Group</h2><p id="groupDesc"></p></div>
+    </div>
+    <div id="groupContent"></div>
+  </section>
+</div>
+
+<script>
+/*
+  The launcher and build.json are both at the repository root.
+  Using ./build.json keeps them on the exact same GitHub Pages revision.
+*/
+const BUILD_URL="./build.json";
+const COLORS=["green","teal","amber","blue"];
+
+let data={
+  version:1,
+  name:"Royall Web Apps",
+  description:"Tools and utilities from AraafRoyall",
+  WebAppsFolder:"web/",
+  top:[],
+  groups:[]
+};
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+function colorFor(index){
+  return COLORS[Math.floor(index/2)%COLORS.length];
+}
+
+function safeIcon(value){
+  const s=String(value??"").trim();
+  return s||"*";
+}
+
+function normalizeFolder(folder){
+  let f=String(folder??"web/").trim().replace(/^\/+|\/+$/g,"");
+  return f?f+"/":"";
+}
+
+function normalizeItem(item){
+  const x=(item&&typeof item==="object")?item:{};
+
+  return {
+    ...x,
+    name:String(x.name??""),
+    description:String(x.description??""),
+    url:String(x.url??""),
+    icon:safeIcon(x.icon)
+  };
+}
+
+function normalizeGroup(group){
+  const g=(group&&typeof group==="object")?group:{};
+
+  return {
+    ...g,
+    name:String(g.name??""),
+    description:String(g.description??""),
+    icon:safeIcon(g.icon),
+    items:Array.isArray(g.items)
+      ? g.items.map(normalizeItem)
+      : []
+  };
+}
+
+/*
+  JSON schema:
+    root
+      ├─ top[]      direct app tiles
+      └─ groups[]
+           ├─ name
+           ├─ description
+           ├─ icon
+           └─ items[] app tiles
+
+  Unknown fields are retained on objects so the JSON can be extended later.
+*/
+function normalizeConfig(raw){
+  const root=(raw&&typeof raw==="object")?raw:{};
+
+  return {
+    ...root,
+    version:root.version??1,
+    name:String(root.name??"Royall Web Apps"),
+    description:String(root.description??""),
+    WebAppsFolder:String(root.WebAppsFolder??"web/"),
+    top:Array.isArray(root.top)
+      ? root.top.map(normalizeItem)
+      : [],
+    groups:Array.isArray(root.groups)
+      ? root.groups.map(normalizeGroup)
+      : []
+  };
+}
+
+function itemUrl(item){
+  const raw=String(item?.url??"").trim();
+  if(!raw)return "#";
+
+  // Absolute/external URL: leave unchanged.
+  if(/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(raw)){
+    return raw;
+  }
+
+  // Every relative item URL is inside WebAppsFolder.
+  return new URL(
+    normalizeFolder(data.WebAppsFolder)+raw.replace(/^\/+/,""),
+    document.baseURI||location.href
+  ).href;
+}
+
+function itemTile(item,index){
+  const c=colorFor(index);
+  const url=itemUrl(item);
+
+  return `<a class="tile" href="${esc(url)}">
+    <div class="tile-icon ${c}">${esc(safeIcon(item.icon))}</div>
+    <div class="tile-body">
+      <div class="tile-name">${esc(item.name||"Untitled")}</div>
+      <div class="tile-desc">${esc(item.description||"")}</div>
+    </div>
+  </a>`;
+}
+
+function groupTile(group,groupIndex,visualIndex){
+  const c=colorFor(visualIndex);
+
+  return `<button class="tile" type="button" data-group-index="${groupIndex}">
+    <div class="tile-icon ${c}">${esc(safeIcon(group.icon))}</div>
+    <div class="tile-body">
+      <div class="tile-name">${esc(group.name||"Group")}</div>
+      <div class="tile-desc">${esc(group.description||"")}</div>
+    </div>
+  </button>`;
+}
+
+function matchesText(obj,q){
+  if(!q)return true;
+
+  return (
+    String(obj?.name??"")+" "+
+    String(obj?.description??"")
+  ).toLowerCase().includes(q);
+}
+
+function groupMatches(group,q){
+  if(!q)return true;
+  if(matchesText(group,q))return true;
+
+  return group.items.some(item=>matchesText(item,q));
+}
+
+function bindGroupButtons(){
+  document.querySelectorAll("[data-group-index]").forEach(button=>{
+    button.onclick=()=>{
+      openGroup(Number(button.getAttribute("data-group-index")));
+    };
+  });
+}
+
+function renderHome(q=""){
+  const search=String(q||"").trim().toLowerCase();
+  let html="";
+
+  // Exact JSON order:
+  // 1. all top[]
+  // 2. all groups[]
+  data.top.forEach((item,index)=>{
+    if(matchesText(item,search)){
+      html+=itemTile(item,index);
+    }
+  });
+
+  data.groups.forEach((group,index)=>{
+    if(groupMatches(group,search)){
+      // index is the actual groups[] index.
+      // top.length is used only for visual color ordering.
+      html+=groupTile(group,index,data.top.length+index);
+    }
+  });
+
+  document.getElementById("homeContent").innerHTML=
+    html
+      ? `<div class="grid">${html}</div>`
+      : `<div class="empty">No apps found.</div>`;
+
+  bindGroupButtons();
+}
+
+function fillGroup(index){
+  if(!Number.isInteger(index)||index<0||index>=data.groups.length){
+    return false;
+  }
+
+  const group=data.groups[index];
+
+  document.getElementById("groupIcon").className=
+    "page-icon "+colorFor(data.top.length+index);
+
+  document.getElementById("groupIcon").textContent=
+    safeIcon(group.icon);
+
+  document.getElementById("groupTitle").textContent=
+    group.name||"Group";
+
+  document.getElementById("groupDesc").textContent=
+    group.description||"";
+
+  document.getElementById("groupContent").innerHTML=
+    group.items.length
+      ? `<div class="grid">${group.items.map((item,i)=>itemTile(item,i)).join("")}</div>`
+      : `<div class="empty">No apps in this group.</div>`;
+
+  return true;
+}
+
+function openGroup(index){
+  if(!fillGroup(index))return;
+
+  document.getElementById("home").classList.remove("active");
+  document.getElementById("group").classList.add("active");
+
+  // Hash only stores the current group; no pushState/replaceState.
+  location.hash="group="+index;
+  scrollTo(0,0);
+}
+
+function showHome(){
+  document.getElementById("group").classList.remove("active");
+  document.getElementById("home").classList.add("active");
+
+  if(location.hash)location.hash="";
+  scrollTo(0,0);
+}
+
+function route(){
+  const match=location.hash.match(/^#group=(\d+)$/);
+
+  if(match){
+    const index=Number(match[1]);
+
+    if(fillGroup(index)){
+      document.getElementById("home").classList.remove("active");
+      document.getElementById("group").classList.add("active");
+      scrollTo(0,0);
+      return;
+    }
+  }
+
+  document.getElementById("group").classList.remove("active");
+  document.getElementById("home").classList.add("active");
+}
+
+async function load(){
+  try{
+    const r=await fetch(BUILD_URL+"?v="+Date.now(),{
+      cache:"no-store",
+      headers:{"Accept":"application/json"}
+    });
+
+    if(!r.ok)throw new Error("HTTP "+r.status);
+
+    const raw=await r.json();
+    data=normalizeConfig(raw);
+
+    document.title=data.name;
+
+    document.getElementById("brand").textContent=data.name;
+    document.getElementById("brandSub").textContent="Live catalog from GitHub";
+
+    document.getElementById("homeTitle").textContent=data.name;
+    document.getElementById("homeDesc").textContent=
+      data.description||"Tools and utilities from AraafRoyall";
+
+    renderHome();
+    route();
+  }catch(e){
+    document.getElementById("brandSub").textContent="Catalog unavailable";
+    document.getElementById("homeDesc").textContent=
+      "Could not load build.json.";
+
+    document.getElementById("homeContent").innerHTML=
+      `<div class="error">
+        Unable to load the app catalog.<br><br>
+        ${esc(e.message)}
+      </div>`;
+  }
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+  if(document.getElementById("home").classList.contains("active")){
+    renderHome(e.target.value);
+  }
+});
+
+window.addEventListener("hashchange",route);
+
+load();
+</script>
+</body>
+</html>
