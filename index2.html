@@ -24,6 +24,11 @@ html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
 font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{padding:14px}
 .app{width:min(760px,100%);margin:0 auto}
+.topbar{height:48px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.topbarTitle{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.refresh{width:42px;height:42px;border:1px solid var(--line);border-radius:13px;background:#fff;
+color:var(--text);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow);font-size:20px}
+.refresh:active{transform:scale(.96)}
 .hero{background:linear-gradient(145deg,#eaf9f1,#effbf9);border:1px solid #d6eee3;
 border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
 .heroTop{display:flex;align-items:center;gap:12px}
