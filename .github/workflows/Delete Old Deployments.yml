@@ -1,10 +1,9 @@
-name: Cleanup Deployments
+name: Cleanup GitHub Pages Deployments
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: read
   deployments: write
 
 jobs:
@@ -14,28 +13,28 @@ jobs:
     steps:
       - name: Keep latest 3 deployments
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           set -e
 
-          echo "Fetching deployments..."
+          echo "Fetching GitHub Pages deployments..."
 
           deployments=$(gh api \
             --paginate \
             -H "Accept: application/vnd.github+json" \
-            "/repos/$REPO/deployments?per_page=100" \
-            --jq '.[] | [.id, .created_at, .environment] | @tsv')
+            "/repos/$REPO/deployments?environment=github-pages&per_page=100" \
+            --jq '.[] | [.id, .created_at] | @tsv')
 
           count=0
 
-          while IFS=$'\t' read -r id created environment; do
+          while IFS=$'\t' read -r id created; do
             [ -z "$id" ] && continue
 
             count=$((count + 1))
 
             if [ "$count" -le 3 ]; then
-              echo "KEEP  #$id  $created  $environment"
+              echo "KEEP    #$id  $created"
               continue
             fi
 
@@ -44,18 +43,18 @@ jobs:
               "/repos/$REPO/deployments/$id/statuses" \
               --jq '.[0].state // "unknown"')
 
-            echo "OLD   #$id  $created  $environment  status=$status"
-
             if [ "$status" = "inactive" ]; then
+              echo "DELETE  #$id  $created"
+
               gh api \
                 --method DELETE \
                 -H "Accept: application/vnd.github+json" \
                 "/repos/$REPO/deployments/$id"
 
-              echo "DELETED #$id"
             else
-              echo "SKIPPED #$id — deployment is not inactive"
+              echo "SKIP    #$id  $created  status=$status"
             fi
+
           done <<< "$deployments"
 
           echo "Cleanup complete."
