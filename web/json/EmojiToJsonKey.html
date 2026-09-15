@@ -4,29 +4,63 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Emoji Key Generator</title>
+
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;margin:0;overflow:hidden}
 body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#17211d}
 .app{width:100%;height:100dvh;display:flex;flex-direction:column;padding:16px 16px 84px}
-.header{flex:none;margin-bottom:12px}
+.header{flex:none;margin-bottom:11px}
 .title{margin:0;font-size:25px;font-weight:850;letter-spacing:-.5px;color:#087f5b}
 .subtitle{margin:4px 0 0;font-size:13px;color:#74817b}
-.info-card{flex:none;border:1px solid #e6ece9;border-radius:17px;background:#fff;padding:14px;box-shadow:0 5px 18px rgba(20,60,45,.06)}
-.info-row{display:flex;justify-content:space-between;align-items:center}
+
+.card{flex:none;border:1px solid #e6ece9;border-radius:17px;background:#fff;padding:14px;box-shadow:0 5px 18px rgba(20,60,45,.06)}
+.setup-card{display:none}
+.setup-card.show{display:block}
+.info-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .info-title{font-size:14px;font-weight:800;color:#34463e}
-.badge{background:#e9f8f3;color:#087f5b;padding:6px 9px;border-radius:20px;font-size:11px;font-weight:800}
+.badge{background:#e9f8f3;color:#087f5b;padding:6px 9px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}
+
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.check{
+    display:flex;align-items:center;gap:9px;
+    border:1px solid #e1e9e5;border-radius:12px;
+    padding:10px;background:#fbfdfc;
+    color:#34463e;font-size:13px;font-weight:700;
+}
+.check:has(input:checked){border-color:#9edfc9;background:#effaf6}
+.check input{width:17px;height:17px;accent-color:#0f9f73;margin:0}
+.all-wrap{margin-top:8px}
+.setup-actions{display:flex;gap:9px;margin-top:11px}
+.setup-actions button,.preset-change{
+    border:none;border-radius:12px;padding:11px 12px;font-size:13px;font-weight:800
+}
+.setup-generate{flex:1;background:#0f9f73;color:#fff}
+.setup-all{background:#e9f3fb;color:#1769aa}
+.setup-meta{margin-top:8px;font-size:11px;color:#7a8781;line-height:1.4}
+
+.preset-summary{display:none;align-items:center;justify-content:space-between;gap:10px}
+.preset-summary.show{display:flex}
+.preset-summary-left{min-width:0}
+.preset-summary-title{font-size:13px;font-weight:800;color:#34463e}
+.preset-summary-value{margin-top:3px;font-size:12px;color:#78867f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preset-change{background:#eef6fb;color:#1769aa;flex:none}
+
 .info-text{margin-top:8px;font-size:12px;color:#7a8781;line-height:1.45}
 .controls{display:flex;gap:9px;flex:none;margin:12px 0}
 .action{flex:1;border:1px solid transparent;border-radius:12px;padding:11px 8px;font-size:14px;font-weight:750;cursor:pointer}
 .copy{background:#e9f8f3;color:#087f5b;border-color:#d7eee7}
 .download{background:#fff4d8;color:#986500;border-color:#f5e6bb}
+
 .json-card{min-height:0;flex:1;display:flex;flex-direction:column;border:1px solid #e6ece9;border-radius:17px;background:#fff;box-shadow:0 5px 18px rgba(20,60,45,.06);padding:12px}
-.json-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.json-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;gap:8px}
 .json-title{font-size:14px;font-weight:800;color:#31423a}
-.json-badge{font-size:11px;font-weight:750;color:#1769aa;background:#e9f3fb;border-radius:20px;padding:5px 8px}
+.json-badge{font-size:11px;font-weight:750;color:#1769aa;background:#e9f3fb;border-radius:20px;padding:5px 8px;white-space:nowrap}
 pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;white-space:pre-wrap;word-break:break-word;background:#f7faf9;border:1px solid #e8efec;border-radius:13px;padding:12px;font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;line-height:1.5;color:#29352f}
+
 .fab{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:calc(100% - 32px);max-width:420px;height:52px;border:none;border-radius:17px;color:#fff;font-size:15px;font-weight:800;letter-spacing:.1px;cursor:pointer;background:#0f9f73;box-shadow:0 8px 22px rgba(15,118,110,.25),inset 0 1px 1px rgba(255,255,255,.32)}
+.fab:active{transform:translateX(-50%) scale(.985)}
+
 .overlay{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(15,30,24,.28);backdrop-filter:blur(4px);z-index:20}
 .dialog{width:100%;max-width:440px;background:#fff;border-radius:24px 24px 0 0;padding:18px;box-shadow:0 -12px 35px rgba(0,0,0,.16);animation:slideUp .2s ease}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -37,24 +71,61 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
 .dialog-buttons{display:flex;gap:9px;margin-top:12px}
 .dialog-buttons button{flex:1;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:750}
 .cancel{background:#eef2f0;color:#50625a}.save{background:#1769aa;color:#fff}
+
 #toast{position:fixed;left:50%;bottom:79px;transform:translateX(-50%) translateY(10px);background:#146c57;color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.22s;z-index:30;box-shadow:0 6px 20px rgba(0,0,0,.15)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
+
 <body>
 
+<!-- EmojiPool.txt must be beside this file -->
 <div class="app">
+
   <div class="header">
     <h1 class="title">Emoji Key Generator</h1>
     <div class="subtitle">Generate a random emoji mapping instantly.</div>
   </div>
 
-  <div class="info-card">
+  <div class="card setup-card show" id="setupCard">
     <div class="info-row">
-      <div class="info-title">Emoji Pool</div>
+      <div class="info-title">Choose JSON Preset</div>
       <div class="badge" id="poolBadge">Loading...</div>
     </div>
-    <div class="info-text">Built-in Emoji Pool is loaded from the server.</div>
+
+    <div class="preset-grid">
+      <label class="check"><input type="checkbox" id="az"> A – Z</label>
+      <label class="check"><input type="checkbox" id="low"> a – z</label>
+      <label class="check"><input type="checkbox" id="num"> 0 – 9</label>
+      <label class="check"><input type="checkbox" id="special"> Special</label>
+    </div>
+
+    <div class="all-wrap">
+      <label class="check">
+        <input type="checkbox" id="all">
+        All
+      </label>
+    </div>
+
+    <div class="setup-actions">
+      <button class="setup-generate" onclick="applyPreset(true)">Use Selected Preset</button>
+      <button class="setup-all" onclick="selectAll()">Select All</button>
+    </div>
+
+    <div class="setup-meta" id="presetMeta">
+      Select the key groups you want in the JSON.
+    </div>
+  </div>
+
+  <div class="card" id="summaryCard" style="display:none">
+    <div class="preset-summary show">
+      <div class="preset-summary-left">
+        <div class="preset-summary-title">Current Preset</div>
+        <div class="preset-summary-value" id="presetSummary">Not set</div>
+      </div>
+      <button class="preset-change" onclick="changePreset()">Change Preset</button>
+    </div>
+    <div class="info-text">The key groups above determine which entries are generated.</div>
   </div>
 
   <div class="controls">
@@ -65,10 +136,11 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
   <div class="json-card">
     <div class="json-header">
       <div class="json-title">Generated JSON</div>
-      <div class="json-badge" id="status">Not generated</div>
+      <div class="json-badge" id="status">Preset not set</div>
     </div>
-    <pre id="output">Press Generate New to create your emoji mapping.</pre>
+    <pre id="output">Choose a preset to begin.</pre>
   </div>
+
 </div>
 
 <button class="fab" onclick="generate()">＋ Generate New</button>
@@ -90,9 +162,24 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
 <script>
 let currentJSON="";
 let EMOJIS=[];
+let selectedKeys=[];
+let presetSet=false;
+
 const output=document.getElementById("output");
 const status=document.getElementById("status");
 const poolBadge=document.getElementById("poolBadge");
+const setupCard=document.getElementById("setupCard");
+const summaryCard=document.getElementById("summaryCard");
+const presetSummary=document.getElementById("presetSummary");
+const presetMeta=document.getElementById("presetMeta");
+
+const checks={
+  az:document.getElementById("az"),
+  low:document.getElementById("low"),
+  num:document.getElementById("num"),
+  special:document.getElementById("special"),
+  all:document.getElementById("all")
+};
 
 function getEmojis(text){
   if(typeof Intl!=="undefined"&&Intl.Segmenter){
@@ -105,16 +192,12 @@ function getEmojis(text){
 async function loadPool(){
   try{
     const r=await fetch("EmojiPool.txt",{cache:"no-store"});
-    if(!r.ok) throw new Error("HTTP "+r.status);
+    if(!r.ok)throw new Error("HTTP "+r.status);
     const text=await r.text();
     EMOJIS=[...new Set(getEmojis(text))];
     poolBadge.textContent=EMOJIS.length+" emojis";
-    if(EMOJIS.length<102){
-      poolBadge.textContent="Too small";
-      showToast("EmojiPool.txt needs more emojis");
-    }
+    if(EMOJIS.length<102)showToast("EmojiPool.txt needs more emojis");
   }catch(e){
-    EMOJIS=[];
     poolBadge.textContent="Load failed";
     output.textContent="Unable to load EmojiPool.txt.\n\nKeep EmojiPool.txt in the same folder as index.html.";
     status.textContent="Pool error";
@@ -122,25 +205,109 @@ async function loadPool(){
   }
 }
 
-function generate(){
+function buildKeys(){
   const keys=[];
-  for(let i=65;i<=90;i++)keys.push(String.fromCharCode(i));
-  for(let i=97;i<=122;i++)keys.push(String.fromCharCode(i));
-  for(let i=48;i<=57;i++)keys.push(String.fromCharCode(i));
-  keys.push("=","/","#","-","+","*","_","@","&","%",".","?");
+  if(checks.all.checked||checks.az.checked)
+    for(let i=65;i<=90;i++)keys.push(String.fromCharCode(i));
+  if(checks.all.checked||checks.low.checked)
+    for(let i=97;i<=122;i++)keys.push(String.fromCharCode(i));
+  if(checks.all.checked||checks.num.checked)
+    for(let i=48;i<=57;i++)keys.push(String.fromCharCode(i));
+  if(checks.all.checked||checks.special.checked)
+    keys.push("=","/","#","-","+","*","_","@","&","%",".","?");
+  return keys;
+}
 
-  if(EMOJIS.length<keys.length){
+function presetNames(){
+  if(checks.all.checked)return "All · A–Z · a–z · 0–9 · Special";
+  const names=[];
+  if(checks.az.checked)names.push("A–Z");
+  if(checks.low.checked)names.push("a–z");
+  if(checks.num.checked)names.push("0–9");
+  if(checks.special.checked)names.push("Special");
+  return names.join(" · ");
+}
+
+function selectAll(){
+  checks.all.checked=true;
+  checks.az.checked=checks.low.checked=checks.num.checked=checks.special.checked=true;
+  updatePresetMeta();
+}
+
+checks.all.addEventListener("change",()=>{
+  const v=checks.all.checked;
+  checks.az.checked=checks.low.checked=checks.num.checked=checks.special.checked=v;
+  updatePresetMeta();
+});
+
+["az","low","num","special"].forEach(k=>{
+  checks[k].addEventListener("change",()=>{
+    if(!checks[k].checked)checks.all.checked=false;
+    if(checks.az.checked&&checks.low.checked&&checks.num.checked&&checks.special.checked)checks.all.checked=true;
+    updatePresetMeta();
+  });
+});
+
+function updatePresetMeta(){
+  const keys=buildKeys();
+  presetMeta.textContent=keys.length?keys.length+" JSON keys selected.":"Select at least one key group.";
+}
+
+function applyPreset(){
+  const keys=buildKeys();
+  if(!keys.length){
+    showToast("Select at least one preset");
+    return;
+  }
+  if(keys.length>EMOJIS.length){
+    showToast("Need "+keys.length+" unique emojis");
+    return;
+  }
+
+  selectedKeys=keys;
+  presetSet=true;
+
+  presetSummary.textContent=
+    presetNames()+" · "+keys.length+" keys";
+
+  setupCard.classList.remove("show");
+  setupCard.style.display="none";
+  summaryCard.style.display="block";
+
+  status.textContent=keys.length+" keys";
+  output.textContent="Preset ready.\n\nPress Generate New to create the mapping.";
+  generate();
+}
+
+function changePreset(){
+  setupCard.style.display="block";
+  setupCard.classList.add("show");
+  summaryCard.style.display="none";
+  updatePresetMeta();
+}
+
+function generate(){
+  if(!presetSet){
+    showToast("Choose a preset first");
+    setupCard.style.display="block";
+    setupCard.classList.add("show");
+    return;
+  }
+
+  if(selectedKeys.length>EMOJIS.length){
     showToast("Not enough unique emojis");
     return;
   }
 
   const pool=[...EMOJIS];
   shuffle(pool);
+
   const map={};
-  keys.forEach((key,i)=>map[key]=pool[i]);
+  selectedKeys.forEach((key,i)=>map[key]=pool[i]);
+
   currentJSON=JSON.stringify(map,null,4);
   output.textContent=currentJSON;
-  status.textContent=keys.length+" keys";
+  status.textContent=selectedKeys.length+" keys";
   showToast("New mapping generated");
 }
 
@@ -207,6 +374,7 @@ function showToast(message){
   window.toastTimer=setTimeout(()=>t.classList.remove("show"),1600);
 }
 
+updatePresetMeta();
 loadPool();
 </script>
 </body>
