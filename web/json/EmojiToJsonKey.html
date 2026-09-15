@@ -50,6 +50,48 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 .all-wrap{margin-top:8px}
 .setup-meta{margin-top:8px;font-size:11px;color:#7a8781;line-height:1.4}
 
+.pool-status{
+    width:100%;
+    min-height:28px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:8px;
+    padding:6px 10px;
+    border:1px solid #e8efec;
+    border-radius:9px;
+    background:#f8fbfa;
+    color:#64736c;
+    font-size:11px;
+    font-weight:700;
+}
+.pool-status-dot{
+    width:7px;
+    height:7px;
+    flex:none;
+    border-radius:50%;
+    background:#f0b429;
+}
+.pool-status.loaded{
+    color:#087f5b;
+    background:#f3fbf8;
+    border-color:#d9efe7;
+}
+.pool-status.loaded .pool-status-dot{background:#0f9f73}
+.pool-status.fallback{
+    color:#1769aa;
+    background:#f3f8fc;
+    border-color:#dcecf7;
+}
+.pool-status.fallback .pool-status-dot{background:#1769aa}
+.pool-status.error{
+    color:#a05f00;
+    background:#fff9ec;
+    border-color:#f4e4bc;
+}
+.pool-status.error .pool-status-dot{background:#e2a400}
+
+
 .preset-summary{display:none;align-items:center;justify-content:space-between;gap:10px}
 .preset-summary.show{display:flex}
 .preset-summary-left{min-width:0}
@@ -91,6 +133,22 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
 <body>
 
 <!-- EmojiPool.txt must be beside this file -->
+<!-- Built-in fallback emoji pool -->
+<script>
+const BUILTIN_EMOJI_POOL = `😀 😁 😂 🤣 😃 😄 😅 😆 😉 😊 😋 😎 😍 😘 😗 😙 😚 🙂 🤗 🤩
+🤔 🤨 😐 😑 😶 🙄 😏 😣 😥 😮 🤐 😯 😪 😫 😴 😌 😛 😜 😝 🤤
+😒 😓 😔 😕 🙃 🤑 😲 ☹️ 🙁 😖 😞 😟 😤 😢 😭 😦 😧 😨 😩 🤯
+😬 😰 😱 🥵 🥶 😳 🤪 😵 😡 😠 🤬 😷 🤒 🤕 🤢 🤮 🤧 😇 🥳 🥺
+🤠 🤡 💩 👻 💀 ☠️ 👽 🤖 🎃 😺 😸 😹 😻 😼 😽 🙀 😿 😾
+🚀 🚁 🚗 🚕 🚌 🚓 🚑 🚒 🚜 ✈️ 🛳️ 🚤 🛵 🚲 🛴
+🌍 🌎 🌏 🌙 ⭐ 🌟 ✨ ⚡ 🔥 💧 🌈 ☀️ 🌤️ ⛅ 🌧️ ❄️ ☃️ 🌊 🌱 🌳
+🍎 🍉 🍇 🍓 🍒 🍍 🥭 🍕 🍔 🍟 🌮 🍩 🍪 🍫 🍿 🥤 ☕
+⚽ 🏀 🏈 ⚾ 🎾 🏐 🎮 🎲 🎯 🏆 🥇 🥈 🥉 🎸 🎹 🎧 🎤
+❤️ 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💖 💗 💓 💕 💞 💘 💝 💟
+👍 👎 👌 ✌️ 🤞 🤟 🤘 👏 🙌 🙏 💪 👀 👋 🤝 🫶 🎈🎁🎖️🏅🥇🥈🥉🎗️⚽⚾🥎🏀🏐🎾🥏
+🔼 🔽 ⏫ ⏬ ✅ ❌ ⚠️ ❗ ❓ ⭐ ✳️ ✴️ 🔥 💎 🎁 🧩 🛠️ 🔒 🔑`;
+</script>
+
 <div class="app">
 
   <div class="header">
@@ -143,6 +201,11 @@ pre{margin:0;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
     <div class="info-text">The key groups above determine which entries are generated.</div>
   </div>
 
+  <div class="pool-status" id="poolHelper">
+    <span class="pool-status-dot"></span>
+    <span id="poolHelperText">Loading Emoji Pool...</span>
+  </div>
+
   <div class="controls">
     <button class="action copy" onclick="copyJSON()">Copy JSON</button>
     <button class="action download" onclick="openDownload()">Export JSON</button>
@@ -184,6 +247,7 @@ const output=document.getElementById("output");
 const status=document.getElementById("status");
 const poolBadge=document.getElementById("poolBadge");
 const poolHelper=document.getElementById("poolHelper");
+const poolHelperText=document.getElementById("poolHelperText");
 const setupCard=document.getElementById("setupCard");
 const summaryCard=document.getElementById("summaryCard");
 const presetSummary=document.getElementById("presetSummary");
@@ -208,21 +272,26 @@ function getEmojis(text){
 async function loadPool(){
   try{
     const r=await fetch("EmojiPool.txt",{cache:"no-store"});
-    if(!r.ok)throw new Error("HTTP "+r.status);
+    if(!r.ok) throw new Error("HTTP "+r.status);
+
     const text=await r.text();
     EMOJIS=[...new Set(getEmojis(text))];
+
+    if(EMOJIS.length===0) throw new Error("Empty pool");
+
     poolBadge.textContent=EMOJIS.length+" emojis";
-    poolHelper.textContent="✓ Emoji Pool Loaded";
-    if(EMOJIS.length<102) {
-      poolHelper.textContent="⚠ Emoji Pool Loaded, but needs more unique emojis";
-      showToast("EmojiPool.txt needs more emojis");
+    poolHelper.className="pool-status loaded";
+    poolHelperText.textContent="✓ Emoji Pool Loaded · EmojiPool.txt";
+
+    if(EMOJIS.length<102){
+      poolHelper.className="pool-status error";
+      poolHelperText.textContent="⚠ Emoji Pool Loaded · needs more unique emojis";
     }
   }catch(e){
-    poolBadge.textContent="Load failed";
-    poolHelper.textContent="✕ Emoji Pool could not be loaded";
-    output.textContent="Unable to load EmojiPool.txt.\n\nKeep EmojiPool.txt in the same folder as index.html.";
-    status.textContent="Pool error";
-    showToast("Could not load EmojiPool.txt");
+    EMOJIS=[...new Set(getEmojis(BUILTIN_EMOJI_POOL))];
+    poolBadge.textContent=EMOJIS.length+" emojis";
+    poolHelper.className="pool-status fallback";
+    poolHelperText.textContent="↺ Using built-in Emoji Pool · EmojiPool.txt unavailable";
   }
 }
 
