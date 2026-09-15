@@ -1,0 +1,61 @@
+name: Cleanup Deployments
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Keep latest 3 deployments
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+
+          echo "Fetching deployments..."
+
+          deployments=$(gh api \
+            --paginate \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/$REPO/deployments?per_page=100" \
+            --jq '.[] | [.id, .created_at, .environment] | @tsv')
+
+          count=0
+
+          while IFS=$'\t' read -r id created environment; do
+            [ -z "$id" ] && continue
+
+            count=$((count + 1))
+
+            if [ "$count" -le 3 ]; then
+              echo "KEEP  #$id  $created  $environment"
+              continue
+            fi
+
+            status=$(gh api \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$REPO/deployments/$id/statuses" \
+              --jq '.[0].state // "unknown"')
+
+            echo "OLD   #$id  $created  $environment  status=$status"
+
+            if [ "$status" = "inactive" ]; then
+              gh api \
+                --method DELETE \
+                -H "Accept: application/vnd.github+json" \
+                "/repos/$REPO/deployments/$id"
+
+              echo "DELETED #$id"
+            else
+              echo "SKIPPED #$id — deployment is not inactive"
+            fi
+          done <<< "$deployments"
+
+          echo "Cleanup complete."
