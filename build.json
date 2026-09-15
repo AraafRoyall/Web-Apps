@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "name": "Royall Web Apps",
+
+  "top": [
+    {
+      "name": "Cleaner Royall",
+      "description": "Cleaner script maker",
+      "url": "cleaner.html",
+      "icon": "CR"
+    },
+    {
+      "name": "JSON Manager",
+      "description": "Create and edit JSON",
+      "url": "json/json.html",
+      "icon": "{}"
+    }
+  ],
+
+  "groups": [
+    {
+      "name": "Cryptography",
+      "description": "Encryption and security tools",
+      "items": [
+        {
+          "name": "AES Crypto",
+          "description": "AES encryption utility",
+          "url": "CryptoECC/AES.html",
+          "icon": "A"
+        },
+        {
+          "name": "ECC Crypto",
+          "description": "Elliptic curve tools",
+          "url": "CryptoECC/index.html",
+          "icon": "E"
+        }
+      ]
+    },
+    {
+      "name": "Utilities",
+      "description": "Useful web tools",
+      "items": [
+        {
+          "name": "QR Tools",
+          "description": "QR utilities",
+          "url": "qr/qr.html",
+          "icon": "QR"
+        }
+      ]
+    }
+  ]
+}
