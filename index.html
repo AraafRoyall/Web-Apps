@@ -78,38 +78,93 @@ button,input{font:inherit}button{cursor:pointer}
 <script>
 const BUILD_URL="https://raw.githubusercontent.com/AraafRoyall/Web-Apps/main/build.json";
 const COLORS=["green","teal","amber","blue"];
-let data={top:[],groups:[],WebAppsFolder:"web/"};
+let data={
+  version:1,
+  name:"Royall Web Apps",
+  description:"Tools and utilities from AraafRoyall",
+  WebAppsFolder:"web/",
+  top:[],
+  groups:[]
+};
 
 function esc(v){
-  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
 }
+
 function colorFor(index){
-  return COLORS[Math.floor(index/2)%4];
+  return COLORS[Math.floor(index/2)%COLORS.length];
 }
+
 function safeIcon(value){
-  return value==null||String(value).trim()===""?"*":value;
+  const s=String(value??"").trim();
+  return s||"*";
 }
+
 function normalizeFolder(folder){
   let f=String(folder??"web/").trim().replace(/^\/+|\/+$/g,"");
   return f?f+"/":"";
 }
 
 /*
-  build.json lives beside the repository-root index.html.
-  App paths in JSON are relative to WebAppsFolder.
+  JSON contract:
 
-  Example:
-    WebAppsFolder = "web/"
-    url = "cleaner.html"
-    -> /Web-Apps/web/cleaner.html
+  {
+    version,
+    name,
+    description,
+    WebAppsFolder,
+    top: [ app, app, ... ],
+    groups: [
+      {
+        name,
+        description,
+        icon,
+        items: [ app, app, ... ]
+      }
+    ]
+  }
+
+  App:
+  {
+    name,
+    description,
+    url,
+    icon
+  }
+
+  Extra/unknown JSON fields are intentionally ignored so the schema
+  can be extended later without breaking the launcher.
 */
+
+function normalizeConfig(raw){
+  const root=(raw&&typeof raw==="object")?raw:{};
+
+  return {
+    version:root.version??1,
+    name:root.name||"Royall Web Apps",
+    description:root.description||"",
+    WebAppsFolder:root.WebAppsFolder||"web/",
+    top:Array.isArray(root.top)?root.top:[],
+    groups:Array.isArray(root.groups)?root.groups:[]
+  };
+}
+
 function itemUrl(item){
   const raw=String(item?.url??"").trim();
   if(!raw)return "#";
 
-  // Keep absolute/external URLs untouched.
-  if(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)||raw.startsWith("//"))return raw;
+  // External URLs stay exactly as supplied by JSON.
+  if(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)||raw.startsWith("//")){
+    return raw;
+  }
 
+  // Relative app URL = WebAppsFolder + url.
   return new URL(
     normalizeFolder(data.WebAppsFolder)+raw.replace(/^\/+/,""),
     document.baseURI||location.href
@@ -120,109 +175,125 @@ function itemTile(item,index){
   const c=colorFor(index);
   const url=itemUrl(item);
 
-  /*
-    Use a real anchor for app navigation.
-    This works for:
-      - GitHub Pages relative app URLs
-      - absolute https:// URLs
-      - other external sites
-      - Android WebView/browser link handling
-  */
   return `<a class="tile" href="${esc(url)}">
-    <div class="tile-icon ${c}">${esc(safeIcon(item.icon))}</div>
+    <div class="tile-icon ${c}">${esc(safeIcon(item?.icon))}</div>
     <div class="tile-body">
-      <div class="tile-name">${esc(item.name||"Untitled")}</div>
-      <div class="tile-desc">${esc(item.description||"")}</div>
+      <div class="tile-name">${esc(item?.name||"Untitled")}</div>
+      <div class="tile-desc">${esc(item?.description||"")}</div>
     </div>
   </a>`;
 }
 
 function groupTile(group,index){
   const c=colorFor(index);
-  return `<button class="tile" onclick="openGroup(${index})">
-    <div class="tile-icon ${c}">${esc(safeIcon(group.icon))}</div>
+
+  return `<button class="tile" type="button" onclick="openGroup(${index})">
+    <div class="tile-icon ${c}">${esc(safeIcon(group?.icon))}</div>
     <div class="tile-body">
-      <div class="tile-name">${esc(group.name||"Group")}</div>
-      <div class="tile-desc">${esc(group.description||"")}</div>
+      <div class="tile-name">${esc(group?.name||"Group")}</div>
+      <div class="tile-desc">${esc(group?.description||"")}</div>
     </div>
   </button>`;
 }
 
-function entryMatches(entry,s){
-  if(!s)return true;
-  const own=(entry.name+" "+(entry.description||"")).toLowerCase();
-  if(own.includes(s))return true;
+function matchesText(obj,q){
+  if(!q)return true;
 
-  // Searching a child app keeps the group visible.
-  if(Array.isArray(entry.items)){
-    return entry.items.some(item=>
-      (item.name+" "+(item.description||"")).toLowerCase().includes(s)
-    );
-  }
-  return false;
+  const text=(
+    String(obj?.name??"")+" "+
+    String(obj?.description??"")
+  ).toLowerCase();
+
+  return text.includes(q);
+}
+
+function groupMatches(group,q){
+  if(!q)return true;
+  if(matchesText(group,q))return true;
+
+  const items=Array.isArray(group?.items)?group.items:[];
+  return items.some(item=>matchesText(item,q));
 }
 
 /*
-  Latest behavior:
-  - One unified home list.
-  - Direct apps and groups are mixed automatically in JSON order:
-      top[] first, then groups[].
-  - No "Top Apps" / "Groups" headings.
-  - A group is visually just another tile.
+  Home ordering is exactly:
+    top[0...n]
+    then groups[0...n]
+
+  There are no hard-coded categories, so future top/groups entries
+  added to build.json automatically appear here.
 */
 function renderHome(q=""){
-  const s=q.trim().toLowerCase();
+  const search=String(q||"").trim().toLowerCase();
   const top=Array.isArray(data.top)?data.top:[];
   const groups=Array.isArray(data.groups)?data.groups:[];
 
-  const entries=[
-    ...top.map(item=>({type:"item",item})),
-    ...groups.map((group,index)=>({type:"group",item:group,index}))
-  ];
-
   let html="";
-  entries.forEach((entry,index)=>{
-    if(!entryMatches(entry.item,s))return;
+  let visualIndex=0;
 
-    // Color follows the actual unified visual row order.
-    html+=entry.type==="group"
-      ? groupTile(entry.item,index,entry.index)
-      : itemTile(entry.item,index);
+  top.forEach(item=>{
+    if(matchesText(item,search)){
+      html+=itemTile(item,visualIndex);
+    }
+    visualIndex++;
   });
 
-  if(!html)html=`<div class="empty">No apps found.</div>`;
+  groups.forEach((group,index)=>{
+    if(groupMatches(group,search)){
+      html+=groupTile(group,visualIndex,index);
+    }
+    visualIndex++;
+  });
+
   document.getElementById("homeContent").innerHTML=
-    `<div class="grid">${html}</div>`;
+    html
+      ? `<div class="grid">${html}</div>`
+      : `<div class="empty">No apps found.</div>`;
+}
+
+function fillGroup(index){
+  const group=data.groups[index];
+  if(!group)return false;
+
+  document.getElementById("groupIcon").className=
+    "page-icon "+colorFor(index);
+
+  document.getElementById("groupIcon").textContent=
+    safeIcon(group.icon);
+
+  document.getElementById("groupTitle").textContent=
+    group.name||"Group";
+
+  document.getElementById("groupDesc").textContent=
+    group.description||"";
+
+  const items=Array.isArray(group.items)?group.items:[];
+
+  document.getElementById("groupContent").innerHTML=
+    items.length
+      ? `<div class="grid">${items.map((item,i)=>itemTile(item,i)).join("")}</div>`
+      : `<div class="empty">No apps in this group.</div>`;
+
+  return true;
 }
 
 function openGroup(index){
-  const g=data.groups[index];
-  if(!g)return;
-
-  document.getElementById("groupIcon").className="page-icon "+colorFor(index);
-  document.getElementById("groupIcon").textContent=safeIcon(g.icon);
-  document.getElementById("groupTitle").textContent=g.name||"Group";
-  document.getElementById("groupDesc").textContent=g.description||"";
-
-  const items=Array.isArray(g.items)?g.items:[];
-  document.getElementById("groupContent").innerHTML=items.length
-    ? `<div class="grid">${items.map((x,i)=>itemTile(x,i)).join("")}</div>`
-    : `<div class="empty">No apps in this group.</div>`;
+  if(!fillGroup(index))return;
 
   document.getElementById("home").classList.remove("active");
   document.getElementById("group").classList.add("active");
-  scrollTo(0,0);
 
-  // Hash only; safe for Android content:// and GitHub Pages.
+  // Hash routing keeps the group state without changing the UI.
   location.hash="group="+index;
+  scrollTo(0,0);
 }
 
 function showHome(){
   document.getElementById("group").classList.remove("active");
   document.getElementById("home").classList.add("active");
-  scrollTo(0,0);
 
   if(location.hash)location.hash="";
+  scrollTo(0,0);
 }
 
 function route(){
@@ -230,78 +301,67 @@ function route(){
 
   if(match){
     const index=Number(match[1]);
-    if(Number.isInteger(index)&&index>=0&&index<(data.groups||[]).length){
-      openGroupViewOnly(index);
+
+    if(
+      Number.isInteger(index)&&
+      index>=0&&
+      index<data.groups.length&&
+      fillGroup(index)
+    ){
+      document.getElementById("home").classList.remove("active");
+      document.getElementById("group").classList.add("active");
+      scrollTo(0,0);
       return;
     }
   }
 
-  showHomeViewOnly();
-}
-
-function openGroupViewOnly(index){
-  const g=data.groups[index];
-  if(!g)return;
-
-  document.getElementById("groupIcon").className="page-icon "+colorFor(index);
-  document.getElementById("groupIcon").textContent=safeIcon(g.icon);
-  document.getElementById("groupTitle").textContent=g.name||"Group";
-  document.getElementById("groupDesc").textContent=g.description||"";
-
-  const items=Array.isArray(g.items)?g.items:[];
-  document.getElementById("groupContent").innerHTML=items.length
-    ? `<div class="grid">${items.map((x,i)=>itemTile(x,i)).join("")}</div>`
-    : `<div class="empty">No apps in this group.</div>`;
-
-  document.getElementById("home").classList.remove("active");
-  document.getElementById("group").classList.add("active");
-  scrollTo(0,0);
-}
-
-function showHomeViewOnly(){
   document.getElementById("group").classList.remove("active");
   document.getElementById("home").classList.add("active");
 }
 
 async function load(){
   try{
-    const r=await fetch(BUILD_URL+"?v="+Date.now(),{cache:"no-store"});
+    const r=await fetch(BUILD_URL+"?v="+Date.now(),{
+      cache:"no-store",
+      headers:{"Accept":"application/json"}
+    });
+
     if(!r.ok)throw new Error("HTTP "+r.status);
 
-    const parsed=await r.json();
+    const raw=await r.json();
+    data=normalizeConfig(raw);
 
-    data={
-      top:Array.isArray(parsed.top)?parsed.top:[],
-      groups:Array.isArray(parsed.groups)?parsed.groups:[],
-      WebAppsFolder:parsed.WebAppsFolder||"web/"
-    };
+    document.title=data.name;
+    document.getElementById("brand").textContent=data.name;
+    document.getElementById("brandSub").textContent=
+      "Live catalog from GitHub";
 
-    const name=parsed.name||"Royall Web Apps";
-    document.title=name;
-    document.getElementById("brand").textContent=name;
-    document.getElementById("brandSub").textContent="Live catalog from GitHub";
-    document.getElementById("homeTitle").textContent=name;
+    document.getElementById("homeTitle").textContent=data.name;
     document.getElementById("homeDesc").textContent=
-      parsed.description||"Tools and utilities from AraafRoyall";
+      data.description||"Tools and utilities from AraafRoyall";
 
     renderHome();
     route();
   }catch(e){
     document.getElementById("brandSub").textContent="Catalog unavailable";
-    document.getElementById("homeDesc").textContent="Could not load build.json from GitHub.";
+    document.getElementById("homeDesc").textContent=
+      "Could not load build.json from GitHub.";
+
     document.getElementById("homeContent").innerHTML=
-      `<div class="error">Unable to load the app catalog.<br><br>${esc(e.message)}</div>`;
+      `<div class="error">
+        Unable to load the app catalog.<br><br>
+        ${esc(e.message)}
+      </div>`;
   }
 }
 
 document.getElementById("search").addEventListener("input",e=>{
-  if(!document.getElementById("home").classList.contains("active"))return;
-  renderHome(e.target.value);
+  if(document.getElementById("home").classList.contains("active")){
+    renderHome(e.target.value);
+  }
 });
 
-window.addEventListener("hashchange",()=>{
-  if(data)route();
-});
+window.addEventListener("hashchange",route);
 
 load();
 </script>
