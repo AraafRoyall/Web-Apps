@@ -67,6 +67,19 @@
           "icon": "B"
         }
       ]
+    },
+    {
+      "name": "WhatsApp",
+      "description": "WhatsApp related tools",
+      "icon": "*",
+      "items": [
+        {
+          "name": "Chat TXT Reader",
+          "description": "Read WhatsApp chat TXT files",
+          "url": "WhatsApp/ChatTxtReader.html",
+          "icon": "WA"
+        }
+      ]
     }
   ]
 }
