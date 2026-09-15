@@ -1,0 +1,20 @@
+{
+  "name": "Royall Web Apps",
+  "short_name": "Royall Apps",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6faf8",
+  "theme_color": "#18a66a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
