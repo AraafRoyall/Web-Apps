@@ -56,9 +56,14 @@ body{padding:10px}.grid{gap:8px}.tile{padding:9px;gap:9px}.icon{width:40px;heigh
 <body>
 <div class="app"><div id="view"></div></div>
 <script>
-const BUILD_URL="./build.json";
 const COLORS=["green","teal","amber","blue"];
-let DATA=null;
+let DATA={
+  name:"Royall Web Apps",
+  description:"Loading...",
+  WebAppsFolder:"web/",
+  top:[],
+  groups:[]
+};
 
 const view=document.getElementById("view");
 
@@ -209,17 +214,92 @@ window.openGroup=openGroup;
 window.goHome=goHome;
 window.addEventListener("hashchange",route);
 
+function buildJsonUrl(){
+  // build.json is beside this index.html.
+  // This works for GitHub Pages, normal HTTPS, file/content viewers, etc.
+  return new URL("./build.json", document.baseURI || location.href).href;
+}
+
+function renderLoadingShell(){
+  view.innerHTML=`
+    <div class="hero">
+      <div class="heroTop">
+        <div class="heroIcon">R</div>
+        <div>
+          <h1>Royall Web Apps</h1>
+          <p>Loading web apps...</p>
+        </div>
+      </div>
+      <div class="searchWrap">
+        <input class="search" type="search" placeholder="Search apps..." disabled>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="loading" style="grid-column:1/-1">Loading web apps...</div>
+    </div>
+  `;
+}
+
+function renderLoadError(error){
+  view.innerHTML=`
+    <div class="hero">
+      <div class="heroTop">
+        <div class="heroIcon">R</div>
+        <div>
+          <h1>Royall Web Apps</h1>
+          <p>Launcher</p>
+        </div>
+      </div>
+    </div>
+    <div class="error">
+      <strong>Could not load build.json.</strong><br>
+      ${esc(error.message||error)}
+      <br><br>
+      <small>Expected: ${esc(buildJsonUrl())}</small>
+    </div>
+  `;
+}
+
 async function init(){
-  view.innerHTML=`<div class="loading">Loading web apps...</div>`;
+  // Render actual UI immediately. JSON is only the data source.
+  renderLoadingShell();
+
   try{
-    const response=await fetch(BUILD_URL,{cache:"no-store",headers:{"Accept":"application/json"}});
-    if(!response.ok)throw new Error("build.json returned HTTP "+response.status);
-    DATA=await response.json();
-    if(!DATA||typeof DATA!=="object")throw new Error("Invalid build.json format.");
+    const response=await fetch(buildJsonUrl(),{
+      cache:"no-store",
+      headers:{"Accept":"application/json"}
+    });
+
+    if(!response.ok){
+      throw new Error("HTTP "+response.status+" while loading build.json");
+    }
+
+    const text=await response.text();
+
+    let parsed;
+    try{
+      parsed=JSON.parse(text);
+    }catch(e){
+      throw new Error("build.json returned invalid JSON");
+    }
+
+    if(!parsed || typeof parsed!=="object"){
+      throw new Error("build.json is not a JSON object");
+    }
+
+    // Keep UI/data contract defensive.
+    DATA={
+      name:parsed.name||"Royall Web Apps",
+      description:parsed.description||"",
+      WebAppsFolder:parsed.WebAppsFolder||"web/",
+      top:Array.isArray(parsed.top)?parsed.top:[],
+      groups:Array.isArray(parsed.groups)?parsed.groups:[]
+    };
+
     route();
   }catch(error){
     console.error(error);
-    view.innerHTML=`<div class="error"><strong>Unable to load apps.</strong><br>${esc(error.message||error)}</div>`;
+    renderLoadError(error);
   }
 }
 init();
