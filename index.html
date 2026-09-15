@@ -3,306 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6faf8">
+<meta name="theme-color" content="#f7fbf9">
 <title>Royall Web Apps</title>
 <style>
 :root{
   --bg:#f6faf8;--surface:#fff;--surface2:#f2f8f5;--line:#dce9e3;--text:#17342a;--muted:#6f877d;
-  --green:#18a66a;--green2:#0d8a56;--teal:#0ea7a1;--amber:#d99b16;--blue:#3d78d8;
-  --shadow:0 8px 28px rgba(22,72,53,.08);--radius:18px;
+  --green:#18a66a;--green2:#0d8a56;--teal:#0ea7a1;--amber:#e7a51c;--blue:#4388e8;
+  --shadow:0 8px 28px rgba(22,72,53,.08);--radius:18px
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color:var(--text);
-font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{padding:14px}
-.app{width:min(760px,100%);margin:0 auto}
-.hero{background:linear-gradient(145deg,#eaf9f1,#effbf9);border:1px solid #d6eee3;border-radius:24px;
-padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
-.heroTop{display:flex;align-items:center;gap:12px}
-.heroIcon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#18a66a;
-color:#fff;font-weight:800;font-size:18px;box-shadow:0 5px 14px rgba(24,166,106,.2)}
-h1{margin:0;font-size:21px;line-height:1.15;letter-spacing:-.02em}
-.hero p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
-.searchWrap{margin-top:15px}
-.search{width:100%;height:48px;border:1px solid var(--line);border-radius:14px;padding:0 14px;background:#fff;
-color:var(--text);outline:none;font-size:15px;box-shadow:0 4px 14px rgba(22,72,53,.05)}
-.search:focus{border-color:#a9d8c4;box-shadow:0 0 0 3px rgba(24,166,106,.10)}
-.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.back{border:1px solid var(--line);background:#fff;color:var(--text);height:42px;padding:0 14px;border-radius:13px;
-font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
-.pageTitle{margin:0;font-size:19px}
-.pageDesc{margin:4px 0 0;color:var(--muted);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.tile{display:flex;align-items:center;gap:11px;min-width:0;background:#fff;border:1px solid var(--line);
-border-radius:16px;padding:10px;box-shadow:var(--shadow);text-decoration:none;color:inherit;cursor:pointer;
-transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease;width:100%;text-align:left}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}button{cursor:pointer}
+.app{max-width:760px;margin:auto;min-height:100vh;padding:12px 12px 30px}
+.screen{display:none}.screen.active{display:block}
+.topbar{display:flex;align-items:center;gap:11px;padding:6px 2px 17px}
+.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--green),var(--teal));display:grid;place-items:center;color:#fff;font-weight:900;box-shadow:0 8px 22px rgba(14,167,161,.20)}
+.brand{flex:1;min-width:0}.brand h1{margin:0;font-size:18px;line-height:1.2}.brand p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.icon-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);width:42px;height:42px;border-radius:13px;box-shadow:0 4px 14px rgba(22,72,53,.05)}
+.hero{background:linear-gradient(145deg,#eaf9f1,#effbf9);border:1px solid #d6eee3;border-radius:24px;padding:20px;margin-bottom:15px;box-shadow:var(--shadow)}
+.hero h2{margin:0;font-size:26px;letter-spacing:-.6px}.hero p{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.search{margin-top:14px;position:relative}.search span{position:absolute;left:13px;top:9px;font-size:18px;color:var(--muted)}
+.search input{width:100%;border:1px solid #cfe2da;background:#fff;border-radius:13px;padding:12px 13px 12px 39px;color:var(--text);outline:none}
+.search input:focus{border-color:#75c7a4;box-shadow:0 0 0 3px rgba(24,166,106,.08)}
+.section{margin-top:15px}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:0 2px 9px}
+.section-title{font-size:14px;font-weight:850}.muted{font-size:10px;color:var(--muted);margin-top:3px}.count{font-size:10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.tile{border:1px solid var(--line);background:var(--surface);border-radius:16px;min-height:76px;padding:11px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;text-align:left;transition:transform .14s ease;text-decoration:none;color:inherit;width:100%;font:inherit}
 .tile:active{transform:scale(.985)}
-.tile:hover{border-color:#c8ddd5;box-shadow:0 10px 24px rgba(22,72,53,.10)}
-.icon{width:43px;height:43px;min-width:43px;border-radius:13px;display:grid;place-items:center;color:#fff;
-font-size:13px;font-weight:800;letter-spacing:-.02em}
-.green{background:var(--green)}.teal{background:var(--teal)}.amber{background:var(--amber)}.blue{background:var(--blue)}
-.tileText{min-width:0}
-.tileName{font-size:14px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tileDesc{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.empty{padding:30px 12px;text-align:center;color:var(--muted);font-size:13px}
-.loading{padding:18px 4px;color:var(--muted);font-size:13px}
-.error{padding:13px;border:1px solid #efc6cb;background:#fff6f7;color:#a43d47;border-radius:14px;font-size:13px;line-height:1.45}
-@media(max-width:370px){
-body{padding:10px}.grid{gap:8px}.tile{padding:9px;gap:9px}.icon{width:40px;height:40px;min-width:40px}
-.tileName{font-size:13px}.tileDesc{font-size:11px}
-}
+.tile-icon{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-weight:900;font-size:12px;flex:none}
+.tile-body{min-width:0;flex:1}.tile-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile-desc{font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.green{background:#e5f7ee;color:#14935b}.teal{background:#e4f7f6;color:#078b87}.amber{background:#fff4d9;color:#b47a00}.blue{background:#e8f1ff;color:#3778ca}
+.back{display:flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--green2);font-weight:800;padding:2px 0 14px}
+.page-head{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.page-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900}
+.page-head h2{margin:0;font-size:20px}.page-head p{margin:3px 0 0;font-size:11px;color:var(--muted)}
+.empty{text-align:center;border:1px dashed #cdded7;background:#fbfdfc;border-radius:15px;padding:24px;color:var(--muted);font-size:12px}
+.error{padding:17px;border:1px solid #efcdd1;background:#fff7f8;border-radius:15px;color:#a34d57;font-size:12px}
+.loading{text-align:center;padding:42px 10px;color:var(--muted);font-size:12px}
+.footer{text-align:center;color:#94a69f;font-size:10px;padding:20px 0 4px}
+@media(max-width:390px){.app{padding-left:10px;padding-right:10px}.tile{min-height:70px;padding:9px}.tile-icon{width:37px;height:37px}.tile-name{font-size:12px}}
 </style>
 </head>
 <body>
-<div class="app"><div id="view"></div></div>
+<div class="app">
+  <section class="screen active" id="home">
+    <header class="topbar">
+      <div class="logo">R</div>
+      <div class="brand"><h1 id="brand">Royall Web Apps</h1><p id="brandSub">Loading catalog…</p></div>
+      <button class="icon-btn" onclick="location.reload()">↻</button>
+    </header>
+
+    <section class="hero">
+      <h2 id="homeTitle">Web Apps</h2>
+      <p id="homeDesc">Loading the latest app catalog from GitHub…</p>
+      <div class="search"><span>⌕</span><input id="search" placeholder="Search apps..." autocomplete="off"></div>
+    </section>
+
+    <main id="homeContent"><div class="loading">Loading apps…</div></main>
+    <div class="footer">AraafRoyall • Web-Apps</div>
+  </section>
+
+  <section class="screen" id="group">
+    <button class="back" onclick="showHome()">‹ All Apps</button>
+    <div class="page-head">
+      <div id="groupIcon" class="page-icon green">*</div>
+      <div><h2 id="groupTitle">Group</h2><p id="groupDesc"></p></div>
+    </div>
+    <div id="groupContent"></div>
+  </section>
+</div>
+
 <script>
+const BUILD_URL="https://raw.githubusercontent.com/AraafRoyall/Web-Apps/main/build.json";
 const COLORS=["green","teal","amber","blue"];
-let DATA={
-  name:"Royall Web Apps",
-  description:"Loading...",
-  WebAppsFolder:"web/",
-  top:[],
-  groups:[]
-};
+let data={top:[],groups:[],WebAppsFolder:"web/"};
 
-const view=document.getElementById("view");
-
-function esc(value){
-  return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+function colorFor(index){
+  return COLORS[Math.floor(index/2)%4];
 }
 function safeIcon(value){
-  const s=String(value??"").trim();
-  return s||"*";
+  return value==null||String(value).trim()===""?"*":value;
 }
 function normalizeFolder(folder){
-  let f=String(folder??"").trim().replace(/^\/+|\/+$/g,"");
+  let f=String(folder??"web/").trim().replace(/^\/+|\/+$/g,"");
   return f?f+"/":"";
 }
 
 /*
-  index.html and build.json are both at the repository root.
-  Therefore WebAppsFolder is resolved relative to this page:
-    /Web-Apps/ + web/ + cleaner.html
+  build.json lives beside the repository-root index.html.
+  App paths in JSON are relative to WebAppsFolder.
+
+  Example:
+    WebAppsFolder = "web/"
+    url = "cleaner.html"
+    -> /Web-Apps/web/cleaner.html
 */
-function buildTarget(itemUrl){
-  const raw=String(itemUrl??"").trim();
+function itemUrl(item){
+  const raw=String(item?.url??"").trim();
   if(!raw)return "#";
+
+  // Keep absolute/external URLs untouched.
   if(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)||raw.startsWith("//"))return raw;
-  return new URL(normalizeFolder(DATA?.WebAppsFolder)+raw.replace(/^\/+/,""),location.href).href;
+
+  return new URL(
+    normalizeFolder(data.WebAppsFolder)+raw.replace(/^\/+/,""),
+    document.baseURI||location.href
+  ).href;
 }
 
-function colorFor(index){
-  // 2 cards per row: Green, Green, Teal, Teal, Amber, Amber, Blue, Blue...
-  return COLORS[Math.floor(index/2)%4];
-}
-function isGroup(entry){
-  return !!entry&&Array.isArray(entry.items);
-}
-function itemMatches(item,q){
-  if(!q)return true;
-  q=q.toLowerCase();
-  return (item.name||"").toLowerCase().includes(q)||(item.description||"").toLowerCase().includes(q);
-}
-function groupMatches(group,q){
-  if(!q)return true;
-  q=q.toLowerCase();
-  return (group.name||"").toLowerCase().includes(q)||
-         (group.description||"").toLowerCase().includes(q)||
-         (group.items||[]).some(x=>itemMatches(x,q));
-}
-function tile(entry,index,groupIndex){
-  const group=isGroup(entry);
-  const color=colorFor(index);
-  const icon=safeIcon(entry.icon);
-  return group
-    ? `<button class="tile" type="button" onclick="openGroup(${groupIndex})">
-         <div class="icon ${color}">${esc(icon)}</div>
-         <div class="tileText"><div class="tileName">${esc(entry.name||"Untitled")}</div>
-         <div class="tileDesc">${esc(entry.description||"")}</div></div>
-       </button>`
-    : `<a class="tile" href="${esc(buildTarget(entry.url))}">
-         <div class="icon ${color}">${esc(icon)}</div>
-         <div class="tileText"><div class="tileName">${esc(entry.name||"Untitled")}</div>
-         <div class="tileDesc">${esc(entry.description||"")}</div></div>
-       </a>`;
+function itemTile(item,index){
+  const c=colorFor(index);
+  const url=itemUrl(item);
+
+  /*
+    Use a real anchor for app navigation.
+    This works for:
+      - GitHub Pages relative app URLs
+      - absolute https:// URLs
+      - other external sites
+      - Android WebView/browser link handling
+  */
+  return `<a class="tile" href="${esc(url)}">
+    <div class="tile-icon ${c}">${esc(safeIcon(item.icon))}</div>
+    <div class="tile-body">
+      <div class="tile-name">${esc(item.name||"Untitled")}</div>
+      <div class="tile-desc">${esc(item.description||"")}</div>
+    </div>
+  </a>`;
 }
 
-function getAllEntries(){
-  const top=Array.isArray(DATA.top)?DATA.top:[];
-  const groups=Array.isArray(DATA.groups)?DATA.groups:[];
-  return [
-    ...top.map(x=>({entry:x,type:"item",groupIndex:-1})),
-    ...groups.map((x,i)=>({entry:x,type:"group",groupIndex:i}))
+function groupTile(group,index){
+  const c=colorFor(index);
+  return `<button class="tile" onclick="openGroup(${index})">
+    <div class="tile-icon ${c}">${esc(safeIcon(group.icon))}</div>
+    <div class="tile-body">
+      <div class="tile-name">${esc(group.name||"Group")}</div>
+      <div class="tile-desc">${esc(group.description||"")}</div>
+    </div>
+  </button>`;
+}
+
+function entryMatches(entry,s){
+  if(!s)return true;
+  const own=(entry.name+" "+(entry.description||"")).toLowerCase();
+  if(own.includes(s))return true;
+
+  // Searching a child app keeps the group visible.
+  if(Array.isArray(entry.items)){
+    return entry.items.some(item=>
+      (item.name+" "+(item.description||"")).toLowerCase().includes(s)
+    );
+  }
+  return false;
+}
+
+/*
+  Latest behavior:
+  - One unified home list.
+  - Direct apps and groups are mixed automatically in JSON order:
+      top[] first, then groups[].
+  - No "Top Apps" / "Groups" headings.
+  - A group is visually just another tile.
+*/
+function renderHome(q=""){
+  const s=q.trim().toLowerCase();
+  const top=Array.isArray(data.top)?data.top:[];
+  const groups=Array.isArray(data.groups)?data.groups:[];
+
+  const entries=[
+    ...top.map(item=>({type:"item",item})),
+    ...groups.map((group,index)=>({type:"group",item:group,index}))
   ];
-}
 
-function renderHome(query=""){
-  const all=getAllEntries();
-  const q=query.trim();
+  let html="";
+  entries.forEach((entry,index)=>{
+    if(!entryMatches(entry.item,s))return;
 
-  // No visual category labels. Everything is one unified list.
-  let cards="";
-  all.forEach((obj,index)=>{
-    const matched=obj.type==="group"?groupMatches(obj.entry,q):itemMatches(obj.entry,q);
-    if(matched)cards+=tile(obj.entry,index,obj.groupIndex);
+    // Color follows the actual unified visual row order.
+    html+=entry.type==="group"
+      ? groupTile(entry.item,index,entry.index)
+      : itemTile(entry.item,index);
   });
 
-  view.innerHTML=`
-    <div class="hero">
-      <div class="heroTop">
-        <div class="heroIcon">R</div>
-        <div>
-          <h1>${esc(DATA.name||"Royall Web Apps")}</h1>
-          <p>${esc(DATA.description||"")}</p>
-        </div>
-      </div>
-      <div class="searchWrap">
-        <input id="search" class="search" type="search" placeholder="Search apps..." value="${esc(query)}" autocomplete="off">
-      </div>
-    </div>
-    <div class="grid">${cards||`<div class="empty" style="grid-column:1/-1">No matching items.</div>`}</div>
-  `;
-
-  document.getElementById("search").addEventListener("input",function(){
-    renderHome(this.value);
-    const again=document.getElementById("search");
-    again.focus();
-    again.setSelectionRange(again.value.length,again.value.length);
-  });
-}
-
-function renderGroup(index){
-  const groups=Array.isArray(DATA.groups)?DATA.groups:[];
-  const group=groups[index];
-  if(!group){goHome(false);return}
-
-  const items=Array.isArray(group.items)?group.items:[];
-  view.innerHTML=`
-    <div class="toolbar">
-      <button class="back" type="button" onclick="goHome()">← Back</button>
-      <div>
-        <h2 class="pageTitle">${esc(group.name||"Group")}</h2>
-        <p class="pageDesc">${esc(group.description||"")}</p>
-      </div>
-    </div>
-    <div class="grid">
-      ${items.length?items.map((x,i)=>tile(x,i,-1)).join(""):`<div class="empty" style="grid-column:1/-1">No apps in this group.</div>`}
-    </div>
-  `;
+  if(!html)html=`<div class="empty">No apps found.</div>`;
+  document.getElementById("homeContent").innerHTML=
+    `<div class="grid">${html}</div>`;
 }
 
 function openGroup(index){
-  if(!DATA||!DATA.groups||!DATA.groups[index])return;
+  const g=data.groups[index];
+  if(!g)return;
+
+  document.getElementById("groupIcon").className="page-icon "+colorFor(index);
+  document.getElementById("groupIcon").textContent=safeIcon(g.icon);
+  document.getElementById("groupTitle").textContent=g.name||"Group";
+  document.getElementById("groupDesc").textContent=g.description||"";
+
+  const items=Array.isArray(g.items)?g.items:[];
+  document.getElementById("groupContent").innerHTML=items.length
+    ? `<div class="grid">${items.map((x,i)=>itemTile(x,i)).join("")}</div>`
+    : `<div class="empty">No apps in this group.</div>`;
+
+  document.getElementById("home").classList.remove("active");
+  document.getElementById("group").classList.add("active");
+  scrollTo(0,0);
+
+  // Hash only; safe for Android content:// and GitHub Pages.
   location.hash="group="+index;
 }
-function goHome(){
+
+function showHome(){
+  document.getElementById("group").classList.remove("active");
+  document.getElementById("home").classList.add("active");
+  scrollTo(0,0);
+
   if(location.hash)location.hash="";
-  else renderHome();
 }
+
 function route(){
-  if(!DATA)return;
-  const m=location.hash.match(/^#group=(\d+)$/);
-  if(m){
-    const index=Number(m[1]);
-    if(Number.isInteger(index)&&index>=0&&index<(DATA.groups||[]).length){
-      renderGroup(index);return;
+  const match=location.hash.match(/^#group=(\d+)$/);
+
+  if(match){
+    const index=Number(match[1]);
+    if(Number.isInteger(index)&&index>=0&&index<(data.groups||[]).length){
+      openGroupViewOnly(index);
+      return;
     }
   }
-  renderHome();
-}
-window.openGroup=openGroup;
-window.goHome=goHome;
-window.addEventListener("hashchange",route);
 
-function buildJsonUrl(){
-  // build.json is beside this index.html.
-  // This works for GitHub Pages, normal HTTPS, file/content viewers, etc.
-  return new URL("./build.json", document.baseURI || location.href).href;
+  showHomeViewOnly();
 }
 
-function renderLoadingShell(){
-  view.innerHTML=`
-    <div class="hero">
-      <div class="heroTop">
-        <div class="heroIcon">R</div>
-        <div>
-          <h1>Royall Web Apps</h1>
-          <p>Loading web apps...</p>
-        </div>
-      </div>
-      <div class="searchWrap">
-        <input class="search" type="search" placeholder="Search apps..." disabled>
-      </div>
-    </div>
-    <div class="grid">
-      <div class="loading" style="grid-column:1/-1">Loading web apps...</div>
-    </div>
-  `;
+function openGroupViewOnly(index){
+  const g=data.groups[index];
+  if(!g)return;
+
+  document.getElementById("groupIcon").className="page-icon "+colorFor(index);
+  document.getElementById("groupIcon").textContent=safeIcon(g.icon);
+  document.getElementById("groupTitle").textContent=g.name||"Group";
+  document.getElementById("groupDesc").textContent=g.description||"";
+
+  const items=Array.isArray(g.items)?g.items:[];
+  document.getElementById("groupContent").innerHTML=items.length
+    ? `<div class="grid">${items.map((x,i)=>itemTile(x,i)).join("")}</div>`
+    : `<div class="empty">No apps in this group.</div>`;
+
+  document.getElementById("home").classList.remove("active");
+  document.getElementById("group").classList.add("active");
+  scrollTo(0,0);
 }
 
-function renderLoadError(error){
-  view.innerHTML=`
-    <div class="hero">
-      <div class="heroTop">
-        <div class="heroIcon">R</div>
-        <div>
-          <h1>Royall Web Apps</h1>
-          <p>Launcher</p>
-        </div>
-      </div>
-    </div>
-    <div class="error">
-      <strong>Could not load build.json.</strong><br>
-      ${esc(error.message||error)}
-      <br><br>
-      <small>Expected: ${esc(buildJsonUrl())}</small>
-    </div>
-  `;
+function showHomeViewOnly(){
+  document.getElementById("group").classList.remove("active");
+  document.getElementById("home").classList.add("active");
 }
 
-async function init(){
-  // Render actual UI immediately. JSON is only the data source.
-  renderLoadingShell();
-
+async function load(){
   try{
-    const response=await fetch(buildJsonUrl(),{
-      cache:"no-store",
-      headers:{"Accept":"application/json"}
-    });
+    const r=await fetch(BUILD_URL+"?v="+Date.now(),{cache:"no-store"});
+    if(!r.ok)throw new Error("HTTP "+r.status);
 
-    if(!response.ok){
-      throw new Error("HTTP "+response.status+" while loading build.json");
-    }
+    const parsed=await r.json();
 
-    const text=await response.text();
-
-    let parsed;
-    try{
-      parsed=JSON.parse(text);
-    }catch(e){
-      throw new Error("build.json returned invalid JSON");
-    }
-
-    if(!parsed || typeof parsed!=="object"){
-      throw new Error("build.json is not a JSON object");
-    }
-
-    // Keep UI/data contract defensive.
-    DATA={
-      name:parsed.name||"Royall Web Apps",
-      description:parsed.description||"",
-      WebAppsFolder:parsed.WebAppsFolder||"web/",
+    data={
       top:Array.isArray(parsed.top)?parsed.top:[],
-      groups:Array.isArray(parsed.groups)?parsed.groups:[]
+      groups:Array.isArray(parsed.groups)?parsed.groups:[],
+      WebAppsFolder:parsed.WebAppsFolder||"web/"
     };
 
+    const name=parsed.name||"Royall Web Apps";
+    document.title=name;
+    document.getElementById("brand").textContent=name;
+    document.getElementById("brandSub").textContent="Live catalog from GitHub";
+    document.getElementById("homeTitle").textContent=name;
+    document.getElementById("homeDesc").textContent=
+      parsed.description||"Tools and utilities from AraafRoyall";
+
+    renderHome();
     route();
-  }catch(error){
-    console.error(error);
-    renderLoadError(error);
+  }catch(e){
+    document.getElementById("brandSub").textContent="Catalog unavailable";
+    document.getElementById("homeDesc").textContent="Could not load build.json from GitHub.";
+    document.getElementById("homeContent").innerHTML=
+      `<div class="error">Unable to load the app catalog.<br><br>${esc(e.message)}</div>`;
   }
 }
-init();
+
+document.getElementById("search").addEventListener("input",e=>{
+  if(!document.getElementById("home").classList.contains("active"))return;
+  renderHome(e.target.value);
+});
+
+window.addEventListener("hashchange",()=>{
+  if(data)route();
+});
+
+load();
 </script>
 </body>
 </html>
