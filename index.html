@@ -1,72 +1,228 @@
-{
-  "version": 1,
-  "name": "Royall Web Apps",
-  "description": "Tools and utilities from AraafRoyall",
-  "WebAppsFolder": "web/",
-  "top": [
-    {
-      "name": "Cleaner Royall",
-      "description": "Cleaner script maker",
-      "url": "cleaner.html",
-      "icon": "CR"
-    },
-    {
-      "name": "JSON Manager",
-      "description": "Create and edit JSON",
-      "url": "json/json.html",
-      "icon": "{}"
-    }
-  ],
-  "groups": [
-    {
-      "name": "Cryptography",
-      "description": "Encryption and security tools",
-      "icon": "🔐",
-      "items": [
-        {
-          "name": "AES Crypto",
-          "description": "AES encryption utility",
-          "url": "CryptoECC/AES.html",
-          "icon": "A"
-        },
-        {
-          "name": "ECC Crypto",
-          "description": "Elliptic curve tools",
-          "url": "CryptoECC/index.html",
-          "icon": "E"
-        }
-      ]
-    },
-    {
-      "name": "Utilities",
-      "description": "Useful web tools",
-      "icon": "✦",
-      "items": [
-        {
-          "name": "QR Tools",
-          "description": "QR utility",
-          "url": "qr/qr.html",
-          "icon": "QR"
-        },
-        {
-          "name": "Image to Base64",
-          "description": "Convert image data",
-          "url": "ImageToBase64/convert.html",
-          "icon": "IMG"
-        },
-        {
-          "name": "Emoji JSON",
-          "description": "Emoji JSON utility",
-          "url": "EmojiJson.html",
-          "icon": "✦"
-        },
-        {
-          "name": "Bold Text",
-          "description": "Text formatting tool",
-          "url": "bold.html",
-          "icon": "B"
-        }
-      ]
-    }
-  ]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6faf8">
+<title>Royall Web Apps</title>
+<style>
+:root{
+  --bg:#f6faf8;--surface:#fff;--surface2:#f2f8f5;--line:#dce9e3;--text:#17342a;--muted:#6f877d;
+  --green:#18a66a;--green2:#0d8a56;--teal:#0ea7a1;--amber:#d99b16;--blue:#3d78d8;
+  --shadow:0 8px 28px rgba(22,72,53,.08);--radius:18px;
 }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;background:var(--bg);color:var(--text);
+font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:14px}
+.app{width:min(760px,100%);margin:0 auto}
+.hero{background:linear-gradient(145deg,#eaf9f1,#effbf9);border:1px solid #d6eee3;border-radius:24px;
+padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+.heroTop{display:flex;align-items:center;gap:12px}
+.heroIcon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#18a66a;
+color:#fff;font-weight:800;font-size:18px;box-shadow:0 5px 14px rgba(24,166,106,.2)}
+h1{margin:0;font-size:21px;line-height:1.15;letter-spacing:-.02em}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+.searchWrap{margin-top:15px}
+.search{width:100%;height:48px;border:1px solid var(--line);border-radius:14px;padding:0 14px;background:#fff;
+color:var(--text);outline:none;font-size:15px;box-shadow:0 4px 14px rgba(22,72,53,.05)}
+.search:focus{border-color:#a9d8c4;box-shadow:0 0 0 3px rgba(24,166,106,.10)}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{border:1px solid var(--line);background:#fff;color:var(--text);height:42px;padding:0 14px;border-radius:13px;
+font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+.pageTitle{margin:0;font-size:19px}
+.pageDesc{margin:4px 0 0;color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{display:flex;align-items:center;gap:11px;min-width:0;background:#fff;border:1px solid var(--line);
+border-radius:16px;padding:10px;box-shadow:var(--shadow);text-decoration:none;color:inherit;cursor:pointer;
+transition:transform .14s ease,box-shadow .14s ease,border-color .14s ease;width:100%;text-align:left}
+.tile:active{transform:scale(.985)}
+.tile:hover{border-color:#c8ddd5;box-shadow:0 10px 24px rgba(22,72,53,.10)}
+.icon{width:43px;height:43px;min-width:43px;border-radius:13px;display:grid;place-items:center;color:#fff;
+font-size:13px;font-weight:800;letter-spacing:-.02em}
+.green{background:var(--green)}.teal{background:var(--teal)}.amber{background:var(--amber)}.blue{background:var(--blue)}
+.tileText{min-width:0}
+.tileName{font-size:14px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tileDesc{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{padding:30px 12px;text-align:center;color:var(--muted);font-size:13px}
+.loading{padding:18px 4px;color:var(--muted);font-size:13px}
+.error{padding:13px;border:1px solid #efc6cb;background:#fff6f7;color:#a43d47;border-radius:14px;font-size:13px;line-height:1.45}
+@media(max-width:370px){
+body{padding:10px}.grid{gap:8px}.tile{padding:9px;gap:9px}.icon{width:40px;height:40px;min-width:40px}
+.tileName{font-size:13px}.tileDesc{font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="app"><div id="view"></div></div>
+<script>
+const BUILD_URL="./build.json";
+const COLORS=["green","teal","amber","blue"];
+let DATA=null;
+
+const view=document.getElementById("view");
+
+function esc(value){
+  return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function safeIcon(value){
+  const s=String(value??"").trim();
+  return s||"*";
+}
+function normalizeFolder(folder){
+  let f=String(folder??"").trim().replace(/^\/+|\/+$/g,"");
+  return f?f+"/":"";
+}
+
+/*
+  index.html and build.json are both at the repository root.
+  Therefore WebAppsFolder is resolved relative to this page:
+    /Web-Apps/ + web/ + cleaner.html
+*/
+function buildTarget(itemUrl){
+  const raw=String(itemUrl??"").trim();
+  if(!raw)return "#";
+  if(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)||raw.startsWith("//"))return raw;
+  return new URL(normalizeFolder(DATA?.WebAppsFolder)+raw.replace(/^\/+/,""),location.href).href;
+}
+
+function colorFor(index){
+  // 2 cards per row: Green, Green, Teal, Teal, Amber, Amber, Blue, Blue...
+  return COLORS[Math.floor(index/2)%4];
+}
+function isGroup(entry){
+  return !!entry&&Array.isArray(entry.items);
+}
+function itemMatches(item,q){
+  if(!q)return true;
+  q=q.toLowerCase();
+  return (item.name||"").toLowerCase().includes(q)||(item.description||"").toLowerCase().includes(q);
+}
+function groupMatches(group,q){
+  if(!q)return true;
+  q=q.toLowerCase();
+  return (group.name||"").toLowerCase().includes(q)||
+         (group.description||"").toLowerCase().includes(q)||
+         (group.items||[]).some(x=>itemMatches(x,q));
+}
+function tile(entry,index,groupIndex){
+  const group=isGroup(entry);
+  const color=colorFor(index);
+  const icon=safeIcon(entry.icon);
+  return group
+    ? `<button class="tile" type="button" onclick="openGroup(${groupIndex})">
+         <div class="icon ${color}">${esc(icon)}</div>
+         <div class="tileText"><div class="tileName">${esc(entry.name||"Untitled")}</div>
+         <div class="tileDesc">${esc(entry.description||"")}</div></div>
+       </button>`
+    : `<a class="tile" href="${esc(buildTarget(entry.url))}">
+         <div class="icon ${color}">${esc(icon)}</div>
+         <div class="tileText"><div class="tileName">${esc(entry.name||"Untitled")}</div>
+         <div class="tileDesc">${esc(entry.description||"")}</div></div>
+       </a>`;
+}
+
+function getAllEntries(){
+  const top=Array.isArray(DATA.top)?DATA.top:[];
+  const groups=Array.isArray(DATA.groups)?DATA.groups:[];
+  return [
+    ...top.map(x=>({entry:x,type:"item",groupIndex:-1})),
+    ...groups.map((x,i)=>({entry:x,type:"group",groupIndex:i}))
+  ];
+}
+
+function renderHome(query=""){
+  const all=getAllEntries();
+  const q=query.trim();
+
+  // No visual category labels. Everything is one unified list.
+  let cards="";
+  all.forEach((obj,index)=>{
+    const matched=obj.type==="group"?groupMatches(obj.entry,q):itemMatches(obj.entry,q);
+    if(matched)cards+=tile(obj.entry,index,obj.groupIndex);
+  });
+
+  view.innerHTML=`
+    <div class="hero">
+      <div class="heroTop">
+        <div class="heroIcon">R</div>
+        <div>
+          <h1>${esc(DATA.name||"Royall Web Apps")}</h1>
+          <p>${esc(DATA.description||"")}</p>
+        </div>
+      </div>
+      <div class="searchWrap">
+        <input id="search" class="search" type="search" placeholder="Search apps..." value="${esc(query)}" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid">${cards||`<div class="empty" style="grid-column:1/-1">No matching items.</div>`}</div>
+  `;
+
+  document.getElementById("search").addEventListener("input",function(){
+    renderHome(this.value);
+    const again=document.getElementById("search");
+    again.focus();
+    again.setSelectionRange(again.value.length,again.value.length);
+  });
+}
+
+function renderGroup(index){
+  const groups=Array.isArray(DATA.groups)?DATA.groups:[];
+  const group=groups[index];
+  if(!group){goHome(false);return}
+
+  const items=Array.isArray(group.items)?group.items:[];
+  view.innerHTML=`
+    <div class="toolbar">
+      <button class="back" type="button" onclick="goHome()">← Back</button>
+      <div>
+        <h2 class="pageTitle">${esc(group.name||"Group")}</h2>
+        <p class="pageDesc">${esc(group.description||"")}</p>
+      </div>
+    </div>
+    <div class="grid">
+      ${items.length?items.map((x,i)=>tile(x,i,-1)).join(""):`<div class="empty" style="grid-column:1/-1">No apps in this group.</div>`}
+    </div>
+  `;
+}
+
+function openGroup(index){
+  if(!DATA||!DATA.groups||!DATA.groups[index])return;
+  location.hash="group="+index;
+}
+function goHome(){
+  if(location.hash)location.hash="";
+  else renderHome();
+}
+function route(){
+  if(!DATA)return;
+  const m=location.hash.match(/^#group=(\d+)$/);
+  if(m){
+    const index=Number(m[1]);
+    if(Number.isInteger(index)&&index>=0&&index<(DATA.groups||[]).length){
+      renderGroup(index);return;
+    }
+  }
+  renderHome();
+}
+window.openGroup=openGroup;
+window.goHome=goHome;
+window.addEventListener("hashchange",route);
+
+async function init(){
+  view.innerHTML=`<div class="loading">Loading web apps...</div>`;
+  try{
+    const response=await fetch(BUILD_URL,{cache:"no-store",headers:{"Accept":"application/json"}});
+    if(!response.ok)throw new Error("build.json returned HTTP "+response.status);
+    DATA=await response.json();
+    if(!DATA||typeof DATA!=="object")throw new Error("Invalid build.json format.");
+    route();
+  }catch(error){
+    console.error(error);
+    view.innerHTML=`<div class="error"><strong>Unable to load apps.</strong><br>${esc(error.message||error)}</div>`;
+  }
+}
+init();
+</script>
+</body>
+</html>
