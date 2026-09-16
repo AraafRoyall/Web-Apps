@@ -858,6 +858,21 @@ textarea:focus,input:focus{
   </div>
 </div>
 
+<!-- Text clear dialog -->
+<div class="dialog-backdrop" id="textClearDialog" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <div class="dialog-icon">!</div>
+      <h3>Clear text?</h3>
+    </div>
+    <p>This will clear the text in the input field. Your result will remain unchanged.</p>
+    <div class="dialog-actions">
+      <button class="dialog-btn cancel" id="cancelTextClearBtn" type="button">Cancel</button>
+      <button class="dialog-btn danger" id="confirmTextClearBtn" type="button">Clear</button>
+    </div>
+  </div>
+</div>
+
 <!-- Regenerate dialog -->
 <div class="dialog-backdrop" id="regenerateDialog" aria-hidden="true">
   <div class="dialog" role="dialog" aria-modal="true">
@@ -1220,12 +1235,27 @@ textarea:focus,input:focus{
   $("clearTextBtn").onclick = function(){
     if(!$("inputText").value){
       toast("Text already clear");
-      return;
+      return false;
     }
+    openDialog("textClearDialog");
+    return false;
+  };
 
+  $("cancelTextClearBtn").onclick = function(){
+    closeDialog("textClearDialog");
+  };
+
+  $("confirmTextClearBtn").onclick = function(){
     $("inputText").value = "";
     updateInputStats();
+    closeDialog("textClearDialog");
     toast("Text cleared");
+  };
+
+  $("textClearDialog").onclick = function(e){
+    if(e.target === this){
+      closeDialog("textClearDialog");
+    }
   };
 
   $("clearDialog").onclick = function(e){
