@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>Secure ECIES3</title>
+<title>Secure ECIES</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;margin:0;overflow:hidden}
@@ -100,8 +100,12 @@ button{cursor:pointer}
 }
 .status-strip .right{
   margin-left:auto;
-  color:#87928d;
+  color:#0f9f73;
   font-size:9.5px;
+  font-weight:900;
+}
+.status-strip .right.failed{
+  color:#d04444;
 }
 
 .card{
@@ -138,6 +142,17 @@ button{cursor:pointer}
   font-weight:850;
 }
 
+.import-btn{
+  height:28px;
+  padding:0 9px;
+  border:1px solid #e1d6f2;
+  border-radius:9px;
+  background:#f5effb;
+  color:#7a3eb1;
+  font-size:10px;
+  font-weight:850;
+}
+
 .section-title{
   margin:0 0 7px;
   color:var(--amber);
@@ -164,6 +179,22 @@ button{cursor:pointer}
   color:var(--blue);
   font-size:10px;
   font-weight:800;
+}
+.edit-btn{
+  width:28px;
+  height:28px;
+  padding:0;
+  border:1px solid #dce5e1;
+  border-radius:9px;
+  background:#f4f8f6;
+  color:#54655e;
+  font-size:16px;
+  line-height:1;
+  font-weight:850;
+}
+.edit-btn:disabled{
+  opacity:.38;
+  cursor:default;
 }
 
 textarea{
@@ -199,6 +230,11 @@ textarea:focus,input:focus{
   align-items:center;
   gap:7px;
   margin-bottom:6px;
+}
+.key-head-actions{
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
 .key-head .label{
   min-width:0;
@@ -256,13 +292,15 @@ textarea:focus,input:focus{
 }
 
 .input-head{
-  display:grid;
-  grid-template-columns:minmax(0,auto) minmax(0,1fr) auto auto;
+  display:flex;
   align-items:center;
-  gap:7px;
+  flex-wrap:nowrap;
+  gap:4px;
+  min-width:0;
   margin-bottom:6px;
 }
 .input-title{
+  flex:1 1 auto;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -272,6 +310,7 @@ textarea:focus,input:focus{
   font-weight:850;
 }
 .input-stats{
+  flex:0 1 auto;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -280,6 +319,19 @@ textarea:focus,input:focus{
   color:#8a9690;
   font-size:9.5px;
   font-weight:700;
+}
+.input-head .edit-btn{
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
+  font-size:15px;
+}
+.input-head .text-clear,
+.input-head .text-paste{
+  flex:0 0 auto;
+  height:26px;
+  padding:0 6px;
+  font-size:9.5px;
 }
 
 .divider{
@@ -680,7 +732,7 @@ textarea:focus,input:focus{
   <header class="header">
     <div class="icon">🔐</div>
     <div class="header-main">
-      <h1 class="title">Secure ECIES3</h1>
+      <h1 class="title">Secure ECIES</h1>
       <div class="sub">X25519 · AES-GCM · URL-safe Base64</div>
     </div>
     <button class="text-clear header-clear" id="clearAllBtn" type="button">Clear All</button>
@@ -688,15 +740,19 @@ textarea:focus,input:focus{
 
   <div class="status-strip">
     <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-    <span class="right">ECI4 v2</span>
+    <span class="right" id="coreStatusMain">Active ✔️</span>
   </div>
 
   <!-- Recipient Key -->
   <section class="card">
     <div class="key-head">
       <div class="label" id="recipientLabel">Recipient Public Key</div>
-      <button class="copy-btn" id="pasteRecipientBtn" type="button">Paste</button>
+      <div class="key-head-actions">
+        <button class="import-btn" id="importRecipientBtn" type="button">Import Key</button>
+        <button class="copy-btn" id="pasteRecipientBtn" type="button">Paste</button>
+      </div>
     </div>
+    <input id="recipientImportFile" type="file" accept=".json,application/json" hidden>
     <textarea id="recipientKey" class="key-input" spellcheck="false" placeholder="Paste recipient public key…"></textarea>
 
     <div class="mode">
@@ -711,6 +767,8 @@ textarea:focus,input:focus{
     <div class="input-head">
       <div class="input-title" id="inputTitle">Text to Encrypt</div>
       <div class="input-stats">• <span id="wordCount">0</span> words • <span id="inputCount">0</span> chars</div>
+      <button class="edit-btn" id="undoTextBtn" type="button" title="Undo">↶</button>
+      <button class="edit-btn" id="redoTextBtn" type="button" title="Redo">↷</button>
       <button class="text-clear" id="clearTextBtn" type="button">Clear</button>
       <button class="text-paste" id="pasteTextBtn" type="button">Paste</button>
     </div>
@@ -727,7 +785,7 @@ textarea:focus,input:focus{
       <button class="copy-btn" id="copyResultBtn" type="button">Copy</button>
       <button class="result-download" id="downloadResultBtn" type="button" hidden>Download</button>
     </div>
-    <div class="result" id="result">Result will appear after Encrypt or Decrypt.</div>
+    <div class="result" id="result">Output Result will be shown here</div>
   </section>
 
 </div>
@@ -746,20 +804,20 @@ textarea:focus,input:focus{
     <header class="header">
       <div class="icon">🔑</div>
       <div class="header-main">
-        <h1 class="title">ECIES KeyPair</h1>
+        <h1 class="title">KeyPair Generator</h1>
         <div class="sub">X25519 · Raw Base64URL keys</div>
       </div>
-      <button class="download-key-btn keypair-top-download" id="downloadKeyPairBtn" type="button" hidden>Download KeyPair</button>
+      <button class="download-key-btn keypair-top-download" id="downloadKeyPairBtn" type="button" hidden>Download KeyPair Json</button>
     </header>
 
     <div class="status-strip">
       <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-      <span class="right">ECI4 v2</span>
+      <span class="right" id="coreStatusKeypair">Active ✔️</span>
     </div>
 
     <div class="keypair-scroll">
       <section class="keypair-card">
-        <h2 class="section-title">ECIES KeyPair Generator</h2>
+        <h2 class="section-title">• ECIES KeyPair</h2>
 
         <!-- Created only after a key pair exists -->
         <div class="keypair-generated" id="keypairGenerated">
@@ -795,7 +853,7 @@ textarea:focus,input:focus{
 
     <div class="keypair-bottom-actions">
       <button class="keypair-bottom-back" id="keypairBottomBackBtn" type="button">Back</button>
-      <button class="keypair-generate" id="generateKeyPairBtn" type="button">Generate Key Pair</button>
+      <button class="keypair-generate" id="generateKeyPairBtn" type="button">Generate New KeyPair</button>
     </div>
     </div>
 
@@ -804,6 +862,22 @@ textarea:focus,input:focus{
 
 <!-- Toast -->
 <div class="toast" id="toast">Done</div>
+
+<!-- Import Key choice dialog -->
+<div class="dialog-backdrop" id="importKeyDialog" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <div class="dialog-icon" style="background:#f5effb;color:#7a3eb1;border-color:#e1d6f2">↕</div>
+      <h3>Import Key as</h3>
+    </div>
+    <p>The mode will switch automatically, according to selected import.</p>
+    <div class="dialog-actions">
+      <button class="dialog-btn cancel" id="cancelImportKeyBtn" type="button">Cancel</button>
+      <button class="dialog-btn" id="importPublicKeyBtn" type="button" style="border:1px solid #bfe5d8;background:#eaf8f3;color:#0f766e">Public Key</button>
+      <button class="dialog-btn" id="importPrivateKeyBtn" type="button" style="border:1px solid #e1d6f2;background:#f5effb;color:#7a3eb1">Private Key</button>
+    </div>
+  </div>
+</div>
 
 <!-- Clear All dialog -->
 <div class="dialog-backdrop" id="clearDialog" aria-hidden="true">
@@ -816,6 +890,21 @@ textarea:focus,input:focus{
     <div class="dialog-actions">
       <button class="dialog-btn cancel" id="cancelClearBtn" type="button">Cancel</button>
       <button class="dialog-btn danger" id="confirmClearBtn" type="button">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- Text clear dialog -->
+<div class="dialog-backdrop" id="textClearDialog" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <div class="dialog-icon">!</div>
+      <h3>Clear text?</h3>
+    </div>
+    <p>This will clear the text in the input field. Your result will remain unchanged.</p>
+    <div class="dialog-actions">
+      <button class="dialog-btn cancel" id="cancelTextClearBtn" type="button">Cancel</button>
+      <button class="dialog-btn danger" id="confirmTextClearBtn" type="button">Clear</button>
     </div>
   </div>
 </div>
@@ -851,448 +940,80 @@ textarea:focus,input:focus{
   </div>
 </div>
 
+<script src="./ecies3_core.js"></script>
 <script>
 (function(){
   "use strict";
 
-  var te = new TextEncoder();
-  var td = new TextDecoder();
-
-  var VERSION = 2;
-  var IV_LEN = 12;
-  var MAGIC = new Uint8Array([69,67,73,52]);
-  var AAD = te.encode("ECIES");
-  var KDF_INFO = te.encode("ECIES-X25519-AESGCM");
-  var ZERO_SALT = new Uint8Array(32);
-
   var mode = "encrypt";
-
   var keyPairExists = false;
   var generatedPublicB64 = "";
   var generatedPrivateRaw = null;
   var privateVisible = false;
+  var keyPairGenerating = false;
 
-  function $(id){
-    return document.getElementById(id);
-  }
+  var textHistory = [""];
+  var textHistoryIndex = 0;
+  var applyingTextHistory = false;
+  var historyLimit = 100;
+
+  function $(id){ return document.getElementById(id); }
 
   function toast(message){
     var el = $("toast");
     el.textContent = message;
     el.classList.add("show");
     clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(function(){
-      el.classList.remove("show");
-    },1500);
+    window.__toastTimer = setTimeout(function(){ el.classList.remove("show"); },1500);
   }
 
-  /* ---------- Base64URL ---------- */
-  function bytesToB64Url(bytes){
-    var s = "";
-    for(var i=0;i<bytes.length;i++){
-      s += String.fromCharCode(bytes[i]);
+  function setCoreStatus(){
+    var el1 = $("coreStatusMain");
+    var el2 = $("coreStatusKeypair");
+    var ok = !!(window.ECIES3Core && typeof window.ECIES3Core.encrypt === "function" && typeof window.ECIES3Core.decrypt === "function");
+    var text = ok ? "Active ✔️" : "Script Init Failed";
+    el1.textContent = text;
+    el2.textContent = text;
+    el1.classList.toggle("failed", !ok);
+    el2.classList.toggle("failed", !ok);
+    return ok;
+  }
+
+  /* ---------- Core status + Main UI ---------- */
+  setCoreStatus();
+
+  function updateTextHistoryButtons(){
+    $("undoTextBtn").disabled = textHistoryIndex <= 0;
+    $("redoTextBtn").disabled = textHistoryIndex >= textHistory.length - 1;
+  }
+
+  function recordTextHistory(){
+    if(applyingTextHistory) return;
+    var value = $("inputText").value || "";
+    if(textHistory[textHistoryIndex] === value){
+      updateTextHistoryButtons();
+      return;
     }
-    return btoa(s)
-      .replace(/\+/g,"-")
-      .replace(/\//g,"_")
-      .replace(/=+$/g,"");
-  }
-
-  function b64UrlToBytes(str){
-    str = String(str || "")
-      .trim()
-      .replace(/\s+/g,"")
-      .replace(/-/g,"+")
-      .replace(/_/g,"/");
-
-    while(str.length % 4) str += "=";
-
-    var bin = atob(str);
-    var out = new Uint8Array(bin.length);
-
-    for(var i=0;i<bin.length;i++){
-      out[i] = bin.charCodeAt(i);
+    textHistory = textHistory.slice(0, textHistoryIndex + 1);
+    textHistory.push(value);
+    if(textHistory.length > historyLimit){
+      textHistory.shift();
     }
-
-    return out;
+    textHistoryIndex = textHistory.length - 1;
+    updateTextHistoryButtons();
   }
 
-  /* ---------- Binary helpers ---------- */
-  function concatParts(){
-    var total = 0;
-
-    for(var i=0;i<arguments.length;i++){
-      total += arguments[i].length;
-    }
-
-    var out = new Uint8Array(total);
-    var offset = 0;
-
-    for(var j=0;j<arguments.length;j++){
-      out.set(arguments[j],offset);
-      offset += arguments[j].length;
-    }
-
-    return out;
+  function applyTextHistory(index){
+    if(index < 0 || index >= textHistory.length) return;
+    applyingTextHistory = true;
+    textHistoryIndex = index;
+    $("inputText").value = textHistory[index];
+    updateInputStats();
+    applyingTextHistory = false;
+    updateTextHistoryButtons();
+    $("inputText").focus();
   }
 
-  function encodeDerLength(len){
-    if(len < 128){
-      return new Uint8Array([len]);
-    }
-
-    var tmp = [];
-
-    while(len > 0){
-      tmp.unshift(len & 255);
-      len >>= 8;
-    }
-
-    return new Uint8Array([0x80 | tmp.length].concat(tmp));
-  }
-
-  function derTag(tag,content){
-    return concatParts(
-      new Uint8Array([tag]),
-      encodeDerLength(content.length),
-      content
-    );
-  }
-
-  function derSeq(){
-    return derTag(0x30,concatParts.apply(null,arguments));
-  }
-
-  function derInt(value){
-    return derTag(0x02,new Uint8Array([value]));
-  }
-
-  function derOid(bytes){
-    return derTag(0x06,bytes);
-  }
-
-  function derBitString(bytes){
-    return derTag(
-      0x03,
-      concatParts(new Uint8Array([0]),bytes)
-    );
-  }
-
-  function derOctet(bytes){
-    return derTag(0x04,bytes);
-  }
-
-  var OID_X25519 = new Uint8Array([0x2b,0x65,0x6e]);
-
-  function spkiFromRaw(rawPublic){
-    return derSeq(
-      derSeq(derOid(OID_X25519)),
-      derBitString(rawPublic)
-    );
-  }
-
-  function pkcs8FromRaw(rawPrivate){
-    return derSeq(
-      derInt(0),
-      derSeq(derOid(OID_X25519)),
-      derOctet(derOctet(rawPrivate))
-    );
-  }
-
-  function readDerLength(buf,offset){
-    var first = buf[offset];
-
-    if(first < 0x80){
-      return {
-        len:first,
-        next:offset + 1
-      };
-    }
-
-    var count = first & 0x7f;
-    var len = 0;
-
-    for(var i=0;i<count;i++){
-      len = (len << 8) | buf[offset + 1 + i];
-    }
-
-    return {
-      len:len,
-      next:offset + 1 + count
-    };
-  }
-
-  function readDer(buf,offset){
-    var tag = buf[offset];
-    var info = readDerLength(buf,offset + 1);
-
-    return {
-      tag:tag,
-      start:info.next,
-      end:info.next + info.len,
-      next:info.next + info.len
-    };
-  }
-
-  function extractRawFromSpki(spki){
-    var sequence = readDer(spki,0);
-    var algorithm = readDer(spki,sequence.start);
-    var bitString = readDer(spki,algorithm.next);
-
-    if(
-      sequence.tag !== 0x30 ||
-      algorithm.tag !== 0x30 ||
-      bitString.tag !== 0x03 ||
-      spki[bitString.start] !== 0
-    ){
-      throw new Error("Bad public key");
-    }
-
-    var raw = spki.slice(bitString.start + 1,bitString.end);
-
-    if(raw.length !== 32){
-      throw new Error("Bad public key length");
-    }
-
-    return raw;
-  }
-
-  function extractRawFromPkcs8(pkcs8){
-    var sequence = readDer(pkcs8,0);
-    var version = readDer(pkcs8,sequence.start);
-    var algorithm = readDer(pkcs8,version.next);
-    var key = readDer(pkcs8,algorithm.next);
-
-    if(
-      sequence.tag !== 0x30 ||
-      version.tag !== 0x02 ||
-      algorithm.tag !== 0x30 ||
-      key.tag !== 0x04
-    ){
-      throw new Error("Bad private key");
-    }
-
-    var inner = pkcs8.slice(key.start,key.end);
-    var octet = readDer(inner,0);
-
-    if(octet.tag !== 0x04){
-      throw new Error("Bad private key");
-    }
-
-    var raw = inner.slice(octet.start,octet.end);
-
-    if(raw.length !== 32){
-      throw new Error("Bad private key length");
-    }
-
-    return raw;
-  }
-
-  /* ---------- ECIES crypto ---------- */
-  async function importPublicRaw(rawPublic){
-    return crypto.subtle.importKey(
-      "spki",
-      spkiFromRaw(rawPublic),
-      {name:"X25519"},
-      false,
-      []
-    );
-  }
-
-  async function importPrivateRaw(rawPrivate){
-    return crypto.subtle.importKey(
-      "pkcs8",
-      pkcs8FromRaw(rawPrivate),
-      {name:"X25519"},
-      false,
-      ["deriveBits"]
-    );
-  }
-
-  async function hmacSha256(keyBytes,dataBytes){
-    var key = await crypto.subtle.importKey(
-      "raw",
-      keyBytes,
-      {name:"HMAC",hash:"SHA-256"},
-      false,
-      ["sign"]
-    );
-
-    return new Uint8Array(
-      await crypto.subtle.sign("HMAC",key,dataBytes)
-    );
-  }
-
-  async function hkdfLike(shared){
-    var prk = await hmacSha256(ZERO_SALT,shared);
-    var okm = await hmacSha256(prk,KDF_INFO);
-    return okm.slice(0,32);
-  }
-
-  async function aesEncrypt(plainBytes,aesKey,iv){
-    var key = await crypto.subtle.importKey(
-      "raw",
-      aesKey,
-      {name:"AES-GCM"},
-      false,
-      ["encrypt"]
-    );
-
-    return new Uint8Array(
-      await crypto.subtle.encrypt(
-        {
-          name:"AES-GCM",
-          iv:iv,
-          additionalData:AAD,
-          tagLength:128
-        },
-        key,
-        plainBytes
-      )
-    );
-  }
-
-  async function aesDecrypt(cipherBytes,aesKey,iv){
-    var key = await crypto.subtle.importKey(
-      "raw",
-      aesKey,
-      {name:"AES-GCM"},
-      false,
-      ["decrypt"]
-    );
-
-    return new Uint8Array(
-      await crypto.subtle.decrypt(
-        {
-          name:"AES-GCM",
-          iv:iv,
-          additionalData:AAD,
-          tagLength:128
-        },
-        key,
-        cipherBytes
-      )
-    );
-  }
-
-  async function encryptCompatible(text,recipientPublicB64){
-    var recipientRaw = b64UrlToBytes(recipientPublicB64);
-
-    if(recipientRaw.length !== 32){
-      throw new Error("Public key must be 32 bytes");
-    }
-
-    var recipientKey = await importPublicRaw(recipientRaw);
-
-    var ephemeral = await crypto.subtle.generateKey(
-      {name:"X25519"},
-      true,
-      ["deriveBits"]
-    );
-
-    var ephemeralSpki = new Uint8Array(
-      await crypto.subtle.exportKey("spki",ephemeral.publicKey)
-    );
-
-    var ephemeralPublicRaw = extractRawFromSpki(ephemeralSpki);
-
-    var shared = new Uint8Array(
-      await crypto.subtle.deriveBits(
-        {
-          name:"X25519",
-          public:recipientKey
-        },
-        ephemeral.privateKey,
-        256
-      )
-    );
-
-    var aesKey = await hkdfLike(shared);
-    var iv = crypto.getRandomValues(new Uint8Array(IV_LEN));
-
-    var cipher = await aesEncrypt(
-      te.encode(text || ""),
-      aesKey,
-      iv
-    );
-
-    return bytesToB64Url(
-      concatParts(
-        MAGIC,
-        new Uint8Array([VERSION]),
-        ephemeralPublicRaw,
-        iv,
-        cipher
-      )
-    );
-  }
-
-  async function decryptCompatible(cipherB64,privateB64){
-    var all = b64UrlToBytes(cipherB64);
-    var privateRaw = b64UrlToBytes(privateB64);
-
-    if(privateRaw.length !== 32){
-      throw new Error("Private key must be 32 bytes");
-    }
-
-    var ephemeralRaw;
-    var iv;
-    var cipher;
-
-    var modern =
-      all.length >= 65 &&
-      all[0] === 69 &&
-      all[1] === 67 &&
-      all[2] === 73 &&
-      all[3] === 52;
-
-    if(modern){
-      if(all[4] !== VERSION){
-        throw new Error("Bad version");
-      }
-
-      ephemeralRaw = all.slice(5,37);
-      iv = all.slice(37,49);
-      cipher = all.slice(49);
-    }else{
-      if(all.length < 61 || all[0] !== 1){
-        throw new Error("Invalid legacy payload");
-      }
-
-      ephemeralRaw = all.slice(1,33);
-      iv = all.slice(33,45);
-      cipher = all.slice(45);
-    }
-
-    if(
-      ephemeralRaw.length !== 32 ||
-      iv.length !== IV_LEN ||
-      cipher.length < 16
-    ){
-      throw new Error("Invalid payload");
-    }
-
-    var ephemeralKey = await importPublicRaw(ephemeralRaw);
-    var privateKey = await importPrivateRaw(privateRaw);
-
-    var shared = new Uint8Array(
-      await crypto.subtle.deriveBits(
-        {
-          name:"X25519",
-          public:ephemeralKey
-        },
-        privateKey,
-        256
-      )
-    );
-
-    var aesKey = await hkdfLike(shared);
-    var plain = await aesDecrypt(cipher,aesKey,iv);
-
-    return td.decode(plain);
-  }
-
-  /* ---------- Main UI ---------- */
   function updateInputStats(){
     var text = $("inputText").value || "";
     var trimmed = text.trim();
@@ -1369,6 +1090,67 @@ textarea:focus,input:focus{
     }
   };
 
+  $("importRecipientBtn").onclick = function(){
+    openDialog("importKeyDialog");
+  };
+
+  function beginKeyImport(importMode){
+    setMode(importMode);
+    closeDialog("importKeyDialog");
+    $("recipientImportFile").value = "";
+    setTimeout(function(){
+      $("recipientImportFile").click();
+    }, 0);
+  }
+
+  $("cancelImportKeyBtn").onclick = function(){
+    closeDialog("importKeyDialog");
+  };
+
+  $("importPublicKeyBtn").onclick = function(){
+    beginKeyImport("encrypt");
+  };
+
+  $("importPrivateKeyBtn").onclick = function(){
+    beginKeyImport("decrypt");
+  };
+
+  $("importKeyDialog").onclick = function(e){
+    if(e.target === this){
+      closeDialog("importKeyDialog");
+    }
+  };
+
+  $("recipientImportFile").onchange = async function(){
+    var file = this.files && this.files[0];
+    if(!file) return;
+
+    try{
+      var raw = await file.text();
+      var data = JSON.parse(raw);
+      var field = mode === "encrypt" ? "PublicKey" : "PrivateKey";
+      var key = typeof data[field] === "string" ? data[field].trim() : "";
+
+      if(!key){
+        toast(field + " not found");
+        return;
+      }
+
+      // Validate the selected key before putting it into the field.
+      var bytes = ECIES3Core.b64UrlToBytes(key);
+      if(!bytes || bytes.length !== 32){
+        toast("Invalid " + field);
+        return;
+      }
+
+      $("recipientKey").value = key;
+      $("recipientKey").dispatchEvent(new Event("input"));
+      toast(field + " imported");
+    }catch(e){
+      toast("Invalid key JSON");
+    }
+  };
+
   $("pasteTextBtn").onclick = async function(){
     try{
       await pasteInto("inputText");
@@ -1433,9 +1215,29 @@ textarea:focus,input:focus{
     toast("Downloaded");
   };
 
-  $("inputText").addEventListener("input",updateInputStats);
+  $("inputText").addEventListener("input",function(){
+    updateInputStats();
+    recordTextHistory();
+  });
+
+  $("undoTextBtn").onclick = function(){
+    if(textHistoryIndex > 0){
+      applyTextHistory(textHistoryIndex - 1);
+      toast("Undo");
+    }
+  };
+
+  $("redoTextBtn").onclick = function(){
+    if(textHistoryIndex < textHistory.length - 1){
+      applyTextHistory(textHistoryIndex + 1);
+      toast("Redo");
+    }
+  };
+
+  updateTextHistoryButtons();
 
   $("actionBtn").onclick = async function(){
+    if(!setCoreStatus()){ toast("Script failed to init"); return; }
     var text = $("inputText").value;
     var key = $("recipientKey").value;
 
@@ -1468,8 +1270,8 @@ textarea:focus,input:focus{
 
       var output =
         mode === "encrypt"
-          ? await encryptCompatible(text,key)
-          : await decryptCompatible(text,key);
+          ? await ECIES3Core.encrypt(text,key)
+          : await ECIES3Core.decrypt(text,key);
 
       $("result").textContent = output;
       updateResultCount();
@@ -1507,6 +1309,7 @@ textarea:focus,input:focus{
 
   $("clearAllBtn").onclick = function(){
     openDialog("clearDialog");
+    return false;
   };
 
   $("cancelClearBtn").onclick = function(){
@@ -1530,12 +1333,27 @@ textarea:focus,input:focus{
   $("clearTextBtn").onclick = function(){
     if(!$("inputText").value){
       toast("Text already clear");
-      return;
+      return false;
     }
+    openDialog("textClearDialog");
+    return false;
+  };
 
+  $("cancelTextClearBtn").onclick = function(){
+    closeDialog("textClearDialog");
+  };
+
+  $("confirmTextClearBtn").onclick = function(){
     $("inputText").value = "";
     updateInputStats();
+    closeDialog("textClearDialog");
     toast("Text cleared");
+  };
+
+  $("textClearDialog").onclick = function(e){
+    if(e.target === this){
+      closeDialog("textClearDialog");
+    }
   };
 
   $("clearDialog").onclick = function(e){
@@ -1545,9 +1363,13 @@ textarea:focus,input:focus{
   };
 
   /* ---------- KeyPair window ---------- */
-  function showKeyPairWindow(){
+  async function showKeyPairWindow(){
     $("keypairWindow").classList.add("show");
     $("keypairWindow").setAttribute("aria-hidden","false");
+
+    if(!keyPairExists && !keyPairGenerating){
+      await generateKeyPairNow();
+    }
   }
 
   function hideKeyPairWindow(){
@@ -1556,14 +1378,14 @@ textarea:focus,input:focus{
   }
 
   $("openKeyPairBtn").onclick = showKeyPairWindow;
-  
+
   $("keypairBottomBackBtn").onclick = hideKeyPairWindow;
 
   function renderGeneratedPair(publicRaw,privateRaw){
     keyPairExists = true;
     privateVisible = false;
 
-    generatedPublicB64 = bytesToB64Url(publicRaw);
+    generatedPublicB64 = ECIES3Core.bytesToB64Url(publicRaw);
     generatedPrivateRaw = privateRaw;
 
     $("generatedPublicKey").value = generatedPublicB64;
@@ -1578,32 +1400,23 @@ textarea:focus,input:focus{
   }
 
   async function generateKeyPairNow(){
+    if(keyPairGenerating) return false;
+    if(!setCoreStatus()){ toast("Script failed to init"); return false; }
+
+    keyPairGenerating = true;
     try{
       $("generateKeyPairBtn").disabled = true;
       $("generateKeyPairBtn").textContent = "Generating…";
 
-      var kp = await crypto.subtle.generateKey(
-        {name:"X25519"},
-        true,
-        ["deriveBits"]
-      );
-
-      var publicSpki = new Uint8Array(
-        await crypto.subtle.exportKey("spki",kp.publicKey)
-      );
-
-      var privatePkcs8 = new Uint8Array(
-        await crypto.subtle.exportKey("pkcs8",kp.privateKey)
-      );
-
-      var publicRaw = extractRawFromSpki(publicSpki);
-      var privateRaw = extractRawFromPkcs8(privatePkcs8);
-
-      renderGeneratedPair(publicRaw,privateRaw);
+      var kp = await ECIES3Core.generateKeyPair();
+      renderGeneratedPair(kp.publicKey,kp.privateKey);
       toast("Key pair generated");
+      return true;
     }catch(e){
       toast(e && e.message ? e.message : String(e));
+      return false;
     }finally{
+      keyPairGenerating = false;
       $("generateKeyPairBtn").disabled = false;
       $("generateKeyPairBtn").textContent = "Generate Key Pair";
     }
@@ -1643,7 +1456,7 @@ textarea:focus,input:focus{
 
     $("generatedPrivateKey").value =
       privateVisible
-        ? bytesToB64Url(generatedPrivateRaw)
+        ? ECIES3Core.bytesToB64Url(generatedPrivateRaw)
         : "••••••••••••••••••••••••••••••••••••••••";
 
     $("togglePrivateBtn").textContent =
@@ -1683,7 +1496,7 @@ textarea:focus,input:focus{
     }
 
     $("recipientKey").value =
-      bytesToB64Url(generatedPrivateRaw);
+      ECIES3Core.bytesToB64Url(generatedPrivateRaw);
 
     setMode("decrypt");
     hideKeyPairWindow();
@@ -1726,7 +1539,7 @@ textarea:focus,input:focus{
 
     var json = JSON.stringify({
       PublicKey:generatedPublicB64,
-      PrivateKey:bytesToB64Url(generatedPrivateRaw)
+      PrivateKey:ECIES3Core.bytesToB64Url(generatedPrivateRaw)
     },null,2);
 
     var blob = new Blob(
