@@ -688,7 +688,7 @@ textarea:focus,input:focus{
 
   <div class="status-strip">
     <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-    <span class="right">ECI4 v2</span>
+    <span class="right" id="coreStatusMain">Script Init Failed</span>
   </div>
 
   <!-- Recipient Key -->
@@ -754,7 +754,7 @@ textarea:focus,input:focus{
 
     <div class="status-strip">
       <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-      <span class="right">ECI4 v2</span>
+      <span class="right" id="coreStatusKeypair">Script Init Failed</span>
     </div>
 
     <div class="keypair-scroll">
@@ -854,7 +854,39 @@ textarea:focus,input:focus{
 <script src="./ecies3_core.js"></script>
 <script>
 (function(){
-/* ---------- Main UI ---------- */
+  "use strict";
+
+  var mode = "encrypt";
+  var keyPairExists = false;
+  var generatedPublicB64 = "";
+  var generatedPrivateRaw = null;
+  var privateVisible = false;
+
+  function $(id){ return document.getElementById(id); }
+
+  function toast(message){
+    var el = $("toast");
+    el.textContent = message;
+    el.classList.add("show");
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(function(){ el.classList.remove("show"); },1500);
+  }
+
+  function setCoreStatus(){
+    var el1 = $("coreStatusMain");
+    var el2 = $("coreStatusKeypair");
+    var ok = !!(window.ECIES3Core && typeof window.ECIES3Core.encrypt === "function" && typeof window.ECIES3Core.decrypt === "function");
+    var text = ok ? "Script Init ✔️" : "Script Init Failed";
+    el1.textContent = text;
+    el2.textContent = text;
+    el1.classList.toggle("failed", !ok);
+    el2.classList.toggle("failed", !ok);
+    return ok;
+  }
+
+  /* ---------- Core status + Main UI ---------- */
+  setCoreStatus();
+
   function updateInputStats(){
     var text = $("inputText").value || "";
     var trimmed = text.trim();
@@ -998,6 +1030,7 @@ textarea:focus,input:focus{
   $("inputText").addEventListener("input",updateInputStats);
 
   $("actionBtn").onclick = async function(){
+    if(!setCoreStatus()){ toast("Script failed to init"); return; }
     var text = $("inputText").value;
     var key = $("recipientKey").value;
 
@@ -1069,6 +1102,7 @@ textarea:focus,input:focus{
 
   $("clearAllBtn").onclick = function(){
     openDialog("clearDialog");
+    return false;
   };
 
   $("cancelClearBtn").onclick = function(){
@@ -1125,7 +1159,7 @@ textarea:focus,input:focus{
     keyPairExists = true;
     privateVisible = false;
 
-    generatedPublicB64 = bytesToB64Url(publicRaw);
+    generatedPublicB64 = ECIES3Core.bytesToB64Url(publicRaw);
     generatedPrivateRaw = privateRaw;
 
     $("generatedPublicKey").value = generatedPublicB64;
@@ -1140,19 +1174,35 @@ textarea:focus,input:focus{
   }
 
   async function generateKeyPairNow(){
+    if(!setCoreStatus()){ toast("Script failed to init"); return; }
     try{
-      $("generateKeyPairBtn").disabled=true;
-      $("generateKeyPairBtn").textContent="Generating…";
+      $("generateKeyPairBtn").disabled = true;
+      $("generateKeyPairBtn").textContent = "Generating…";
 
-      var pair=await ECIES3Core.generateKeyPair();
+      var kp = await crypto.subtle.generateKey(
+        {name:"X25519"},
+        true,
+        ["deriveBits"]
+      );
 
-      renderGeneratedPair(pair.publicKey,pair.privateKey);
+      var publicSpki = new Uint8Array(
+        await crypto.subtle.exportKey("spki",kp.publicKey)
+      );
+
+      var privatePkcs8 = new Uint8Array(
+        await crypto.subtle.exportKey("pkcs8",kp.privateKey)
+      );
+
+      var publicRaw = extractRawFromSpki(publicSpki);
+      var privateRaw = extractRawFromPkcs8(privatePkcs8);
+
+      renderGeneratedPair(publicRaw,privateRaw);
       toast("Key pair generated");
     }catch(e){
-      toast(e&&e.message?e.message:String(e));
+      toast(e && e.message ? e.message : String(e));
     }finally{
-      $("generateKeyPairBtn").disabled=false;
-      $("generateKeyPairBtn").textContent="Generate Key Pair";
+      $("generateKeyPairBtn").disabled = false;
+      $("generateKeyPairBtn").textContent = "Generate Key Pair";
     }
   }
 
@@ -1190,7 +1240,7 @@ textarea:focus,input:focus{
 
     $("generatedPrivateKey").value =
       privateVisible
-        ? bytesToB64Url(generatedPrivateRaw)
+        ? ECIES3Core.bytesToB64Url(generatedPrivateRaw)
         : "••••••••••••••••••••••••••••••••••••••••";
 
     $("togglePrivateBtn").textContent =
@@ -1230,7 +1280,7 @@ textarea:focus,input:focus{
     }
 
     $("recipientKey").value =
-      bytesToB64Url(generatedPrivateRaw);
+      ECIES3Core.bytesToB64Url(generatedPrivateRaw);
 
     setMode("decrypt");
     hideKeyPairWindow();
@@ -1321,7 +1371,6 @@ textarea:focus,input:focus{
   updateResultCount();
   setMode("encrypt");
 
-})();
 })();
 </script>
 </body>
