@@ -187,6 +187,10 @@ input:focus,textarea:focus{border-color:#45bda9;outline:none;box-shadow:0 0 0 3p
   display:flex;
   gap:7px;
 }
+.key-row input{
+  flex:1;
+  min-width:0;
+}
 input{
   width:100%;
   height:42px;
@@ -199,38 +203,7 @@ input{
   font-size:14px;
 }
 input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
-.key-input{
-  flex:1;
-  min-width:0;
-  width:100%;
-  height:42px;
-  min-height:42px;
-  max-height:42px;
-  overflow-x:auto;
-  overflow-y:auto;
-  padding:10px 11px;
-  border:1px solid #d7e2dd;
-  border-radius:12px;
-  outline:none;
-  background:#f9fcfb;
-  color:#17211d;
-  font-size:14px;
-  line-height:20px;
-  white-space:pre-wrap;
-  word-break:break-word;
-  cursor:text;
-}
-.key-input:empty::before{
-  content:attr(data-placeholder);
-  color:#89958f;
-  pointer-events:none;
-}
-.key-input:focus{
-  border-color:#45bda9;
-  outline:none;
-  box-shadow:0 0 0 3px rgba(15,159,115,.13);
-}
-.key-input.key-hidden{-webkit-text-security:disc;text-security:disc;}
+#encryptionKey.key-hidden{-webkit-text-security:disc;text-security:disc;}
 .small-btn{
   flex:none;
   height:42px;
@@ -544,7 +517,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     <h2 class="section-title">Encryption Key</h2>
 
     <div class="key-row">
-      <div id="encryptionKey" class="key-input key-hidden" contenteditable="true" role="textbox" aria-label="Encryption Key" aria-placeholder="Enter encryption key" data-placeholder="Enter encryption key" spellcheck="false" autocapitalize="off" autocorrect="off" inputmode="text"></div>
+      <input id="encryptionKey" type="text" autocomplete="off" name="data-key" autocorrect="off" inputmode="text" spellcheck="false" autocapitalize="off" placeholder="Enter encryption key">
       <button class="small-btn" id="showPass" type="button">Show</button>
       <button class="small-btn blue" id="pastePass" type="button">Paste</button>
     </div>
@@ -656,15 +629,8 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
   async function pasteInto(id){
     var text = await navigator.clipboard.readText();
-    var el = $(id);
-
-    if(el.isContentEditable){
-      el.textContent = text || "";
-    }else{
-      el.value = text || "";
-    }
-
-    el.dispatchEvent(new Event("input",{bubbles:true}));
+    $(id).value = text || "";
+    $(id).dispatchEvent(new Event("input"));
   }
 
   $("encryptMode").onclick = function(){ setMode("encrypt"); };
@@ -747,7 +713,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     }
 
     $("inputText").value = "";
-    $("encryptionKey").textContent = "";
+    $("encryptionKey").value = "";
     $("encryptionKey").classList.add("key-hidden");
     $("showPass").textContent = "Show";
     $("result").textContent = "Result will appear after Encrypt or Decrypt.";
@@ -798,7 +764,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   $("pastePass").onclick = async function(){
     try{
       await pasteInto("encryptionKey");
-      toast("Password pasted");
+      toast("Key pasted");
     }catch(e){
       toast("Clipboard unavailable");
     }
