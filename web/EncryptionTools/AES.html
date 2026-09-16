@@ -187,10 +187,6 @@ input:focus,textarea:focus{border-color:#45bda9;outline:none;box-shadow:0 0 0 3p
   display:flex;
   gap:7px;
 }
-.key-row input{
-  flex:1;
-  min-width:0;
-}
 input{
   width:100%;
   height:42px;
@@ -203,7 +199,38 @@ input{
   font-size:14px;
 }
 input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
-#encryptionKey.key-hidden{-webkit-text-security:disc;text-security:disc;}
+.key-input{
+  flex:1;
+  min-width:0;
+  width:100%;
+  height:42px;
+  min-height:42px;
+  max-height:42px;
+  overflow-x:auto;
+  overflow-y:auto;
+  padding:10px 11px;
+  border:1px solid #d7e2dd;
+  border-radius:12px;
+  outline:none;
+  background:#f9fcfb;
+  color:#17211d;
+  font-size:14px;
+  line-height:20px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  cursor:text;
+}
+.key-input:empty::before{
+  content:attr(data-placeholder);
+  color:#89958f;
+  pointer-events:none;
+}
+.key-input:focus{
+  border-color:#45bda9;
+  outline:none;
+  box-shadow:0 0 0 3px rgba(15,159,115,.13);
+}
+.key-input.key-hidden{-webkit-text-security:disc;text-security:disc;}
 .small-btn{
   flex:none;
   height:42px;
@@ -517,7 +544,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     <h2 class="section-title">Encryption Key</h2>
 
     <div class="key-row">
-      <input id="encryptionKey" type="text" autocomplete="off" name="data-key" autocorrect="off" inputmode="text" spellcheck="false" autocapitalize="off" placeholder="Enter encryption key">
+      <div id="encryptionKey" class="key-input key-hidden" contenteditable="true" role="textbox" aria-label="Encryption Key" data-placeholder="Enter encryption key" spellcheck="false" autocapitalize="off" autocorrect="off"></div>
       <button class="small-btn" id="showPass" type="button">Show</button>
       <button class="small-btn blue" id="pastePass" type="button">Paste</button>
     </div>
@@ -629,8 +656,15 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
   async function pasteInto(id){
     var text = await navigator.clipboard.readText();
-    $(id).value = text || "";
-    $(id).dispatchEvent(new Event("input"));
+    var el = $(id);
+
+    if(el.isContentEditable){
+      el.textContent = text || "";
+    }else{
+      el.value = text || "";
+    }
+
+    el.dispatchEvent(new Event("input",{bubbles:true}));
   }
 
   $("encryptMode").onclick = function(){ setMode("encrypt"); };
@@ -713,7 +747,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     }
 
     $("inputText").value = "";
-    $("encryptionKey").value = "";
+    $("encryptionKey").textContent = "";
     $("encryptionKey").classList.add("key-hidden");
     $("showPass").textContent = "Show";
     $("result").textContent = "Result will appear after Encrypt or Decrypt.";
@@ -764,7 +798,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   $("pastePass").onclick = async function(){
     try{
       await pasteInto("encryptionKey");
-      toast("Key pasted");
+      toast("Password pasted");
     }catch(e){
       toast("Clipboard unavailable");
     }
@@ -779,9 +813,18 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     }
   };
 
+  $("encryptionKey").addEventListener("input", function(){
+    // This is deliberately a contenteditable element, not an <input>, so Chromium password autofill does not classify it as a password field.
+    // Always keep only plain text and let the operation code read textContent.
+    if($("encryptionKey").childElementCount){
+      var plain = $("encryptionKey").textContent;
+      $("encryptionKey").textContent = plain;
+    }
+  });
+
   $("inputText").addEventListener("input",updateInputCount);
   $("actionBtn").onclick = async function(){
-    var encryptionKey = $("encryptionKey").value;
+    var encryptionKey = $("encryptionKey").textContent;
     var input = $("inputText").value;
 
     if(!encryptionKey){
