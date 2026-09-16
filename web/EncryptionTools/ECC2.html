@@ -142,6 +142,17 @@ button{cursor:pointer}
   font-weight:850;
 }
 
+.import-btn{
+  height:28px;
+  padding:0 9px;
+  border:1px solid #e1d6f2;
+  border-radius:9px;
+  background:#f5effb;
+  color:#7a3eb1;
+  font-size:10px;
+  font-weight:850;
+}
+
 .section-title{
   margin:0 0 7px;
   color:var(--amber);
@@ -219,6 +230,11 @@ textarea:focus,input:focus{
   align-items:center;
   gap:7px;
   margin-bottom:6px;
+}
+.key-head-actions{
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
 .key-head .label{
   min-width:0;
@@ -731,8 +747,12 @@ textarea:focus,input:focus{
   <section class="card">
     <div class="key-head">
       <div class="label" id="recipientLabel">Recipient Public Key</div>
-      <button class="copy-btn" id="pasteRecipientBtn" type="button">Paste</button>
+      <div class="key-head-actions">
+        <button class="import-btn" id="importRecipientBtn" type="button">Import Key</button>
+        <button class="copy-btn" id="pasteRecipientBtn" type="button">Paste</button>
+      </div>
     </div>
+    <input id="recipientImportFile" type="file" accept=".json,application/json" hidden>
     <textarea id="recipientKey" class="key-input" spellcheck="false" placeholder="Paste recipient public key…"></textarea>
 
     <div class="mode">
@@ -843,6 +863,22 @@ textarea:focus,input:focus{
 <!-- Toast -->
 <div class="toast" id="toast">Done</div>
 
+<!-- Import Key choice dialog -->
+<div class="dialog-backdrop" id="importKeyDialog" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true">
+    <div class="dialog-head">
+      <div class="dialog-icon" style="background:#f5effb;color:#7a3eb1;border-color:#e1d6f2">↕</div>
+      <h3>Import which key?</h3>
+    </div>
+    <p>Select the key type first. The mode will switch automatically, then choose your JSON file.</p>
+    <div class="dialog-actions">
+      <button class="dialog-btn cancel" id="cancelImportKeyBtn" type="button">Cancel</button>
+      <button class="dialog-btn" id="importPublicKeyBtn" type="button" style="border:1px solid #bfe5d8;background:#eaf8f3;color:#0f766e">Public Key</button>
+      <button class="dialog-btn" id="importPrivateKeyBtn" type="button" style="border:1px solid #e1d6f2;background:#f5effb;color:#7a3eb1">Private Key</button>
+    </div>
+  </div>
+</div>
+
 <!-- Clear All dialog -->
 <div class="dialog-backdrop" id="clearDialog" aria-hidden="true">
   <div class="dialog" role="dialog" aria-modal="true">
@@ -914,6 +950,7 @@ textarea:focus,input:focus{
   var generatedPublicB64 = "";
   var generatedPrivateRaw = null;
   var privateVisible = false;
+  var keyPairGenerating = false;
 
   var textHistory = [""];
   var textHistoryIndex = 0;
@@ -1050,6 +1087,67 @@ textarea:focus,input:focus{
       toast("Pasted");
     }catch(e){
       toast("Clipboard unavailable");
+    }
+  };
+
+  $("importRecipientBtn").onclick = function(){
+    openDialog("importKeyDialog");
+  };
+
+  function beginKeyImport(importMode){
+    setMode(importMode);
+    closeDialog("importKeyDialog");
+    $("recipientImportFile").value = "";
+    setTimeout(function(){
+      $("recipientImportFile").click();
+    }, 0);
+  }
+
+  $("cancelImportKeyBtn").onclick = function(){
+    closeDialog("importKeyDialog");
+  };
+
+  $("importPublicKeyBtn").onclick = function(){
+    beginKeyImport("encrypt");
+  };
+
+  $("importPrivateKeyBtn").onclick = function(){
+    beginKeyImport("decrypt");
+  };
+
+  $("importKeyDialog").onclick = function(e){
+    if(e.target === this){
+      closeDialog("importKeyDialog");
+    }
+  };
+
+  $("recipientImportFile").onchange = async function(){
+    var file = this.files && this.files[0];
+    if(!file) return;
+
+    try{
+      var raw = await file.text();
+      var data = JSON.parse(raw);
+      var field = mode === "encrypt" ? "PublicKey" : "PrivateKey";
+      var key = typeof data[field] === "string" ? data[field].trim() : "";
+
+      if(!key){
+        toast(field + " not found");
+        return;
+      }
+
+      // Validate the selected key before putting it into the field.
+      var bytes = ECIES3Core.b64UrlToBytes(key);
+      if(!bytes || bytes.length !== 32){
+        toast("Invalid " + field);
+        return;
+      }
+
+      $("recipientKey").value = key;
+      $("recipientKey").dispatchEvent(new Event("input"));
+      toast(field + " imported");
+    }catch(e){
+      toast("Invalid key JSON");
     }
   };
 
@@ -1265,9 +1363,13 @@ textarea:focus,input:focus{
   };
 
   /* ---------- KeyPair window ---------- */
-  function showKeyPairWindow(){
+  async function showKeyPairWindow(){
     $("keypairWindow").classList.add("show");
     $("keypairWindow").setAttribute("aria-hidden","false");
+
+    if(!keyPairExists && !keyPairGenerating){
+      await generateKeyPairNow();
+    }
   }
 
   function hideKeyPairWindow(){
@@ -1298,20 +1400,23 @@ textarea:focus,input:focus{
   }
 
   async function generateKeyPairNow(){
-    if(!setCoreStatus()){ toast("Script failed to init"); return; }
+    if(keyPairGenerating) return false;
+    if(!setCoreStatus()){ toast("Script failed to init"); return false; }
+
+    keyPairGenerating = true;
     try{
       $("generateKeyPairBtn").disabled = true;
       $("generateKeyPairBtn").textContent = "Generating…";
 
       var kp = await ECIES3Core.generateKeyPair();
-      var publicRaw = kp.publicKey;
-      var privateRaw = kp.privateKey;
-
-      renderGeneratedPair(publicRaw,privateRaw);
+      renderGeneratedPair(kp.publicKey,kp.privateKey);
       toast("Key pair generated");
+      return true;
     }catch(e){
       toast(e && e.message ? e.message : String(e));
+      return false;
     }finally{
+      keyPairGenerating = false;
       $("generateKeyPairBtn").disabled = false;
       $("generateKeyPairBtn").textContent = "Generate Key Pair";
     }
@@ -1434,7 +1539,7 @@ textarea:focus,input:focus{
 
     var json = JSON.stringify({
       PublicKey:generatedPublicB64,
-      PrivateKey:bytesToB64Url(generatedPrivateRaw)
+      PrivateKey:ECIES3Core.bytesToB64Url(generatedPrivateRaw)
     },null,2);
 
     var blob = new Blob(
