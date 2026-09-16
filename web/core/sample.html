@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Royall UI Engine • Sample</title>
+<link rel="stylesheet" href="royall-ui.css">
+</head>
+<body>
+<div id="app"></div>
+
+<div id="content" style="display:none"></div>
+
+<script src="royall-ui.js"></script>
+<script>
+const ui = RoyallUI.init({
+  title:"Royall UI Engine",
+  description:"Universal visual components • Sample/Test",
+  icon:"🥏",
+  headerButton:{
+    text:"Clear All",
+    className:"soft",
+    onClick:()=>RoyallUI.confirm({
+      icon:"🗑️",
+      title:"Clear All?",
+      text:"This sample will clear its input and result.",
+      confirmText:"Clear"
+    },()=>{input.value="";result.value="";RoyallUI.toast("Everything cleared ✔️");})
+  },
+  status:{text:"• Script Init ✔️",right:"Universal UI"}
+});
+
+const main=ui.main;
+
+const inputBox=RoyallUI.box({
+  title:"Sample Input",
+  subtitle:"Input + counter",
+  actions:[
+    {text:"Paste",className:"soft",onClick:async()=>input.input.value=await RoyallUI.paste()},
+    {text:"Clear",className:"danger-soft",onClick:()=>RoyallUI.clearConfirm(input.input,"Text")}
+  ]
+});
+const input=RoyallUI.areaField({placeholder:"Type something here...",count:true});
+inputBox.body.append(input.el);
+
+const chips=RoyallUI.chips([
+  {label:"Option A",value:"A"},
+  {label:"Option B",value:"B"},
+  {label:"Option C",value:"C"}
+],v=>RoyallUI.toast("Selected "+v));
+const chipBox=RoyallUI.box({title:"Choice / Chips"});
+chipBox.body.append(chips.el);
+main.append(inputBox.el,chipBox.el);
+
+const resultBox=RoyallUI.box({
+  title:"Result",
+  subtitle:"Common result controls",
+  actions:[
+    {text:"Copy",className:"blue",onClick:()=>RoyallUI.copy(result.value)},
+    {text:"Download",className:"soft",onClick:()=>RoyallUI.download("royall-result.txt",result.value)}
+  ]
+});
+const result=document.createElement("textarea");
+result.className="royall-textarea";
+result.placeholder="Result appears here...";
+resultBox.body.append(result);
+main.append(resultBox.el);
+
+const expand=RoyallUI.box({title:"Expandable Section",actions:[
+  {text:"Toggle",className:"soft",onClick:()=>RoyallUI.toggle("demoExpand")}
+]});
+const ex=document.createElement("div");ex.id="demoExpand";ex.className="royall-expand";
+ex.innerHTML='<div class="royall-divider"></div><div class="royall-empty">This content can be expanded/collapsed by the application.</div>';
+expand.body.append(ex);
+main.append(expand.el);
+
+RoyallUI.bottomBar([
+  {text:"Confirm Dialog",className:"primary",onClick:()=>RoyallUI.confirm({icon:"✅",title:"Confirmation",text:"This is the shared two-button confirmation dialog.",confirmText:"Continue"},()=>RoyallUI.toast("Confirmed ✔️"))},
+  {text:"Choice Dialog",className:"blue",onClick:()=>RoyallUI.choice({icon:"🔑",title:"Choose Action",text:"This is the shared choice dialog."},[
+    ["First",()=>RoyallUI.toast("First selected")],
+    ["Second",()=>RoyallUI.toast("Second selected")]
+  ])}
+]);
+</script>
+</body>
+</html>

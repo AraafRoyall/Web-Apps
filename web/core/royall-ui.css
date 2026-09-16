@@ -1,0 +1,125 @@
+
+:root{
+  --royall-bg:#f7f9fa;
+  --royall-surface:#ffffff;
+  --royall-soft:#f1f5f6;
+  --royall-text:#162126;
+  --royall-muted:#6d7a80;
+  --royall-border:#dfe7ea;
+  --royall-primary:#168f8a;
+  --royall-primary-soft:#e8f7f5;
+  --royall-blue:#1877e8;
+  --royall-blue-soft:#edf5ff;
+  --royall-success:#218b4b;
+  --royall-danger:#c43b3b;
+  --royall-danger-soft:#fff0f0;
+  --royall-purple:#7a3eb1;
+  --royall-shadow:0 3px 14px rgba(24,39,45,.07);
+  --royall-radius:14px;
+  --royall-radius-sm:10px;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--royall-bg);color:var(--royall-text)}
+body{min-height:100vh}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.royall-app{min-height:100vh;display:flex;flex-direction:column;max-width:760px;margin:0 auto}
+.royall-main{flex:1;padding:0 12px 100px}
+.royall-header{
+  display:flex;align-items:flex-start;gap:10px;padding:12px 12px 9px;
+  background:var(--royall-surface);border-bottom:1px solid var(--royall-border);
+  position:sticky;top:0;z-index:20;
+}
+.royall-header-icon{width:34px;height:34px;display:grid;place-items:center;font-size:23px;flex:none}
+.royall-header-copy{min-width:0;flex:1}
+.royall-title{font-size:18px;font-weight:850;line-height:1.15}
+.royall-description{margin-top:3px;font-size:11.5px;color:var(--royall-muted);line-height:1.3}
+.royall-header-actions{display:flex;gap:6px;align-items:center}
+.royall-status{
+  margin:9px 12px 10px;padding:6px 9px;border:1px solid var(--royall-border);
+  border-radius:9px;background:var(--royall-soft);font-size:10.5px;color:var(--royall-muted);
+  display:flex;justify-content:space-between;gap:10px;align-items:center
+}
+.royall-status-main{min-width:0}
+.royall-status.ok{color:var(--royall-success);background:#effaf3;border-color:#cfe8d6}
+.royall-status.error{color:var(--royall-danger);background:var(--royall-danger-soft);border-color:#efcdcd}
+.royall-box{
+  background:var(--royall-surface);border:1px solid var(--royall-border);
+  border-radius:var(--royall-radius);box-shadow:var(--royall-shadow);margin:10px 0;
+}
+.royall-box-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 11px 7px}
+.royall-box-title{font-size:13px;font-weight:800}
+.royall-box-subtitle{font-size:10.5px;color:var(--royall-muted);font-weight:600}
+.royall-box-body{padding:0 10px 10px}
+.royall-input-row{display:flex;gap:6px;align-items:center}
+.royall-input,.royall-textarea,.royall-select{
+  width:100%;border:1px solid var(--royall-border);background:#fbfcfd;
+  border-radius:10px;color:var(--royall-text);outline:none;padding:10px 10px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.royall-input:focus,.royall-textarea:focus,.royall-select:focus{
+  border-color:#9accca;box-shadow:0 0 0 3px rgba(22,143,138,.08)
+}
+.royall-textarea{min-height:110px;resize:vertical;line-height:1.45}
+.royall-count{font-size:10px;color:var(--royall-muted);font-weight:700}
+.royall-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.royall-spacer{flex:1}
+.royall-divider{height:1px;background:var(--royall-border);margin:12px 0}
+.royall-btn{
+  border:1px solid transparent;border-radius:9px;padding:8px 11px;min-height:35px;
+  font-size:11.5px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;
+  gap:5px;white-space:nowrap;transition:transform .08s,filter .15s,box-shadow .15s
+}
+.royall-btn:active{transform:scale(.98)}
+.royall-btn.primary{background:var(--royall-primary);color:#fff}
+.royall-btn.blue{background:var(--royall-blue);color:#fff}
+.royall-btn.blue-soft{background:var(--royall-blue-soft);color:var(--royall-blue);border-color:#d8e8ff}
+.royall-btn.soft{background:var(--royall-soft);color:var(--royall-text);border-color:var(--royall-border)}
+.royall-btn.danger-soft{background:var(--royall-danger-soft);color:var(--royall-danger);border-color:#efcdcd}
+.royall-btn.purple{background:#f5effb;color:var(--royall-purple);border-color:#dfcdef}
+.royall-btn.icon-only{width:35px;padding:0}
+.royall-btn.big{min-height:44px;padding:10px 15px;font-size:12px}
+.royall-chip-row{display:flex;gap:7px;flex-wrap:wrap}
+.royall-chip{padding:7px 11px;border-radius:99px;border:1px solid var(--royall-border);background:#fff;font-size:11px;font-weight:800}
+.royall-chip.active{background:var(--royall-primary-soft);border-color:#acdcd8;color:var(--royall-primary)}
+.royall-expand{display:none}
+.royall-expand.open{display:block}
+.royall-fab{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:30;
+  min-width:170px;box-shadow:0 8px 20px rgba(0,0,0,.14)
+}
+.royall-bottom-bar{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:30;
+  width:min(420px,calc(100vw - 24px));display:flex;gap:8px
+}
+.royall-bottom-bar .royall-btn{flex:1}
+.royall-overlay{
+  position:fixed;inset:0;background:rgba(20,31,35,.28);display:none;
+  align-items:center;justify-content:center;padding:20px;z-index:100
+}
+.royall-overlay.open{display:flex}
+.royall-dialog{
+  width:min(390px,100%);background:#fff;border:1px solid var(--royall-border);
+  border-radius:16px;box-shadow:0 14px 36px rgba(0,0,0,.18);padding:15px
+}
+.royall-dialog-head{display:flex;gap:10px;align-items:center}
+.royall-dialog-icon{font-size:24px}
+.royall-dialog-title{font-size:15px;font-weight:850}
+.royall-dialog-text{margin:9px 0 12px;color:var(--royall-muted);font-size:12px;line-height:1.45}
+.royall-dialog-actions{display:flex;gap:8px}
+.royall-dialog-actions .royall-btn{flex:1}
+.royall-toast{
+  position:fixed;left:50%;bottom:79px;transform:translateX(-50%) translateY(10px);
+  background:#18252a;color:#fff;padding:9px 12px;border-radius:10px;font-size:11px;
+  font-weight:700;opacity:0;pointer-events:none;transition:.18s;z-index:200;
+  max-width:calc(100vw - 30px);text-align:center
+}
+.royall-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.royall-empty{padding:24px 12px;text-align:center;color:var(--royall-muted);font-size:12px}
+.royall-footer{padding:10px 12px 16px;text-align:center;color:var(--royall-muted);font-size:10.5px}
+.royall-developer{font-weight:900;color:var(--royall-text);font-size:11.5px}
+@media(max-width:480px){
+  .royall-header{padding-left:10px;padding-right:10px}
+  .royall-main{padding-left:10px;padding-right:10px}
+}
