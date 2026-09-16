@@ -30,10 +30,10 @@
           "icon": "AES"
         },
         {
-          "name": "ECCI v4",
+          "name": "ECIES Secure",
           "description": "Elliptic Curve Tools",
-          "url": "EncryptionTools/ECC2.html",
-          "icon": "ECC"
+          "url": "EncryptionTools/ECC.html",
+          "icon": "ECCIES"
         }
       ]
     },
