@@ -481,7 +481,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 </head>
 
 <body>
-<div class="app">
+<form class="app" id="appForm" autocomplete="off" onsubmit="return false;">
 
   <header class="header">
     <div class="icon">🔒</div>
@@ -514,7 +514,19 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     <h2 class="section-title">Encryption Key</h2>
 
     <div class="password-row">
-      <input id="password" type="password" autocomplete="off" placeholder="Enter encryption key">
+      <input
+        id="password"
+        type="password"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        name="encryption-key"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        data-bwignore="true"
+        data-protonpass-ignore="true"
+        placeholder="Enter encryption key">
       <button class="small-btn" id="showPass" type="button">Show</button>
       <button class="small-btn blue" id="pastePass" type="button">Paste</button>
     </div>
@@ -542,7 +554,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     </div>
   </section>
 
-</div>
+</form>
 
 <button class="fab" id="actionBtn" type="button">🔒 Encrypt</button>
 <div class="toast" id="toast">Done</div>
