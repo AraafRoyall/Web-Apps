@@ -561,16 +561,11 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   </div>
 </div>
 
+<script src="aes.js"></script>
 <script>
 (function(){
   "use strict";
 
-  var te = new TextEncoder();
-  var td = new TextDecoder();
-  var VERSION = 2;
-  var IV_LEN = 12;
-  var AAD = te.encode("AESv1");
-  var mode = "encrypt";
 
   function $(id){ return document.getElementById(id); }
 
@@ -626,112 +621,6 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
     updateInputCount();
     updateResultCount();
-  }
-
-  function bytesToBase64Url(bytes){
-    var binary = "";
-    for(var i=0;i<bytes.length;i++) binary += String.fromCharCode(bytes[i]);
-    return btoa(binary)
-      .replace(/\+/g,"-")
-      .replace(/\//g,"_")
-      .replace(/=+$/,"");
-  }
-
-  function base64UrlToBytes(value){
-    var str = String(value || "")
-      .trim()
-      .replace(/\s+/g,"")
-      .replace(/-/g,"+")
-      .replace(/_/g,"/");
-
-    while(str.length % 4) str += "=";
-
-    var binary = atob(str);
-    var out = new Uint8Array(binary.length);
-
-    for(var i=0;i<binary.length;i++) out[i] = binary.charCodeAt(i);
-    return out;
-  }
-
-  function concat(){
-    var total = 0;
-    for(var i=0;i<arguments.length;i++) total += arguments[i].length;
-
-    var out = new Uint8Array(total);
-    var offset = 0;
-
-    for(var j=0;j<arguments.length;j++){
-      out.set(arguments[j],offset);
-      offset += arguments[j].length;
-    }
-    return out;
-  }
-
-  async function deriveKey(password){
-    if(!window.crypto || !window.crypto.subtle)
-      throw new Error("Web Crypto API is unavailable.");
-
-    var digest = await window.crypto.subtle.digest(
-      "SHA-256",
-      te.encode(String(password || ""))
-    );
-
-    return window.crypto.subtle.importKey(
-      "raw",
-      digest,
-      {name:"AES-GCM"},
-      false,
-      ["encrypt","decrypt"]
-    );
-  }
-
-  async function encryptText(text,password){
-    var iv = window.crypto.getRandomValues(new Uint8Array(IV_LEN));
-    var key = await deriveKey(password);
-
-    var cipher = new Uint8Array(
-      await window.crypto.subtle.encrypt(
-        {
-          name:"AES-GCM",
-          iv:iv,
-          additionalData:AAD,
-          tagLength:128
-        },
-        key,
-        te.encode(String(text || ""))
-      )
-    );
-
-    return bytesToBase64Url(
-      concat(new Uint8Array([VERSION]),iv,cipher)
-    );
-  }
-
-  async function decryptText(value,password){
-    var all = base64UrlToBytes(value);
-
-    if(all.length < 1 + IV_LEN + 16)
-      throw new Error("Invalid cipher text.");
-
-    if(all[0] !== VERSION)
-      throw new Error("Unsupported cipher version.");
-
-    var iv = all.slice(1,1 + IV_LEN);
-    var cipher = all.slice(1 + IV_LEN);
-    var key = await deriveKey(password);
-
-    var plain = await window.crypto.subtle.decrypt(
-      {
-        name:"AES-GCM",
-        iv:iv,
-        additionalData:AAD,
-        tagLength:128
-      },
-      key,
-      cipher
-    );
-
-    return td.decode(plain);
   }
 
   async function pasteInto(id){
@@ -912,8 +801,8 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
       button.textContent = mode === "encrypt" ? "Encrypting…" : "Decrypting…";
 
       var result = mode === "encrypt"
-        ? await encryptText(input,password)
-        : await decryptText(input,password);
+        ? await AES.encrypt(input,password)
+        : await AES.decrypt(input,password);
 
       $("result").textContent = result;
       updateResultCount();
@@ -945,11 +834,9 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
   };
 
   var supported =
-    !!window.crypto &&
-    !!window.crypto.subtle &&
-    typeof window.crypto.subtle.digest === "function" &&
-    typeof window.crypto.subtle.encrypt === "function" &&
-    typeof window.crypto.subtle.decrypt === "function";
+    !!window.AES &&
+    typeof window.AES.encrypt === "function" &&
+    typeof window.AES.decrypt === "function";
 
   if(!supported){
     $("actionBtn").disabled = true;
