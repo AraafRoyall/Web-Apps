@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Royall UI v1 Sample</title>
+<link rel="stylesheet" href="../core/royall-ui.css">
+</head>
+<body>
+<div id="app"></div>
+
+<script src="../core/royall-ui.js"></script>
+<script>
+(function(){
+  var ui=RoyallUI.mount({
+    mount:"#app",
+    icon:"🧩",
+    title:"Sample Tool",
+    description:"Universal Royall UI Engine · v1",
+    status:{text:"• Script Init ✔️",right:"UI Core v1"},
+    headerButton:{
+      text:"Clear All",
+      onClick:function(){
+        uiClear();
+      }
+    }
+  });
+
+  function uiClear(){
+    RoyallUI.confirm({
+      icon:"!",
+      title:"Clear everything?",
+      text:"This demonstrates the same centered confirmation used by our common UI.",
+      confirmText:"Clear"
+    },function(){
+      input.textarea.value="";
+      result.textContent="Result will appear after the action.";
+      RoyallUI.toast("Cleared");
+    });
+  }
+
+  var inputCard=RoyallUI.card("Text to Process",{
+    head:true,
+    stats:"• 0 words • 0 chars",
+    actions:[
+      {text:"Clear",className:"royall-clear-small",onClick:function(){
+        RoyallUI.clearConfirm(input.textarea,"text");
+      }},
+      {text:"Paste",className:"royall-paste-small",onClick:async function(){
+        input.textarea.value=await RoyallUI.paste();
+        RoyallUI.toast("Pasted");
+      }}
+    ]
+  });
+
+  var input=RoyallUI.textarea({placeholder:"Enter text…"});
+  inputCard.appendChild(input.el);
+  ui.content.appendChild(inputCard);
+
+  var keyCard=RoyallUI.card("Example Input");
+  var field=RoyallUI.input({
+    placeholder:"Reusable input field",
+    actions:[
+      {text:"Copy",className:"royall-small-btn blue",onClick:function(x){
+        RoyallUI.copy(x.value);
+      }}
+    ]
+  });
+  keyCard.appendChild(field.el);
+  ui.content.appendChild(keyCard);
+
+  ui.content.appendChild(RoyallUI.divider());
+
+  var resultCard=RoyallUI.card("Result",{
+    head:true,result:true,
+    stats:"0 chars",
+    actions:[
+      {text:"Copy",className:"royall-blue-btn",onClick:function(){
+        RoyallUI.copy(result.textContent);
+      }},
+      {text:"Download",className:"royall-download-btn",onClick:function(){
+        RoyallUI.download("sample-result.txt",result.textContent);
+      }}
+    ]
+  });
+
+  var result=RoyallUI.result("Result will appear after the action.");
+  resultCard.appendChild(result);
+  resultCard.appendChild(document.createTextNode("Ready."));
+  ui.content.appendChild(resultCard);
+
+  RoyallUI.bottomBar([
+    {text:"Confirmation",onClick:function(){
+      RoyallUI.confirm({
+        icon:"✅",
+        title:"Confirmation",
+        text:"This is the shared two-button dialog.",
+        confirmText:"Continue",
+        danger:false
+      },function(){RoyallUI.toast("Confirmed ✔️")});
+    }},
+    {text:"Choice Dialog",onClick:function(){
+      RoyallUI.choice({
+        icon:"🔹",
+        title:"Choose Option",
+        text:"This is the shared choice dialog."
+      },[
+        {text:"Option A",onClick:function(){RoyallUI.toast("Option A")}},
+        {text:"Option B",onClick:function(){RoyallUI.toast("Option B")}}
+      ]);
+    }}
+  ]);
+})();
+</script>
+</body>
+</html>
