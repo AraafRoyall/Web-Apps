@@ -93,6 +93,8 @@ button{cursor:pointer}
 }
 .developer-name{font-size:11.5px;font-weight:900}
 .status-strip .right{
+  color:#15956b;
+
   margin-left:auto;
   color:#87928d;
   font-size:9.5px;
@@ -481,7 +483,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 </head>
 
 <body>
-<form class="app" id="appForm" autocomplete="off" onsubmit="return false;">
+<div class="app">
 
   <header class="header">
     <div class="icon">🔒</div>
@@ -494,7 +496,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
 
   <div class="status-strip">
     <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-    <span class="right">AESv2</span>
+    <span class="right" id="aesStatus">AES.js Active ✔️</span>
   </div>
 
   <!-- TEXT -->
@@ -514,19 +516,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     <h2 class="section-title">Encryption Key</h2>
 
     <div class="password-row">
-      <input
-        id="password"
-        type="password"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        name="encryption-key"
-        data-lpignore="true"
-        data-1p-ignore="true"
-        data-bwignore="true"
-        data-protonpass-ignore="true"
-        placeholder="Enter encryption key">
+      <input id="password" type="password" autocomplete="off" placeholder="Enter encryption key">
       <button class="small-btn" id="showPass" type="button">Show</button>
       <button class="small-btn blue" id="pastePass" type="button">Paste</button>
     </div>
@@ -554,7 +544,7 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     </div>
   </section>
 
-</form>
+</div>
 
 <button class="fab" id="actionBtn" type="button">🔒 Encrypt</button>
 <div class="toast" id="toast">Done</div>
@@ -851,9 +841,16 @@ input:focus{border-color:#89dacd;box-shadow:0 0 0 3px rgba(20,184,166,.08)}
     typeof window.AES.encrypt === "function" &&
     typeof window.AES.decrypt === "function";
 
-  if(!supported){
+  var aesStatus = $("aesStatus");
+
+  if(supported){
+    aesStatus.textContent = "AES.js Active ✔️";
+    aesStatus.style.color = "#15956b";
+  }else{
+    aesStatus.textContent = "AES.js Init Failed ✖️";
+    aesStatus.style.color = "#c73535";
     $("actionBtn").disabled = true;
-    $("message").textContent = "Web Crypto API unavailable.";
+    $("message").textContent = "AES.js initialization failed.";
   }
 
   updateInputCount();
