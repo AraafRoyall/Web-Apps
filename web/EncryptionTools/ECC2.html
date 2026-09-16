@@ -100,8 +100,12 @@ button{cursor:pointer}
 }
 .status-strip .right{
   margin-left:auto;
-  color:#87928d;
+  color:#0f9f73;
   font-size:9.5px;
+  font-weight:900;
+}
+.status-strip .right.failed{
+  color:#d04444;
 }
 
 .card{
@@ -1179,22 +1183,9 @@ textarea:focus,input:focus{
       $("generateKeyPairBtn").disabled = true;
       $("generateKeyPairBtn").textContent = "Generating…";
 
-      var kp = await crypto.subtle.generateKey(
-        {name:"X25519"},
-        true,
-        ["deriveBits"]
-      );
-
-      var publicSpki = new Uint8Array(
-        await crypto.subtle.exportKey("spki",kp.publicKey)
-      );
-
-      var privatePkcs8 = new Uint8Array(
-        await crypto.subtle.exportKey("pkcs8",kp.privateKey)
-      );
-
-      var publicRaw = extractRawFromSpki(publicSpki);
-      var privateRaw = extractRawFromPkcs8(privatePkcs8);
+      var kp = await ECIES3Core.generateKeyPair();
+      var publicRaw = kp.publicKey;
+      var privateRaw = kp.privateKey;
 
       renderGeneratedPair(publicRaw,privateRaw);
       toast("Key pair generated");
