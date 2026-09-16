@@ -169,6 +169,22 @@ button{cursor:pointer}
   font-size:10px;
   font-weight:800;
 }
+.edit-btn{
+  width:28px;
+  height:28px;
+  padding:0;
+  border:1px solid #dce5e1;
+  border-radius:9px;
+  background:#f4f8f6;
+  color:#54655e;
+  font-size:16px;
+  line-height:1;
+  font-weight:850;
+}
+.edit-btn:disabled{
+  opacity:.38;
+  cursor:default;
+}
 
 textarea{
   width:100%;
@@ -260,13 +276,15 @@ textarea:focus,input:focus{
 }
 
 .input-head{
-  display:grid;
-  grid-template-columns:minmax(0,auto) minmax(0,1fr) auto auto;
+  display:flex;
   align-items:center;
-  gap:7px;
+  flex-wrap:nowrap;
+  gap:4px;
+  min-width:0;
   margin-bottom:6px;
 }
 .input-title{
+  flex:1 1 auto;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -276,6 +294,7 @@ textarea:focus,input:focus{
   font-weight:850;
 }
 .input-stats{
+  flex:0 1 auto;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -284,6 +303,19 @@ textarea:focus,input:focus{
   color:#8a9690;
   font-size:9.5px;
   font-weight:700;
+}
+.input-head .edit-btn{
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
+  font-size:15px;
+}
+.input-head .text-clear,
+.input-head .text-paste{
+  flex:0 0 auto;
+  height:26px;
+  padding:0 6px;
+  font-size:9.5px;
 }
 
 .divider{
@@ -692,7 +724,7 @@ textarea:focus,input:focus{
 
   <div class="status-strip">
     <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-    <span class="right" id="coreStatusMain">Script Init Failed</span>
+    <span class="right" id="coreStatusMain">Active ✔️</span>
   </div>
 
   <!-- Recipient Key -->
@@ -715,6 +747,8 @@ textarea:focus,input:focus{
     <div class="input-head">
       <div class="input-title" id="inputTitle">Text to Encrypt</div>
       <div class="input-stats">• <span id="wordCount">0</span> words • <span id="inputCount">0</span> chars</div>
+      <button class="edit-btn" id="undoTextBtn" type="button" title="Undo">↶</button>
+      <button class="edit-btn" id="redoTextBtn" type="button" title="Redo">↷</button>
       <button class="text-clear" id="clearTextBtn" type="button">Clear</button>
       <button class="text-paste" id="pasteTextBtn" type="button">Paste</button>
     </div>
@@ -758,7 +792,7 @@ textarea:focus,input:focus{
 
     <div class="status-strip">
       <span>• Feature Provided by <strong class="developer-name">Araaf Royall</strong> ❣️</span>
-      <span class="right" id="coreStatusKeypair">Script Init Failed</span>
+      <span class="right" id="coreStatusKeypair">Active ✔️</span>
     </div>
 
     <div class="keypair-scroll">
@@ -866,6 +900,11 @@ textarea:focus,input:focus{
   var generatedPrivateRaw = null;
   var privateVisible = false;
 
+  var textHistory = [""];
+  var textHistoryIndex = 0;
+  var applyingTextHistory = false;
+  var historyLimit = 100;
+
   function $(id){ return document.getElementById(id); }
 
   function toast(message){
@@ -880,7 +919,7 @@ textarea:focus,input:focus{
     var el1 = $("coreStatusMain");
     var el2 = $("coreStatusKeypair");
     var ok = !!(window.ECIES3Core && typeof window.ECIES3Core.encrypt === "function" && typeof window.ECIES3Core.decrypt === "function");
-    var text = ok ? "Script Init ✔️" : "Script Init Failed";
+    var text = ok ? "Active ✔️" : "Script Init Failed";
     el1.textContent = text;
     el2.textContent = text;
     el1.classList.toggle("failed", !ok);
@@ -890,6 +929,38 @@ textarea:focus,input:focus{
 
   /* ---------- Core status + Main UI ---------- */
   setCoreStatus();
+
+  function updateTextHistoryButtons(){
+    $("undoTextBtn").disabled = textHistoryIndex <= 0;
+    $("redoTextBtn").disabled = textHistoryIndex >= textHistory.length - 1;
+  }
+
+  function recordTextHistory(){
+    if(applyingTextHistory) return;
+    var value = $("inputText").value || "";
+    if(textHistory[textHistoryIndex] === value){
+      updateTextHistoryButtons();
+      return;
+    }
+    textHistory = textHistory.slice(0, textHistoryIndex + 1);
+    textHistory.push(value);
+    if(textHistory.length > historyLimit){
+      textHistory.shift();
+    }
+    textHistoryIndex = textHistory.length - 1;
+    updateTextHistoryButtons();
+  }
+
+  function applyTextHistory(index){
+    if(index < 0 || index >= textHistory.length) return;
+    applyingTextHistory = true;
+    textHistoryIndex = index;
+    $("inputText").value = textHistory[index];
+    updateInputStats();
+    applyingTextHistory = false;
+    updateTextHistoryButtons();
+    $("inputText").focus();
+  }
 
   function updateInputStats(){
     var text = $("inputText").value || "";
@@ -1031,7 +1102,26 @@ textarea:focus,input:focus{
     toast("Downloaded");
   };
 
-  $("inputText").addEventListener("input",updateInputStats);
+  $("inputText").addEventListener("input",function(){
+    updateInputStats();
+    recordTextHistory();
+  });
+
+  $("undoTextBtn").onclick = function(){
+    if(textHistoryIndex > 0){
+      applyTextHistory(textHistoryIndex - 1);
+      toast("Undo");
+    }
+  };
+
+  $("redoTextBtn").onclick = function(){
+    if(textHistoryIndex < textHistory.length - 1){
+      applyTextHistory(textHistoryIndex + 1);
+      toast("Redo");
+    }
+  };
+
+  updateTextHistoryButtons();
 
   $("actionBtn").onclick = async function(){
     if(!setCoreStatus()){ toast("Script failed to init"); return; }
