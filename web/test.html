@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Exam Paper Maker - Sample</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --primary:#087f5b;
+  --primary-dark:#056044;
+  --gold:#d99a16;
+  --bg:#f4f7f6;
+  --card:#fff;
+  --text:#18221f;
+  --muted:#697570;
+  --border:#dce5e1;
+}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+button,input,textarea,select{font:inherit}
+.app{min-height:100vh}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  background:var(--primary);color:#fff;padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  box-shadow:0 2px 10px #0002
+}
+.topbar h1{font-size:18px;margin:0}
+.top-actions{display:flex;gap:7px}
+.btn{
+  border:0;border-radius:8px;padding:9px 12px;cursor:pointer;font-weight:700
+}
+.btn.light{background:#fff;color:var(--primary)}
+.btn.gold{background:var(--gold);color:#fff}
+.layout{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-columns:350px 1fr;gap:14px}
+.panel{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;box-shadow:0 2px 8px #00000008;height:max-content
+}
+.panel h2{font-size:16px;margin:0 0 12px}
+.field{margin:0 0 10px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 5px}
+.field input,.field textarea,.field select{
+  width:100%;border:1px solid var(--border);border-radius:7px;padding:9px;
+  background:#fff;color:var(--text);outline:none
+}
+.field textarea{min-height:62px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.question-editor{
+  border:1px solid var(--border);padding:10px;border-radius:8px;margin-top:9px;background:#fbfdfc
+}
+.question-title{font-size:13px;font-weight:700;margin-bottom:7px}
+.small-btn{border:0;border-radius:6px;padding:6px 8px;cursor:pointer;background:#eef3f1}
+.delete-btn{color:#a22}
+.add-btn{width:100%;margin-top:10px;background:var(--primary);color:#fff}
+.preview-wrap{display:flex;justify-content:center;overflow:auto;padding:4px}
+.paper{
+  background:#fff;width:210mm;min-height:297mm;padding:17mm 15mm;
+  box-shadow:0 3px 18px #0002;position:relative
+}
+.paper-header{text-align:center;border-bottom:2px solid #222;padding-bottom:10px}
+.paper-header .school{font-size:22px;font-weight:800}
+.paper-header .exam{font-size:18px;font-weight:700;margin-top:3px}
+.paper-header .meta{margin-top:8px;font-size:13px;display:flex;justify-content:space-between;gap:10px}
+.paper-header .subject{font-size:15px;font-weight:700;margin-top:6px}
+.instructions{margin-top:14px}
+.instructions h3{font-size:14px;margin:0 0 5px}
+.instructions ol{margin:0;padding-left:20px;font-size:13px;line-height:1.5}
+.paper-section{margin-top:18px}
+.paper-section-title{
+  font-size:15px;font-weight:800;border-bottom:1px solid #222;padding-bottom:4px;
+  display:flex;justify-content:space-between
+}
+.q{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:11px;font-size:14px;line-height:1.4}
+.q-main{display:flex;gap:7px}
+.qno{font-weight:700;min-width:24px}
+.marks{font-weight:700;white-space:nowrap}
+.subq{margin:5px 0 0 31px}
+.footer-note{
+  position:absolute;bottom:8mm;left:15mm;right:15mm;text-align:center;
+  font-size:10px;color:#777
+}
+.hint{font-size:12px;color:var(--muted);line-height:1.4;margin-top:10px}
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr}
+  .preview-wrap{padding:0}
+  .paper{transform-origin:top left;width:210mm}
+}
+@media print{
+  body{background:#fff}
+  .topbar,.editor-panel{display:none!important}
+  .layout{display:block;padding:0;margin:0}
+  .preview-wrap{padding:0;display:block}
+  .paper{box-shadow:none;width:210mm;min-height:297mm;margin:0;padding:17mm 15mm}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <h1>📝 Exam Paper Maker</h1>
+    <div class="top-actions">
+      <button class="btn light" onclick="window.print()">🖨 Print / PDF</button>
+      <button class="btn gold" onclick="resetSample()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="panel editor-panel">
+      <h2>Paper Details</h2>
+      <div class="field"><label>School / Institute</label><input id="school" value="ROYALL PUBLIC SCHOOL"></div>
+      <div class="field"><label>Exam Name</label><input id="exam" value="Half Yearly Examination"></div>
+      <div class="row">
+        <div class="field"><label>Class</label><input id="className" value="Class 8"></div>
+        <div class="field"><label>Subject</label><input id="subject" value="Mathematics"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Time</label><input id="time" value="2 Hours"></div>
+        <div class="field"><label>Max Marks</label><input id="maxMarks" value="50"></div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="section-head">
+        <h2 style="margin:0">Instructions</h2>
+      </div>
+      <div class="field"><textarea id="instructions">Answer all questions.
+Show necessary steps in numerical problems.
+Write neatly and clearly.</textarea></div>
+
+      <div class="divider"></div>
+      <div class="section-head">
+        <h2 style="margin:0">Questions</h2>
+        <button class="small-btn" onclick="addQuestion()">＋ Add</button>
+      </div>
+      <div id="questionsEditor"></div>
+      <div class="hint">This is only a sample architecture. The actual question types, sections, marks, numbering, formatting and paper controls can be changed later.</div>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="paper" id="paper"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const sampleQuestions=[
+  {section:"Section A — Very Short Answer",text:"Write the place value of 7 in 57,482.",marks:1},
+  {section:"Section A — Very Short Answer",text:"Find the value of 12 × 8.",marks:1},
+  {section:"Section B — Short Answer",text:"Simplify: 3/4 + 5/8.",marks:2},
+  {section:"Section B — Short Answer",text:"A shopkeeper buys an item for ₹800 and sells it for ₹920. Find the profit percent.",marks:3},
+  {section:"Section C — Long Answer",text:"Solve the following equation and verify your answer: 3x + 7 = 28.",marks:4},
+  {section:"Section C — Long Answer",text:"A rectangular field is 24 m long and 15 m wide. Find its area and perimeter.",marks:4}
+];
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function renderEditor(){
+  const box=document.getElementById("questionsEditor");
+  box.innerHTML="";
+  sampleQuestions.forEach((q,i)=>{
+    const d=document.createElement("div");
+    d.className="question-editor";
+    d.innerHTML=`
+      <div class="section-head">
+        <div class="question-title">Question ${i+1}</div>
+        <button class="small-btn delete-btn" onclick="removeQuestion(${i})">Delete</button>
+      </div>
+      <div class="field"><label>Section</label><input value="${esc(q.section)}" oninput="sampleQuestions[${i}].section=this.value;renderPaper()"></div>
+      <div class="field"><label>Question</label><textarea oninput="sampleQuestions[${i}].text=this.value;renderPaper()">${esc(q.text)}</textarea></div>
+      <div class="row">
+        <div class="field"><label>Marks</label><input type="number" min="0" value="${q.marks}" oninput="sampleQuestions[${i}].marks=this.value;renderPaper()"></div>
+        <div class="field"><label>Number</label><input value="${i+1}" disabled></div>
+      </div>`;
+    box.appendChild(d);
+  });
+}
+function addQuestion(){
+  sampleQuestions.push({section:"Section D",text:"Type your question here.",marks:2});
+  renderEditor(); renderPaper();
+}
+function removeQuestion(i){
+  sampleQuestions.splice(i,1);
+  renderEditor(); renderPaper();
+}
+function groupBySection(){
+  const groups={};
+  sampleQuestions.forEach(q=>{
+    const key=q.section || "Questions";
+    (groups[key] ||= []).push(q);
+  });
+  return groups;
+}
+function renderPaper(){
+  const school=document.getElementById("school").value;
+  const exam=document.getElementById("exam").value;
+  const className=document.getElementById("className").value;
+  const subject=document.getElementById("subject").value;
+  const time=document.getElementById("time").value;
+  const maxMarks=document.getElementById("maxMarks").value;
+  const instructions=document.getElementById("instructions").value;
+
+  let html=`
+    <div class="paper-header">
+      <div class="school">${esc(school)}</div>
+      <div class="exam">${esc(exam)}</div>
+      <div class="subject">${esc(subject)}</div>
+      <div class="meta"><span>Class: ${esc(className)}</span><span>Time: ${esc(time)}</span><span>Max Marks: ${esc(maxMarks)}</span></div>
+    </div>
+    <div class="instructions">
+      <h3>Instructions:</h3>
+      <ol>${instructions.split(/\\n+/).filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+    </div>`;
+
+  let n=1;
+  for(const [section,qs] of Object.entries(groupBySection())){
+    html+=`<div class="paper-section"><div class="paper-section-title"><span>${esc(section)}</span><span>${qs.reduce((a,q)=>a+Number(q.marks||0),0)} Marks</span></div>`;
+    qs.forEach(q=>{
+      html+=`<div class="q"><div class="q-main"><div class="qno">${n}.</div><div>${esc(q.text).replace(/\\n/g,"<br>")}</div></div><div class="marks">[${esc(q.marks)}]</div></div>`;
+      n++;
+    });
+    html+=`</div>`;
+  }
+  html+=`<div class="footer-note">— End of Question Paper —</div>`;
+  document.getElementById("paper").innerHTML=html;
+}
+function resetSample(){
+  document.getElementById("school").value="ROYALL PUBLIC SCHOOL";
+  document.getElementById("exam").value="Half Yearly Examination";
+  document.getElementById("className").value="Class 8";
+  document.getElementById("subject").value="Mathematics";
+  document.getElementById("time").value="2 Hours";
+  document.getElementById("maxMarks").value="50";
+  document.getElementById("instructions").value="Answer all questions.\\nShow necessary steps in numerical problems.\\nWrite neatly and clearly.";
+  sampleQuestions.splice(0,sampleQuestions.length,...[
+    {section:"Section A — Very Short Answer",text:"Write the place value of 7 in 57,482.",marks:1},
+    {section:"Section A — Very Short Answer",text:"Find the value of 12 × 8.",marks:1},
+    {section:"Section B — Short Answer",text:"Simplify: 3/4 + 5/8.",marks:2},
+    {section:"Section B — Short Answer",text:"A shopkeeper buys an item for ₹800 and sells it for ₹920. Find the profit percent.",marks:3},
+    {section:"Section C — Long Answer",text:"Solve the following equation and verify your answer: 3x + 7 = 28.",marks:4},
+    {section:"Section C — Long Answer",text:"A rectangular field is 24 m long and 15 m wide. Find its area and perimeter.",marks:4}
+  ]);
+  renderEditor(); renderPaper();
+}
+["school","exam","className","subject","time","maxMarks","instructions"].forEach(id=>{
+  document.getElementById(id).addEventListener("input",renderPaper);
+});
+renderEditor(); renderPaper();
+</script>
+</body>
+</html>
