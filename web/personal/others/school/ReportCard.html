@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#00695c">
+<title>Result Maker</title>
+<style>
+:root{
+  --teal:#00897b;--teal-dark:#00695c;
+  --premium:#087a55;
+  --amber:#ffb300;--amber-soft:#fff8e1;
+  --blue:#1976d2;--blue-soft:#e3f2fd;
+  --purple:#5661b3;--purple-soft:#eff0ff;
+  --green-soft:#e0f2f1;--red:#e53935;
+  --bg:#f3f7f7;--line:#c8d9d9;--text:#173536;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;
+  background:var(--bg);color:var(--text);font-family:Arial,sans-serif;
+}
+button{font-family:inherit}
+.app{width:100%;height:100%;max-width:760px;margin:auto}
+.hidden{display:none!important}
+
+/* ENTRY */
+#entryScreen{
+  position:fixed;inset:0;
+  width:100%;height:100dvh;
+  overflow:hidden;
+}
+.grid-wrap{
+  position:fixed;
+  top:0;left:0;width:100%;
+  height:60dvh;
+  min-height:280px;
+  overflow:hidden;
+  background:#fff;
+  z-index:2;
+}
+.entry{
+  width:100%;
+  height:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.entry .subject-col{width:24%}
+.entry th,.entry td{
+  border:1px solid var(--line);
+  padding:0;
+  text-align:center;
+  vertical-align:middle;
+}
+.entry thead{height:42px}
+.entry thead th{
+  height:42px;
+  font-size:14px;
+  font-weight:900;
+}
+.entry .subhead{background:var(--teal-dark);color:#fff}
+.entry .h30{background:var(--amber);color:#382900}
+.entry .h70{background:var(--blue);color:#fff}
+.entry tbody tr{height:calc((60dvh - 42px)/9)}
+.entry .subject{
+  background:#fafcfc;
+  text-align:left;
+  padding:0 5px;
+  font-size:16px;
+  font-weight:900;
+  line-height:1.05;
+}
+.entry td.mark{height:100%}
+.entry td.c30{background:var(--amber-soft)}
+.entry td.c70{background:var(--blue-soft)}
+.entry td.active-cell{
+  background:#c8f7df!important;
+  box-shadow:inset 0 0 0 3px #008a57!important;
+}
+.entry td.active-cell .edit-cell{
+  background:#c8f7df!important;
+  color:#005e3e;
+}
+.entry tr.active-row .subject{
+  background:#d8f1e5;
+  color:#006a45;
+}
+.edit-cell{
+  width:100%;height:100%;
+  border:0;
+
+  display:flex;align-items:center;justify-content:center;
+  border:0;outline:0;border-radius:0;
+  background:transparent;
+  font-size:23px;font-weight:900;
+  line-height:1;
+  color:var(--text);
+  user-select:text;
+  -webkit-user-select:text;
+  caret-color:var(--teal-dark);
+  white-space:nowrap;
+  overflow:hidden;
+  max-width:100%;
+  min-width:0;
+}
+.edit-cell:focus{
+  background:#c8f7df!important;
+  border:3px solid #008a57!important;
+  box-shadow:0 0 0 1px #00695c!important;
+}
+.edit-cell.invalid{
+  background:#ffdede!important;
+  color:#b71c1c;
+  border:3px solid var(--red)!important;
+  box-shadow:0 0 0 1px #b71c1c!important;
+}
+.credit{
+  position:fixed;
+  left:0;right:0;bottom:66px;
+  text-align:center;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.1px;
+  color:#075d39;
+  z-index:3;
+}
+.view{
+  position:fixed;left:50%;bottom:8px;
+  transform:translateX(-50%);
+  width:calc(100% - 12px);max-width:748px;height:50px;
+  border:0;border-radius:11px;
+  background:var(--premium);
+  color:#fff;font-size:16px;font-weight:900;
+  box-shadow:0 5px 14px rgba(8,122,85,.28),0 2px 4px rgba(0,0,0,.08);
+  z-index:4;
+  transition:transform .12s,box-shadow .12s;
+}
+.view:active{
+  transform:translateX(-50%) translateY(1px);
+  box-shadow:0 3px 8px rgba(8,122,85,.22);
+}
+
+/* RESULT */
+#resultScreen{
+  width:100%;height:100dvh;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:0;
+  padding-bottom:84px;
+}
+.result-head{
+  background:var(--premium);
+  color:#fff;border-radius:0 0 12px 12px;padding:12px 14px 10px;
+  display:block;
+}
+.result-head h1{margin:0;font-size:24px;text-align:left}
+.result-head .result-credit{margin:2px 0 0;color:#fff;text-shadow:none;text-align:right;font-size:12px;font-weight:700;white-space:nowrap}
+.report-view{
+  width:100%;
+  margin:6px 0 0;
+  padding:0;
+  background:transparent;
+  border:0;
+  overflow:hidden;
+}
+.result-card{
+  margin-top:6px;background:#fff;
+  border:0;border-radius:0;padding:0;
+}
+.result-card:not(:first-of-type){
+  margin-left:0;
+  margin-right:0;
+  padding:7px;
+  border:1px solid #e0e9e9;
+  border-radius:8px;
+}
+.result-table{
+  width:100%;border-collapse:collapse;table-layout:fixed;
+}
+.result-table th,.result-table td{
+  border:1px solid var(--line);
+  text-align:center;
+  padding:8px 1px;
+}
+.result-table th{
+  color:#fff;background:var(--teal-dark);
+  font-size:15px;font-weight:900;
+}
+.result-table th:first-child{width:18%}
+.result-table th.c30{background:var(--amber);color:#382900}
+.result-table th.c70{background:var(--blue)}
+.result-table th.c100{background:var(--teal)}
+.result-table th.c200{background:var(--purple)}
+.result-table td{
+  font-size:21px;font-weight:900;
+}
+.result-table td:first-child{
+  text-align:left;padding-left:4px;
+}
+.result-table td.c30{background:var(--amber-soft)}
+.result-table td.c70{background:var(--blue-soft)}
+.result-table td.c100{background:var(--green-soft);color:var(--teal-dark)}
+.result-table td.c200{background:var(--purple-soft);color:#414a96}
+.result-table tfoot td{
+  font-size:21px;
+  font-weight:900;
+  padding:9px 1px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.result-table .obtained-row td{
+  background:#edf7f6;
+  color:var(--teal-dark);
+}
+.result-table .total-row td{
+  background:#f8fafa;
+  color:#566767;
+}
+.result-table .percent-row td{
+  background:#d9f1e2;
+  color:#1565c0;
+  font-size:16px;
+}
+.result-table .percent-row td:first-child{
+  background:#c8e9d8;
+  color:#1565c0;
+}
+.result-table tfoot td:first-child{
+  text-align:left;
+  padding-left:4px;
+  font-size:13px;
+}
+/* Subtle result separators */
+.result-table tbody tr:last-child td{
+  border-bottom:2px solid var(--premium)!important;
+}
+.result-table th.c200,
+.result-table td.c200{
+  border-left:2px solid var(--premium)!important;
+}
+.result-final-row{
+  display:flex;
+  align-items:stretch;
+  gap:6px;
+  margin-top:7px;
+  padding:0;
+  background:transparent;
+  border:0;
+}
+.result-final-row .overall-pct{
+  flex:0 0 calc(50% - 11px);
+  width:calc(50% - 11px);
+  min-width:0;
+  margin:0 8px 0 auto;
+  border-radius:8px;
+  padding:9px 7px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  background:#ffeaf1;
+  border:0;
+  color:#111;
+}
+.result-final-row .overall-pct > span{
+  font-size:11px;
+  font-weight:800;
+  color:#111;
+  text-align:left;
+  white-space:nowrap;
+}
+#pctValue{font-size:inherit;color:inherit}
+.result-final-row .overall-pct b{
+  margin:0;
+  font-size:34px;
+  line-height:1;
+  font-weight:900;
+  color:#c2185b;
+  text-align:center;
+  white-space:nowrap;
+}
+.result-final-row .overall-pct .pct-symbol{
+  color:#6b4754;
+  font-size:.62em;
+  margin-left:2px;
+  vertical-align:baseline;
+}
+/* RESULT MODES */
+.result-mode-selector{
+  position:fixed;
+  left:50%;
+  bottom:62px;
+  transform:translateX(-50%);
+  width:calc(100% - 20px);
+  max-width:748px;
+  z-index:19;
+  margin:0;
+  padding:6px;
+  background:#fff;
+  border:1px solid #d7e5e5;
+  border-radius:12px;
+  box-shadow:0 5px 14px rgba(0,0,0,.06);
+}
+.result-mode-title{
+  margin:0 0 5px;
+  text-align:center;
+  font-size:11px;
+  font-weight:900;
+  color:#356565;
+  letter-spacing:.2px;
+}
+.result-mode-options{
+  display:flex;
+  gap:5px;
+}
+.result-mode-option{
+  flex:1;
+  position:relative;
+  min-width:0;
+}
+.result-mode-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.result-mode-option label{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  padding:6px 4px;
+  border:1px solid #cbdada;
+  border-radius:9px;
+  background:#f7fafa;
+  color:#496565;
+  font-size:11px;
+  font-weight:900;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+  transition:background .15s,border-color .15s,color .15s,box-shadow .15s;
+}
+.result-mode-option input:checked + label{
+  background:#e0f2e8;
+  border:0;
+  color:#075d39;
+  box-shadow:none;
+}
+.result-mode-option label:active{transform:scale(.985)}
+/* Mode 2: show only 100/200 columns. */
+#resultScreen.mode-totals .result-table .c30,
+#resultScreen.mode-totals .result-table .c70{display:none}
+/* Mode 3: show only 30/70 columns. */
+#resultScreen.mode-parts .result-table .c100,
+#resultScreen.mode-parts .result-table .c200{display:none}
+
+.result-actions{
+  position:fixed;
+  left:50%;
+  bottom:8px;
+  transform:translateX(-50%);
+  width:calc(100% - 12px);
+  max-width:748px;
+  margin:0;
+  z-index:20;
+}
+.result-credit{
+  text-align:center;
+  margin:0 0 6px;
+  font-size:13px;
+  font-weight:900;
+  color:#075d39;
+  text-shadow:0 1px 2px rgba(255,255,255,.9);
+}
+.actions{
+  display:flex;
+  gap:7px;
+  padding:0;
+  background:transparent;
+  border:0;
+}
+.actions button{
+  flex:1;
+  border:0;
+  border-radius:12px;
+  padding:13px 5px;
+  font-size:13px;
+  font-weight:900;
+  background:var(--premium);
+  color:#fff;
+  box-shadow:0 8px 20px rgba(0,0,0,.16),0 3px 7px rgba(8,122,85,.22);
+  transition:transform .12s,box-shadow .12s;
+}
+.actions button:active{
+  transform:translateY(1px);
+  box-shadow:0 2px 7px rgba(8,122,85,.2);
+}
+.actions .back{background:var(--blue);color:#fff}
+.actions .new{background:var(--amber);color:#382900}
+
+/* DIALOG */
+.dialog-layer{
+  position:fixed;inset:0;z-index:100;
+  display:none;align-items:center;justify-content:center;
+  padding:18px;background:#0b292978;
+}
+.dialog-layer.show{display:flex}
+.dialog{
+  width:min(100%,340px);
+  background:#fff;border-radius:14px;padding:18px;
+  box-shadow:0 16px 45px #0004;
+}
+.dialog h2{margin:0 0 6px;font-size:19px}
+.dialog p{margin:0 0 16px;font-size:13px;line-height:1.4;color:#5f7070}
+.dactions{display:flex;gap:7px}
+.dactions button{
+  flex:1;border:0;border-radius:9px;padding:11px;
+  font-size:13px;font-weight:900;
+}
+.cancel{background:#edf2f2}.confirm{background:var(--premium);color:#fff}
+
+@media(max-width:430px){
+  .entry .subject-col{width:24%}
+  .entry thead th{font-size:13px}
+  .entry .subject{font-size:15px}
+  .edit-cell{font-size:24px}
+  .result-table td{font-size:15px;padding:8px 1px}
+  .result-table th{font-size:10px;padding:8px 1px}
+  .result-table th:first-child{width:18%}
+  .result-table .obt{font-size:20px}
+  .result-table .tot{font-size:10px}
+  .result-table tfoot td{font-size:15px;padding:9px 1px}
+  .result-table tfoot td:first-child{font-size:11px}
+ .result-table .percent-row td{font-size:13px;background:#d9f1e2;color:#1565c0}
+  .result-final-row .overall-pct b{font-size:34px}
+}
+@media print{
+  html,body{overflow:visible;background:#fff}
+  #entryScreen,.dialog-layer,.actions,.result-mode-selector{display:none!important}
+  #resultScreen{display:block!important;height:auto;overflow:visible;padding:0}
+  .result-card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section id="entryScreen">
+  <div class="grid-wrap">
+    <table class="entry">
+      <colgroup>
+        <col class="subject-col"><col><col><col><col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="subhead">SUBJECT</th>
+          <th class="h30">30</th>
+          <th class="h70">70</th>
+          <th class="h30">30</th>
+          <th class="h70">70</th>
+        </tr>
+      </thead>
+      <tbody id="entryBody"></tbody>
+    </table>
+  </div>
+
+  <div class="credit">Feature Provided by Araaf Royall ❣️</div>
+  <button class="view" onclick="showResult()">📋 VIEW RESULT</button>
+</section>
+
+<section id="resultScreen" class="hidden">
+  <div class="result-head"><h1>RESULT CARD</h1><div class="result-credit">Feature Provided by Araaf Royall ❣️</div></div>
+
+  <div class="report-view">
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>SUBJECT</th>
+          <th class="c30">30</th>
+          <th class="c70">70</th>
+          <th class="c100">100</th>
+          <th class="c30">30</th>
+          <th class="c70">70</th>
+          <th class="c100">100</th>
+          <th class="c200">200</th>
+        </tr>
+      </thead>
+      <tbody id="reportBody"></tbody>
+      <tfoot>
+        <tr class="obtained-row">
+          <td>OBTAINED</td>
+          <td class="c30" id="g1_30">0</td>
+          <td class="c70" id="g1_70">0</td>
+          <td class="c100" id="g1_100">0</td>
+          <td class="c30" id="g2_30">0</td>
+          <td class="c70" id="g2_70">0</td>
+          <td class="c100" id="g2_100">0</td>
+          <td class="c200" id="g200">0</td>
+        </tr>
+        <tr class="total-row">
+          <td>TOTAL</td>
+          <td class="c30">270</td>
+          <td class="c70">630</td>
+          <td class="c100">900</td>
+          <td class="c30">270</td>
+          <td class="c70">630</td>
+          <td class="c100">900</td>
+          <td class="c200">1800</td>
+        </tr>
+        <tr class="percent-row">
+          <td>%</td>
+          <td class="c30" id="p1_30">0.00</td>
+          <td class="c70" id="p1_70">0.00</td>
+          <td class="c100" id="p1_100">0.00</td>
+          <td class="c30" id="p2_30">0.00</td>
+          <td class="c70" id="p2_70">0.00</td>
+          <td class="c100" id="p2_100">0.00</td>
+          <td class="c200" id="p200">0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="result-final-row">
+    <div class="overall-pct">
+      <span>OVERALL %</span>
+      <b id="pct"><span id="pctValue">0.00</span><span class="pct-symbol">%</span></b>
+    </div>
+  </div>
+
+  <div class="result-mode-selector">
+    <div class="result-mode-title">RESULT VIEW</div>
+    <div class="result-mode-options" role="radiogroup" aria-label="Result view mode">
+      <div class="result-mode-option">
+        <input type="radio" id="modeFull" name="resultMode" value="full" checked onchange="setResultMode(this.value)">
+        <label for="modeFull">FULL RESULT</label>
+      </div>
+      <div class="result-mode-option">
+        <input type="radio" id="modeTotals" name="resultMode" value="totals" onchange="setResultMode(this.value)">
+        <label for="modeTotals">100 / 200</label>
+      </div>
+      <div class="result-mode-option">
+        <input type="radio" id="modeParts" name="resultMode" value="parts" onchange="setResultMode(this.value)">
+        <label for="modeParts">30 / 70</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-actions">
+    <div class="result-card actions">
+      <button class="back" onclick="openEditDialog()">✎ EDIT</button>
+      <button class="new" onclick="openDialog()">↻ NEW RESULT</button>
+    </div>
+  </div>
+</section>
+
+<div id="dialogLayer" class="dialog-layer">
+  <div class="dialog">
+    <h2 id="dialogTitle">Confirm</h2>
+    <p id="dialogText"></p>
+    <div class="dactions">
+      <button class="cancel" onclick="closeDialog()">Cancel</button>
+      <button class="confirm" id="dialogConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const subjects=["Hindi","English","Maths","Science","S.St","G.K","Urdu","Drawing","Comp"];
+const COLS=4;
+const ROWS=subjects.length;
+
+const entryBody=document.getElementById("entryBody");
+
+subjects.forEach(name=>{
+  entryBody.insertAdjacentHTML("beforeend",`
+    <tr>
+      <td class="subject">${name}</td>
+      <td class="mark c30"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="30"></div></td>
+      <td class="mark c70"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="70"></div></td>
+      <td class="mark c30"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="30"></div></td>
+      <td class="mark c70"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="70"></div></td>
+    </tr>`);
+});
+
+const cells=[...document.querySelectorAll(".edit-cell")];
+let activeIndex=0; // The one box that is currently allowed to auto-advance.
+
+
+function cleanValue(el){
+  const text=el.textContent.replace(/\D/g,"");
+  if(el.textContent!==text){
+    el.textContent=text;
+    placeCaretEnd(el);
+  }
+  return text;
+}
+
+function placeCaretEnd(el){
+  const range=document.createRange();
+  const sel=window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function selectCell(el){
+  el.focus();
+  const range=document.createRange();
+  const sel=window.getSelection();
+  range.selectNodeContents(el);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function setActive(index,changeSequence=false){
+  document.querySelectorAll(".edit-cell").forEach(c=>c.classList.remove("active-cell"));
+  document.querySelectorAll(".entry td").forEach(td=>td.classList.remove("active-cell"));
+  document.querySelectorAll(".entry tr").forEach(tr=>tr.classList.remove("active-row"));
+
+  if(index<0 || index>=cells.length)return;
+
+  if(changeSequence) activeIndex=index;
+
+  const cell=cells[index];
+  const td=cell.closest("td");
+  const tr=cell.closest("tr");
+
+  cell.classList.add("active-cell");
+  td.classList.add("active-cell");
+  tr.classList.add("active-row");
+}
+
+function previousIndex(index){
+  const row=Math.floor(index/COLS);
+  return row===0 ? -1 : index-COLS;
+}
+
+function canMoveTo(index){
+  if(index<0 || index>=cells.length)return false;
+
+  const previous=previousIndex(index);
+  return previous<0 || cells[previous].textContent.trim()!=="";
+}
+
+function firstEmptyInSequence(){
+  // The entry sequence is column-wise:
+  // 30(top->bottom), 70(top->bottom), 30(top->bottom), 70(top->bottom).
+  for(let col=0;col<COLS;col++){
+    for(let row=0;row<ROWS;row++){
+      const index=row*COLS+col;
+      if(cells[index].textContent.trim()==="") return index;
+    }
+  }
+  return -1;
+}
+
+function canDirectEdit(index){
+  if(index<0 || index>=cells.length)return false;
+
+  // Previously filled cells remain editable.
+  if(cells[index].textContent.trim()!=="") return true;
+
+  // Only the single next empty cell in the overall vertical sequence
+  // may be activated directly.
+  return index===firstEmptyInSequence();
+}
+
+function redirectToCurrent(index){
+  const current=firstEmptyInSequence();
+
+  if(current>=0){
+    setActive(current);
+    selectCell(cells[current]);
+  }
+}
+
+function moveToNext(index){
+  // Auto-next is allowed only from the current sequence box.
+  if(index!==activeIndex)return;
+
+  const col=index%COLS;
+  const row=Math.floor(index/COLS);
+
+  // Continue vertically down the same visual column.
+  if(row<ROWS-1){
+    const next=index+COLS;
+
+    if(canMoveTo(next)){
+      setActive(next,true);
+      selectCell(cells[next]);
+    }
+    return;
+  }
+
+  // Bottom of this column -> top of the next visual column.
+  if(col<COLS-1){
+    const next=col+1;
+
+    if(canMoveTo(next)){
+      setActive(next,true);
+      selectCell(cells[next]);
+    }
+    return;
+  }
+
+  // Absolute last mark box: dismiss keyboard and keep this box active.
+  setActive(index);
+  cells[index].blur();
+  setTimeout(()=>setActive(index),30);
+}
+
+cells.forEach((cell,index)=>{
+  cell.addEventListener("focus",e=>{
+    if(!canDirectEdit(index)){
+      e.preventDefault();
+
+      setActive(activeIndex);
+      selectCell(cells[activeIndex]);
+      return;
+    }
+
+    // Editing a previous/fill box does NOT change the sequence pointer.
+    setActive(index);
+  });
+
+  cell.addEventListener("click",e=>{
+    if(!canDirectEdit(index)){
+      e.preventDefault();
+
+      setActive(activeIndex);
+      selectCell(cells[activeIndex]);
+      return;
+    }
+
+    setActive(index);
+  });
+
+  cell.addEventListener("mousedown",e=>{
+    if(!canDirectEdit(index)){
+      e.preventDefault();
+
+      setActive(activeIndex);
+      selectCell(cells[activeIndex]);
+    }
+  });
+
+  cell.addEventListener("input",()=>{
+    const max=Number(cell.dataset.max);
+    const raw=cleanValue(cell);
+
+    cell.classList.remove("invalid");
+    cell.closest("td").classList.remove("bad");
+
+    if(raw!=="" && Number(raw)>max){
+      cell.classList.add("invalid");
+      cell.closest("td").classList.add("bad");
+      setActive(index);
+      cell.focus();
+      selectCell(cell);
+      return;
+    }
+
+    setActive(index);
+
+    // ONLY the tracked current sequence box can auto-advance.
+    if(raw.length===2 && index===activeIndex){
+      moveToNext(index);
+    }
+  });
+
+  cell.addEventListener("keydown",e=>{
+    if(e.key!=="Enter")return;
+
+    e.preventDefault();
+
+    const raw=cleanValue(cell);
+    const max=Number(cell.dataset.max);
+
+    if(raw!=="" && Number(raw)>max){
+      cell.classList.add("invalid");
+      cell.closest("td").classList.add("bad");
+      setActive(index);
+      selectCell(cell);
+      return;
+    }
+
+    // Enter only advances when this is the current sequence box.
+    if(index===activeIndex){
+      moveToNext(index);
+    }
+  });
+
+  cell.addEventListener("paste",e=>{
+    e.preventDefault();
+
+    const raw=(e.clipboardData||window.clipboardData)
+      .getData("text")
+      .replace(/\D/g,"");
+
+    const max=Number(cell.dataset.max);
+    cell.textContent=raw;
+
+    if(raw!=="" && Number(raw)>max){
+      cell.classList.add("invalid");
+      cell.closest("td").classList.add("bad");
+      setActive(index);
+      selectCell(cell);
+      return;
+    }
+
+    setActive(index);
+
+    if(raw.length===2 && index===activeIndex){
+      moveToNext(index);
+    }
+  });
+});
+
+setActive(0,true);
+
+function getValue(i){
+  return Number(cells[i].textContent.trim())||0;
+}
+
+function showResult(){
+  const bad=document.querySelector(".edit-cell.invalid");
+  if(bad){
+    selectCell(bad);
+    return;
+  }
+
+  let rows="";
+  let g1_30=0,g1_70=0,g1_100=0;
+  let g2_30=0,g2_70=0,g2_100=0,g200=0;
+
+  for(let r=0;r<ROWS;r++){
+    const i=r*COLS;
+
+    const a=getValue(i);
+    const b=getValue(i+1);
+    const c=getValue(i+2);
+    const d=getValue(i+3);
+
+    const s1_100=a+b;
+    const s2_100=c+d;
+    const final200=s1_100+s2_100;
+
+    g1_30+=a;
+    g1_70+=b;
+    g1_100+=s1_100;
+    g2_30+=c;
+    g2_70+=d;
+    g2_100+=s2_100;
+    g200+=final200;
+
+    rows+=`
+      <tr>
+        <td>${subjects[r]}</td>
+        <td class="c30">${a}</td>
+        <td class="c70">${b}</td>
+        <td class="c100">${s1_100}</td>
+        <td class="c30">${c}</td>
+        <td class="c70">${d}</td>
+        <td class="c100">${s2_100}</td>
+        <td class="c200">${final200}</td>
+      </tr>`;
+  }
+
+  document.getElementById("reportBody").innerHTML=rows;
+
+  document.getElementById("g1_30").textContent=g1_30;
+  document.getElementById("g1_70").textContent=g1_70;
+  document.getElementById("g1_100").textContent=g1_100;
+  document.getElementById("g2_30").textContent=g2_30;
+  document.getElementById("g2_70").textContent=g2_70;
+  document.getElementById("g2_100").textContent=g2_100;
+  document.getElementById("g200").textContent=g200;
+
+  document.getElementById("p1_30").textContent=((g1_30/270)*100).toFixed(2);
+  document.getElementById("p1_70").textContent=((g1_70/630)*100).toFixed(2);
+  document.getElementById("p1_100").textContent=((g1_100/900)*100).toFixed(2);
+  document.getElementById("p2_30").textContent=((g2_30/270)*100).toFixed(2);
+  document.getElementById("p2_70").textContent=((g2_70/630)*100).toFixed(2);
+  document.getElementById("p2_100").textContent=((g2_100/900)*100).toFixed(2);
+  document.getElementById("p200").textContent=((g200/1800)*100).toFixed(2);
+
+  const percentage=(g200/1800)*100;
+  document.getElementById("pctValue").textContent=percentage.toFixed(2);
+
+  setResultMode("full");
+  document.getElementById("modeFull").checked=true;
+  document.getElementById("modeTotals").checked=false;
+  document.getElementById("modeParts").checked=false;
+
+  document.getElementById("entryScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
+  document.getElementById("resultScreen").scrollTop=0;
+}
+
+function setResultMode(mode){
+  const screen=document.getElementById("resultScreen");
+  screen.classList.remove("mode-totals","mode-parts");
+  if(mode==="totals")screen.classList.add("mode-totals");
+  if(mode==="parts")screen.classList.add("mode-parts");
+}
+
+function backToEdit(){
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("entryScreen").classList.remove("hidden");
+  setActive(activeIndex);
+}
+
+let dialogAction=null;
+
+function openDialog(){
+  openConfirm(
+    "Generate New Result?",
+    "All entered marks will be cleared and a fresh result will be started.",
+    confirmNew
+  );
+}
+
+function openEditDialog(){
+  openConfirm(
+    "Edit Result?",
+    "Go back to the marks screen to edit the entered marks?",
+    backToEdit
+  );
+}
+
+function openBackDialog(){
+  openConfirm(
+    "Go Back?",
+    "Return to the marks screen? Your current entered marks will remain.",
+    backToEdit
+  );
+}
+
+function openConfirm(title,text,action){
+  dialogAction=action;
+  document.getElementById("dialogTitle").textContent=title;
+  document.getElementById("dialogText").textContent=text;
+  document.getElementById("dialogConfirm").textContent="Confirm";
+  document.getElementById("dialogConfirm").onclick=()=>{
+    const fn=dialogAction;
+    closeDialog();
+    dialogAction=null;
+    if(fn)fn();
+  };
+  document.getElementById("dialogLayer").classList.add("show");
+}
+
+function closeDialog(){
+  document.getElementById("dialogLayer").classList.remove("show");
+  dialogAction=null;
+}
+
+function confirmNew(){
+  cells.forEach(c=>{
+    c.textContent="";
+    c.classList.remove("invalid","active-cell");
+    c.closest("td").classList.remove("bad","active-cell");
+  });
+
+  closeDialog();
+  activeIndex=0;
+  backToEdit();
+  setActive(0,true);
+  cells[0].focus();
+}
+
+/* Android/browser back: ask only when Result is visible. */
+history.pushState({resultMaker:true},"",location.href);
+window.addEventListener("popstate",()=>{
+  const resultVisible=!document.getElementById("resultScreen").classList.contains("hidden");
+
+  if(resultVisible){
+    history.pushState({resultMaker:true},"",location.href);
+    openBackDialog();
+  }else{
+    history.back();
+  }
+});
+
+document.getElementById("dialogLayer").addEventListener("click",e=>{
+  if(e.target.id==="dialogLayer")closeDialog();
+});
+</script>
+</body>
+</html>
