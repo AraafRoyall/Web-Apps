@@ -9,13 +9,13 @@
   "description": "Create or Calculate result cards easily",
   "icons": [
     {
-      "src": "icon192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
