@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#00695c">
+<meta name="theme-color" content="#18a66a">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Result Maker</title>
 <style>
 :root{
@@ -558,7 +565,7 @@ button{font-family:inherit}
     <h2 id="dialogTitle">Confirm</h2>
     <p id="dialogText"></p>
     <div class="dactions">
-      <button class="cancel" onclick="closeDialog()">Cancel</button>
+      <button class="cancel" onclick="cancelDialog()">Cancel</button>
       <button class="confirm" id="dialogConfirm">Confirm</button>
     </div>
   </div>
@@ -832,6 +839,24 @@ function showResult(){
     return;
   }
 
+  const incomplete=cells.some(c=>{
+    const text=c.textContent.trim();
+    return text==="" || Number(text)===0;
+  });
+
+  if(incomplete){
+    openConfirm(
+      "Incomplete Marks",
+      "Some marks are empty or 0. Do you want to generate the result anyway?",
+      generateResult
+    );
+    return;
+  }
+
+  generateResult();
+}
+
+function generateResult(){
   let rows="";
   let g1_30=0,g1_70=0,g1_100=0;
   let g2_30=0,g2_70=0,g2_100=0,g200=0;
@@ -958,6 +983,17 @@ function closeDialog(){
   dialogAction=null;
 }
 
+function cancelDialog(){
+  const restoreExitGuard=entryBackPending;
+  closeDialog();
+
+  if(restoreExitGuard){
+    history.pushState({resultMaker:true},"",location.href);
+  }
+
+  entryBackPending=false;
+}
+
 function confirmNew(){
   cells.forEach(c=>{
     c.textContent="";
@@ -972,21 +1008,51 @@ function confirmNew(){
   cells[0].focus();
 }
 
-/* Android/browser back: ask only when Result is visible. */
+/* Android/browser back protection. */
+let allowExit=false;
+let entryBackPending=false;
+
+function openExitDialog(){
+  openConfirm(
+    "Exit Result Maker?",
+    "Are you sure you want to exit?",
+    confirmExit
+  );
+}
+
+function confirmExit(){
+  allowExit=true;
+  entryBackPending=false;
+  history.back();
+}
+
 history.pushState({resultMaker:true},"",location.href);
 window.addEventListener("popstate",()=>{
+  if(allowExit){
+    allowExit=false;
+    return;
+  }
+
   const resultVisible=!document.getElementById("resultScreen").classList.contains("hidden");
 
   if(resultVisible){
     history.pushState({resultMaker:true},"",location.href);
     openBackDialog();
+    return;
+  }
+
+  // On the main marks screen, the first Back opens an exit confirmation.
+  // Cancel restores the protected history entry; Confirm performs the real Back.
+  if(!entryBackPending){
+    entryBackPending=true;
+    openExitDialog();
   }else{
-    history.back();
+    history.pushState({resultMaker:true},"",location.href);
   }
 });
 
 document.getElementById("dialogLayer").addEventListener("click",e=>{
-  if(e.target.id==="dialogLayer")closeDialog();
+  if(e.target.id==="dialogLayer")cancelDialog();
 });
 </script>
 </body>
