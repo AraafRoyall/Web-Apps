@@ -7,7 +7,6 @@
   "display": "standalone",
   "background_color": "#f6faf8",
   "theme_color": "#18a66a",
-  "description": "Create and manage student result cards.",
   "icons": [
     {
       "src": "./icon-192.png",
