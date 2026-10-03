@@ -446,6 +446,71 @@ button{font-family:inherit}
   #resultScreen{display:block!important;height:auto;overflow:visible;padding:0}
   .result-card{box-shadow:none}
 }
+
+/* WELCOME BOTTOM SHEET */
+.welcome-layer{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(8,35,31,.34);
+  padding:0;
+  opacity:0;visibility:hidden;
+  pointer-events:none;
+  transition:opacity .2s,visibility .2s;
+}
+.welcome-layer.show{
+  opacity:1;visibility:visible;pointer-events:auto;
+}
+.welcome-sheet{
+  width:100%;max-width:760px;
+  background:#fff;
+  border-radius:22px 22px 0 0;
+  padding:20px 16px calc(16px + env(safe-area-inset-bottom));
+  box-shadow:0 -10px 35px rgba(0,0,0,.16);
+  transform:translateY(100%);
+  transition:transform .24s cubic-bezier(.22,.8,.3,1);
+}
+.welcome-layer.show .welcome-sheet{transform:translateY(0)}
+.welcome-grabber{
+  width:42px;height:4px;border-radius:99px;
+  margin:0 auto 14px;background:#c8d9d9;
+}
+.welcome-title{
+  margin:0;
+  display:flex;align-items:center;gap:8px;
+  font-size:21px;line-height:1.2;font-weight:900;color:#173536;
+}
+.welcome-text{
+  margin:8px 0 0;
+  font-size:13px;line-height:1.5;color:#536767;
+}
+.welcome-credit{
+  margin:12px 0 0;
+  font-size:14px;line-height:1.35;color:#075d39;
+}
+.welcome-credit strong{font-weight:900;color:#064c33}
+.welcome-note{
+  margin-top:12px;
+  padding:10px 11px;
+  border-radius:11px;
+  background:#fff7df;
+  color:#6b561f;
+  font-size:12px;line-height:1.45;
+  border-left:3px solid var(--amber);
+}
+.welcome-note strong{color:#5a470f}
+.welcome-ok{
+  width:100%;height:46px;
+  margin-top:14px;
+  border:0;border-radius:11px;
+  background:var(--premium);color:#fff;
+  font-size:15px;font-weight:900;
+  box-shadow:0 5px 14px rgba(8,122,85,.25);
+}
+.welcome-ok:active{transform:translateY(1px)}
+@media(min-width:761px){
+  .welcome-sheet{border-radius:22px;margin:0 0 14px}
+}
+
 </style>
 </head>
 <body>
@@ -470,12 +535,12 @@ button{font-family:inherit}
     </table>
   </div>
 
-  <div class="credit">Provided by Abdur Rahmaan</div>
+  <div class="credit">Feature Provided by Araaf Royall ❣️</div>
   <button class="view" onclick="showResult()">📋 VIEW RESULT</button>
 </section>
 
 <section id="resultScreen" class="hidden">
-  <div class="result-head"><h1>RESULT CARD</h1><div class="result-credit">Provided by Abdur Rahmaan</div></div>
+  <div class="result-head"><h1>RESULT CARD</h1><div class="result-credit">Feature Provided by Araaf Royall ❣️</div></div>
 
   <div class="report-view">
     <table class="result-table">
@@ -568,6 +633,19 @@ button{font-family:inherit}
       <button class="cancel" onclick="cancelDialog()">Cancel</button>
       <button class="confirm" id="dialogConfirm">Confirm</button>
     </div>
+  </div>
+</div>
+
+
+<!-- First-use welcome bottom sheet -->
+<div id="welcomeLayer" class="welcome-layer" aria-hidden="true">
+  <div class="welcome-sheet" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="welcome-grabber"></div>
+    <h2 id="welcomeTitle" class="welcome-title">👋 Welcome to Result Maker</h2>
+    <p class="welcome-text">Create a result quickly, review it in different views, and switch between the full result and marks-only layouts whenever needed.</p>
+    <div class="welcome-credit">Provided by <strong>Araaf Royall</strong> ❣️</div>
+    <div class="welcome-note"><strong>Notice:</strong> Before relying on a result, it is recommended to verify the calculations with a manual calculator at least once or twice, especially when using the app for official records.</div>
+    <button id="welcomeOk" class="welcome-ok" type="button">GOT IT</button>
   </div>
 </div>
 
@@ -1008,6 +1086,31 @@ function confirmNew(){
   cells[0].focus();
 }
 
+
+/* First-use welcome sheet. It is shown once per browser/device. */
+function closeWelcome(){
+  const layer=document.getElementById("welcomeLayer");
+  if(!layer)return;
+  layer.classList.remove("show");
+  layer.setAttribute("aria-hidden","true");
+  try{localStorage.setItem("royall_result_welcome_seen","1");}catch(e){}
+}
+
+function showWelcome(){
+  const layer=document.getElementById("welcomeLayer");
+  if(!layer)return;
+  let seen=false;
+  try{seen=localStorage.getItem("royall_result_welcome_seen")==="1";}catch(e){}
+  if(seen)return;
+  layer.classList.add("show");
+  layer.setAttribute("aria-hidden","false");
+}
+
+document.getElementById("welcomeOk").addEventListener("click",closeWelcome);
+document.getElementById("welcomeLayer").addEventListener("click",e=>{
+  if(e.target.id==="welcomeLayer")closeWelcome();
+});
+
 /* Android/browser back protection. */
 let allowExit=false;
 let entryBackPending=false;
@@ -1054,6 +1157,8 @@ window.addEventListener("popstate",()=>{
 document.getElementById("dialogLayer").addEventListener("click",e=>{
   if(e.target.id==="dialogLayer")cancelDialog();
 });
+
+setTimeout(showWelcome,120);
 </script>
 </body>
 </html>
