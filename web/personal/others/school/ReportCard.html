@@ -1087,29 +1087,28 @@ function confirmNew(){
 }
 
 
-/* First-use welcome sheet. It is shown once per browser/device. */
+/* Welcome sheet. It is shown once per browser session. */
 function closeWelcome(){
   const layer=document.getElementById("welcomeLayer");
   if(!layer)return;
   layer.classList.remove("show");
   layer.setAttribute("aria-hidden","true");
-  try{localStorage.setItem("royall_result_welcome_seen","1");}catch(e){}
+  try{sessionStorage.setItem("royall_result_welcome_seen","1");}catch(e){}
 }
 
 function showWelcome(){
   const layer=document.getElementById("welcomeLayer");
   if(!layer)return;
   let seen=false;
-  try{seen=localStorage.getItem("royall_result_welcome_seen")==="1";}catch(e){}
+  try{seen=sessionStorage.getItem("royall_result_welcome_seen")==="1";}catch(e){}
   if(seen)return;
   layer.classList.add("show");
   layer.setAttribute("aria-hidden","false");
 }
 
 document.getElementById("welcomeOk").addEventListener("click",closeWelcome);
-document.getElementById("welcomeLayer").addEventListener("click",e=>{
-  if(e.target.id==="welcomeLayer")closeWelcome();
-});
+// The welcome sheet is intentionally not dismissible by tapping outside it.
+// Only the GOT IT button can close it.
 
 /* Android/browser back protection. */
 let allowExit=false;
