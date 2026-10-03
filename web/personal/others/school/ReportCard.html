@@ -3,7 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#00695c">
+<meta name="theme-color" content="#18a66a">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Result Maker</title>
 <style>
 :root{
@@ -977,7 +984,14 @@ function closeDialog(){
 }
 
 function cancelDialog(){
+  const restoreExitGuard=entryBackPending;
   closeDialog();
+
+  if(restoreExitGuard){
+    history.pushState({resultMaker:true},"",location.href);
+  }
+
+  entryBackPending=false;
 }
 
 function confirmNew(){
@@ -996,10 +1010,7 @@ function confirmNew(){
 
 /* Android/browser back protection. */
 let allowExit=false;
-
-function pushBackGuard(){
-  history.pushState({resultMakerGuard:true},"",location.href);
-}
+let entryBackPending=false;
 
 function openExitDialog(){
   openConfirm(
@@ -1010,20 +1021,12 @@ function openExitDialog(){
 }
 
 function confirmExit(){
-  /*
-   * History is: previous page -> Result Maker base -> guard.
-   * Skip both Result Maker entries so Confirm performs the real navigation.
-   */
-  if(history.length>2){
-    allowExit=true;
-    history.go(-2);
-  }
+  allowExit=true;
+  entryBackPending=false;
+  history.back();
 }
 
-/* Replace the current entry with a stable base, then add one guard entry. */
-history.replaceState({resultMakerBase:true},"",location.href);
-pushBackGuard();
-
+history.pushState({resultMaker:true},"",location.href);
 window.addEventListener("popstate",()=>{
   if(allowExit){
     allowExit=false;
@@ -1032,16 +1035,20 @@ window.addEventListener("popstate",()=>{
 
   const resultVisible=!document.getElementById("resultScreen").classList.contains("hidden");
 
-  /* Always restore the guard BEFORE showing a dialog. */
-  pushBackGuard();
-
   if(resultVisible){
+    history.pushState({resultMaker:true},"",location.href);
     openBackDialog();
     return;
   }
 
-  /* Main marks screen: Back always asks before leaving. */
-  openExitDialog();
+  // On the main marks screen, the first Back opens an exit confirmation.
+  // Cancel restores the protected history entry; Confirm performs the real Back.
+  if(!entryBackPending){
+    entryBackPending=true;
+    openExitDialog();
+  }else{
+    history.pushState({resultMaker:true},"",location.href);
+  }
 });
 
 document.getElementById("dialogLayer").addEventListener("click",e=>{
