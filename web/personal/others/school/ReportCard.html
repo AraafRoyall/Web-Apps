@@ -37,6 +37,45 @@ button{font-family:inherit}
   width:100%;height:100dvh;
   overflow:hidden;
 }
+.result-type-selector{
+  position:fixed;
+  top:calc(60dvh + 10px);
+  left:50%;
+  transform:translateX(-50%);
+  width:calc(100% - 20px);
+  max-width:748px;
+  z-index:5;
+  padding:6px;
+  background:#fff;
+  border:1px solid #d7e5e5;
+  border-radius:12px;
+  box-shadow:0 5px 14px rgba(0,0,0,.06);
+}
+.result-type-title{
+  margin:0 0 5px;
+  text-align:center;
+  font-size:11px;
+  font-weight:900;
+  color:#356565;
+  letter-spacing:.2px;
+}
+.result-type-options{display:flex;gap:5px}
+.result-type-option{flex:1;position:relative;min-width:0}
+.result-type-option input{position:absolute;opacity:0;pointer-events:none}
+.result-type-option label{
+  display:flex;align-items:center;justify-content:center;
+  min-height:36px;padding:6px 4px;
+  border:1px solid #cbdada;border-radius:9px;
+  background:#f7fafa;color:#496565;
+  font-size:11px;font-weight:900;text-align:center;
+  cursor:pointer;user-select:none;
+  transition:background .15s,border-color .15s,color .15s,box-shadow .15s;
+}
+.result-type-option input:checked + label{
+  background:#e0f2e8;border:0;color:#075d39;box-shadow:none;
+}
+.result-type-option label:active{transform:scale(.985)}
+
 .grid-wrap{
   position:fixed;
   top:0;left:0;width:100%;
@@ -291,6 +330,11 @@ button{font-family:inherit}
   margin-left:2px;
   vertical-align:baseline;
 }
+.half-yearly .session2{display:none!important}
+#entryScreen.half-yearly .entry .subject-col{width:24%}
+#entryScreen.half-yearly .entry col.session2{display:none}
+#resultScreen.half-yearly .result-table .session2{display:none!important}
+
 /* RESULT MODES */
 .result-mode-selector{
   position:fixed;
@@ -307,6 +351,7 @@ button{font-family:inherit}
   border-radius:12px;
   box-shadow:0 5px 14px rgba(0,0,0,.06);
 }
+#resultScreen.half-yearly .result-mode-selector{display:none!important;}
 .result-mode-title{
   margin:0 0 5px;
   text-align:center;
@@ -520,27 +565,41 @@ button{font-family:inherit}
   <div class="grid-wrap">
     <table class="entry">
       <colgroup>
-        <col class="subject-col"><col><col><col><col>
+        <col class="subject-col"><col><col><col class="session2"><col class="session2">
       </colgroup>
       <thead>
         <tr>
           <th class="subhead">SUBJECT</th>
           <th class="h30">30</th>
           <th class="h70">70</th>
-          <th class="h30">30</th>
-          <th class="h70">70</th>
+          <th class="h30 session2">30</th>
+          <th class="h70 session2">70</th>
         </tr>
       </thead>
       <tbody id="entryBody"></tbody>
     </table>
   </div>
 
-  <div class="credit">Provided by AbdurRahmaan 👨‍💻</div>
+  <div class="result-type-selector" aria-label="Result type">
+    <div class="result-type-title">RESULT TYPE</div>
+    <div class="result-type-options" role="radiogroup" aria-label="Result type">
+      <div class="result-type-option">
+        <input type="radio" id="typeAnnual" name="resultType" value="annual" checked onchange="setResultType(this.value)">
+        <label for="typeAnnual">ANNUAL</label>
+      </div>
+      <div class="result-type-option">
+        <input type="radio" id="typeHalfYearly" name="resultType" value="half" onchange="setResultType(this.value)">
+        <label for="typeHalfYearly">HALF YEARLY</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="credit">Feature Provided by Araaf Royall ❣️</div>
   <button class="view" onclick="showResult()">📋 VIEW RESULT</button>
 </section>
 
 <section id="resultScreen" class="hidden">
-  <div class="result-head"><h1>RESULT CARD</h1><div class="result-credit">Provided by AbdurRahmaan 👨‍💻</div></div>
+  <div class="result-head"><h1>RESULT CARD</h1><div class="result-credit">Feature Provided by Araaf Royall ❣️</div></div>
 
   <div class="report-view">
     <table class="result-table">
@@ -550,10 +609,10 @@ button{font-family:inherit}
           <th class="c30">30</th>
           <th class="c70">70</th>
           <th class="c100">100</th>
-          <th class="c30">30</th>
-          <th class="c70">70</th>
-          <th class="c100">100</th>
-          <th class="c200">200</th>
+          <th class="c30 session2">30</th>
+          <th class="c70 session2">70</th>
+          <th class="c100 session2">100</th>
+          <th class="c200 session2">200</th>
         </tr>
       </thead>
       <tbody id="reportBody"></tbody>
@@ -563,30 +622,30 @@ button{font-family:inherit}
           <td class="c30" id="g1_30">0</td>
           <td class="c70" id="g1_70">0</td>
           <td class="c100" id="g1_100">0</td>
-          <td class="c30" id="g2_30">0</td>
-          <td class="c70" id="g2_70">0</td>
-          <td class="c100" id="g2_100">0</td>
-          <td class="c200" id="g200">0</td>
+          <td class="c30 session2" id="g2_30">0</td>
+          <td class="c70 session2" id="g2_70">0</td>
+          <td class="c100 session2" id="g2_100">0</td>
+          <td class="c200 session2" id="g200">0</td>
         </tr>
         <tr class="total-row">
           <td>TOTAL</td>
           <td class="c30">270</td>
           <td class="c70">630</td>
           <td class="c100">900</td>
-          <td class="c30">270</td>
-          <td class="c70">630</td>
-          <td class="c100">900</td>
-          <td class="c200">1800</td>
+          <td class="c30 session2">270</td>
+          <td class="c70 session2">630</td>
+          <td class="c100 session2">900</td>
+          <td class="c200 session2">1800</td>
         </tr>
         <tr class="percent-row">
           <td>%</td>
           <td class="c30" id="p1_30">0.00</td>
           <td class="c70" id="p1_70">0.00</td>
           <td class="c100" id="p1_100">0.00</td>
-          <td class="c30" id="p2_30">0.00</td>
-          <td class="c70" id="p2_70">0.00</td>
-          <td class="c100" id="p2_100">0.00</td>
-          <td class="c200" id="p200">0.00</td>
+          <td class="c30 session2" id="p2_30">0.00</td>
+          <td class="c70 session2" id="p2_70">0.00</td>
+          <td class="c100 session2" id="p2_100">0.00</td>
+          <td class="c200 session2" id="p200">0.00</td>
         </tr>
       </tfoot>
     </table>
@@ -606,11 +665,11 @@ button{font-family:inherit}
         <input type="radio" id="modeFull" name="resultMode" value="full" checked onchange="setResultMode(this.value)">
         <label for="modeFull">FULL RESULT</label>
       </div>
-      <div class="result-mode-option">
+      <div class="result-mode-option" id="modeTotalsOption">
         <input type="radio" id="modeTotals" name="resultMode" value="totals" onchange="setResultMode(this.value)">
         <label for="modeTotals">100 / 200</label>
       </div>
-      <div class="result-mode-option">
+      <div class="result-mode-option" id="modePartsOption">
         <input type="radio" id="modeParts" name="resultMode" value="parts" onchange="setResultMode(this.value)">
         <label for="modeParts">30 / 70</label>
       </div>
@@ -643,7 +702,7 @@ button{font-family:inherit}
     <div class="welcome-grabber"></div>
     <h2 id="welcomeTitle" class="welcome-title">👋 Welcome to Result Maker</h2>
     <p class="welcome-text">Create a result quickly, review it in different views, and switch between the full result and marks-only layouts whenever needed.</p>
-    <div class="welcome-credit">Provided by <strong>AbdurRahmaan</strong> 👨‍💻</div>
+    <div class="welcome-credit">Provided by <strong>Araaf Royall</strong> ❣️</div>
     <div class="welcome-note"><strong>Notice:</strong> Before relying on a result, it is recommended to verify the calculations with a manual calculator at least once or twice, especially when using the app for official records.</div>
     <button id="welcomeOk" class="welcome-ok" type="button">GOT IT</button>
   </div>
@@ -664,13 +723,14 @@ subjects.forEach(name=>{
       <td class="subject">${name}</td>
       <td class="mark c30"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="30"></div></td>
       <td class="mark c70"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="70"></div></td>
-      <td class="mark c30"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="30"></div></td>
-      <td class="mark c70"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="70"></div></td>
+      <td class="mark c30 session2"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="30"></div></td>
+      <td class="mark c70 session2"><div class="edit-cell" contenteditable="true" inputmode="numeric" role="textbox" spellcheck="false" data-max="70"></div></td>
     </tr>`);
 });
 
 const cells=[...document.querySelectorAll(".edit-cell")];
 let activeIndex=0; // The one box that is currently allowed to auto-advance.
+let resultType="annual";
 
 
 function cleanValue(el){
@@ -718,6 +778,10 @@ function setActive(index,changeSequence=false){
   tr.classList.add("active-row");
 }
 
+function activeColumnCount(){
+  return resultType==="half"?2:COLS;
+}
+
 function previousIndex(index){
   const row=Math.floor(index/COLS);
   return row===0 ? -1 : index-COLS;
@@ -725,18 +789,19 @@ function previousIndex(index){
 
 function canMoveTo(index){
   if(index<0 || index>=cells.length)return false;
-
+  const col=index%COLS;
+  if(col>=activeColumnCount())return false;
   const previous=previousIndex(index);
   return previous<0 || cells[previous].textContent.trim()!=="";
 }
 
 function firstEmptyInSequence(){
-  // The entry sequence is column-wise:
-  // 30(top->bottom), 70(top->bottom), 30(top->bottom), 70(top->bottom).
-  for(let col=0;col<COLS;col++){
+  // Column-wise sequence: first 30, first 70, and in Annual mode then second 30, second 70.
+  const colCount=activeColumnCount();
+  for(let col=0;col<colCount;col++){
     for(let row=0;row<ROWS;row++){
       const index=row*COLS+col;
-      if(cells[index].textContent.trim()==="") return index;
+      if(cells[index].textContent.trim()==="")return index;
     }
   }
   return -1;
@@ -768,6 +833,7 @@ function moveToNext(index){
 
   const col=index%COLS;
   const row=Math.floor(index/COLS);
+  const colCount=activeColumnCount();
 
   // Continue vertically down the same visual column.
   if(row<ROWS-1){
@@ -780,8 +846,8 @@ function moveToNext(index){
     return;
   }
 
-  // Bottom of this column -> top of the next visual column.
-  if(col<COLS-1){
+  // Bottom of this column -> top of the next active visual column.
+  if(col<colCount-1){
     const next=col+1;
 
     if(canMoveTo(next)){
@@ -791,7 +857,7 @@ function moveToNext(index){
     return;
   }
 
-  // Absolute last mark box: dismiss keyboard and keep this box active.
+  // Last active mark box: dismiss keyboard and keep this box active.
   setActive(index);
   cells[index].blur();
   setTimeout(()=>setActive(index),30);
@@ -906,6 +972,25 @@ cells.forEach((cell,index)=>{
 
 setActive(0,true);
 
+function setResultType(type){
+  resultType=type==="half"?"half":"annual";
+  document.getElementById("entryScreen").classList.toggle("half-yearly",resultType==="half");
+
+  const annual=document.getElementById("typeAnnual");
+  const half=document.getElementById("typeHalfYearly");
+  if(annual)annual.checked=resultType==="annual";
+  if(half)half.checked=resultType==="half";
+
+  // Keep second-session data intact. The active sequence is recalculated using
+  // only the columns that are currently available in the selected mode.
+  activeIndex=firstEmptyInSequence();
+  if(activeIndex<0){
+    const lastCol=activeColumnCount()-1;
+    activeIndex=(ROWS-1)*COLS+lastCol;
+  }
+  setActive(activeIndex,true);
+}
+
 function getValue(i){
   return Number(cells[i].textContent.trim())||0;
 }
@@ -917,7 +1002,8 @@ function showResult(){
     return;
   }
 
-  const incomplete=cells.some(c=>{
+  const relevantCells=resultType==="half"?cells.filter((c,i)=>i%COLS<2):cells;
+  const incomplete=relevantCells.some(c=>{
     const text=c.textContent.trim();
     return text==="" || Number(text)===0;
   });
@@ -939,13 +1025,15 @@ function generateResult(){
   let g1_30=0,g1_70=0,g1_100=0;
   let g2_30=0,g2_70=0,g2_100=0,g200=0;
 
+  const halfYearly=resultType==="half";
+
   for(let r=0;r<ROWS;r++){
     const i=r*COLS;
 
     const a=getValue(i);
     const b=getValue(i+1);
-    const c=getValue(i+2);
-    const d=getValue(i+3);
+    const c=halfYearly?0:getValue(i+2);
+    const d=halfYearly?0:getValue(i+3);
 
     const s1_100=a+b;
     const s2_100=c+d;
@@ -965,10 +1053,10 @@ function generateResult(){
         <td class="c30">${a}</td>
         <td class="c70">${b}</td>
         <td class="c100">${s1_100}</td>
-        <td class="c30">${c}</td>
-        <td class="c70">${d}</td>
-        <td class="c100">${s2_100}</td>
-        <td class="c200">${final200}</td>
+        <td class="c30 session2">${c}</td>
+        <td class="c70 session2">${d}</td>
+        <td class="c100 session2">${s2_100}</td>
+        <td class="c200 session2">${final200}</td>
       </tr>`;
   }
 
@@ -985,26 +1073,30 @@ function generateResult(){
   document.getElementById("p1_30").textContent=((g1_30/270)*100).toFixed(2);
   document.getElementById("p1_70").textContent=((g1_70/630)*100).toFixed(2);
   document.getElementById("p1_100").textContent=((g1_100/900)*100).toFixed(2);
-  document.getElementById("p2_30").textContent=((g2_30/270)*100).toFixed(2);
-  document.getElementById("p2_70").textContent=((g2_70/630)*100).toFixed(2);
-  document.getElementById("p2_100").textContent=((g2_100/900)*100).toFixed(2);
-  document.getElementById("p200").textContent=((g200/1800)*100).toFixed(2);
+  document.getElementById("p2_30").textContent=halfYearly?"0.00":((g2_30/270)*100).toFixed(2);
+  document.getElementById("p2_70").textContent=halfYearly?"0.00":((g2_70/630)*100).toFixed(2);
+  document.getElementById("p2_100").textContent=halfYearly?"0.00":((g2_100/900)*100).toFixed(2);
+  document.getElementById("p200").textContent=halfYearly?"0.00":((g200/1800)*100).toFixed(2);
 
-  const percentage=(g200/1800)*100;
+  const percentage=halfYearly?(g1_100/900)*100:(g200/1800)*100;
   document.getElementById("pctValue").textContent=percentage.toFixed(2);
 
+  const screen=document.getElementById("resultScreen");
+  screen.classList.toggle("half-yearly",halfYearly);
   setResultMode("full");
   document.getElementById("modeFull").checked=true;
   document.getElementById("modeTotals").checked=false;
   document.getElementById("modeParts").checked=false;
+  document.getElementById("modeTotalsOption").classList.toggle("hidden",halfYearly);
+  document.getElementById("modePartsOption").classList.toggle("hidden",halfYearly);
 
   document.getElementById("entryScreen").classList.add("hidden");
-  document.getElementById("resultScreen").classList.remove("hidden");
-  document.getElementById("resultScreen").scrollTop=0;
+  screen.classList.remove("hidden");
+  screen.scrollTop=0;
 }
-
 function setResultMode(mode){
   const screen=document.getElementById("resultScreen");
+  if(screen.classList.contains("half-yearly") && mode==="totals")mode="full";
   screen.classList.remove("mode-totals","mode-parts");
   if(mode==="totals")screen.classList.add("mode-totals");
   if(mode==="parts")screen.classList.add("mode-parts");
@@ -1013,6 +1105,7 @@ function setResultMode(mode){
 function backToEdit(){
   document.getElementById("resultScreen").classList.add("hidden");
   document.getElementById("entryScreen").classList.remove("hidden");
+  document.getElementById("entryScreen").classList.toggle("half-yearly",resultType==="half");
   setActive(activeIndex);
 }
 
@@ -1110,9 +1203,14 @@ document.getElementById("welcomeOk").addEventListener("click",closeWelcome);
 // The welcome sheet is intentionally not dismissible by tapping outside it.
 // Only the GOT IT button can close it.
 
-/* Android/browser back protection. */
+/* Android/browser back protection. Works in normal Chrome and standalone PWA mode. */
 let allowExit=false;
 let entryBackPending=false;
+
+function armBackGuard(){
+  // Add one same-document history entry so Back first reaches our popstate guard.
+  history.pushState({resultMaker:true,backGuard:true},"",location.href);
+}
 
 function openExitDialog(){
   openConfirm(
@@ -1128,7 +1226,7 @@ function confirmExit(){
   history.back();
 }
 
-history.pushState({resultMaker:true},"",location.href);
+armBackGuard();
 window.addEventListener("popstate",()=>{
   if(allowExit){
     allowExit=false;
@@ -1151,6 +1249,15 @@ window.addEventListener("popstate",()=>{
   }else{
     history.pushState({resultMaker:true},"",location.href);
   }
+});
+
+/* Fallback for browsers that unload the document directly instead of
+   delivering the same-document popstate first. This covers normal Chrome
+   tabs as well as installed standalone/PWA launches. */
+window.addEventListener("beforeunload",e=>{
+  if(allowExit)return;
+  e.preventDefault();
+  e.returnValue="";
 });
 
 document.getElementById("dialogLayer").addEventListener("click",e=>{
